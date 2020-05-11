@@ -10,7 +10,7 @@
 
 ### 引入
 ```
-yarn add coord-picker #or npm i coord-picker
+yarn add coord-picker / npm i coord-picker
 依赖项：vue element-ui plain-kit
 
 全局引入：
