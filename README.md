@@ -11,13 +11,19 @@
 ### 引入
 ```
 yarn add coord-picker #or npm i coord-picker
-
 依赖项：vue element-ui plain-kit
+
+全局引入：
+import CoordPicker from 'coord-picker'
+Vue.use(CoordPicker)
+
+局部引入：
+import { CoordPicker } from 'coord-picker'
+components: { CoordPicker }
 ```
 
 ### 使用
 ```
 请参考极简demo：
 cd node_modules/coord-picker/demo
-
 ```
