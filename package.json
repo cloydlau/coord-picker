@@ -1,0 +1,47 @@
+{
+  "name": "coord-picker",
+  "version": "0.0.1",
+  "author": "cloydlau",
+  "license": "MIT",
+  "description": "A coordinates picker for amap, also available for image corner.",
+  "keywords": [
+    "地图选点",
+    "坐标抓取",
+    "手绘地图角坐标选择器",
+    "coordinates",
+    "amap"
+  ],
+  "private": false,
+  "main": "dist/coord-picker.umd.min.js",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "scripts": {
+    "dev": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lib": "vue-cli-service build --target lib --name coord-picker src/main.ts",
+    "pub": "npm run lib && yrm use npm && npm publish && yrm use taobao"
+  },
+  "dependencies": {
+    "@amap/amap-jsapi-loader": "^0.0.1",
+    "core-js": "^3.6.0",
+    "lodash": "^4.17.15",
+    "normalize.css": "^8.0.1"
+  },
+  "peerDependencies": {
+    "element-ui": "^2.13.1",
+    "plain-kit": "^0.1.22",
+    "vue": "^2.6.11"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.3.0",
+    "@vue/cli-service": "~4.3.0",
+    "element-ui": "^2.13.1",
+    "plain-kit": "^0.1.22",
+    "sass": "^1.26.0",
+    "sass-loader": "^8.0.2",
+    "vue": "^2.6.11",
+    "vue-template-compiler": "^2.6.11"
+  }
+}
