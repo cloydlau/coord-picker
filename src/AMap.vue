@@ -43,6 +43,7 @@ import Vue from 'vue'
 import { isEmpty, err, Meny } from 'plain-kit'
 import _ from 'lodash'
 import AMapLoader from '@amap/amap-jsapi-loader'
+import { apiKey, city } from './config.ts'
 
 Vue.mixin({
   methods: {
