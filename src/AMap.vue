@@ -16,22 +16,7 @@
     </div>
     <div style="display:flex;height:100%">
       <div class="drawer" v-loading="searching">
-        <!--<el-autocomplete v-model.trim="keyword"
-                         :fetch-suggestions="fetchSuggestions"
-                         placeholder="搜索"
-                         :trigger-on-focus="false"
-                         @select="search"
-                         @clear="search"
-                         clearable
-        />-->
-        <Selector v-model.trim="keyword"
-                  :loading="autoCompleting"
-                  placeholder="搜索"
-                  :search="fetchSuggestions"
-                  :options="autoCompleteList"
-                  optionKey="name/name"
-                  @change="search"
-        />
+        <input id="autoComplete" tabindex="1" v-model="keyword">
         <div v-for="(v,i) of searchResult" :key="i" class="item" @click="locate(v)">
           <h3>{{v.name}}</h3>
           <div style="margin:1rem;color:grey">{{v.address}}</div>
@@ -48,9 +33,11 @@
 
 <script>
 import Vue from 'vue'
-import { isEmpty, err, Meny, Selector } from 'plain-kit'
+import { isEmpty, err, Meny } from 'plain-kit'
 import _ from 'lodash'
 import AMapLoader from '@amap/amap-jsapi-loader'
+import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
+import autoComplete from '@tarekraafat/autocomplete.js/dist/js/autoComplete'
 import { apiKey, city } from './config.ts'
 
 Vue.mixin({
@@ -64,7 +51,6 @@ Vue.prototype._ = _
 
 export default {
   name: 'CoordPicker',
-  components: { Selector },
   props: {
     show: {
       type: Boolean,
@@ -191,8 +177,7 @@ export default {
           }).catch(e => {
             this.$err(e)
           })
-        }
-        if (!this.meny) {
+
           this.$nextTick(() => {
             this.meny = Meny.create({
               // The element that will be animated in from off screen
@@ -212,6 +197,28 @@ export default {
               // [optional] Use touch swipe events to open/close
               touch: true,
               angle: 15.5
+            })
+
+            new autoComplete({
+              data: {                              // Data src [Array, Function, Async] | (REQUIRED)
+                src: async () => this.$isEmpty(this.keyword) ? [] : await this.fetchSuggestions(),
+                key: ['name'],
+                cache: false
+              },
+              placeHolder: '搜索地点',     // Place Holder text                 | (Optional)
+              selector: '#autoComplete',           // Input field selector              | (Optional)
+              threshold: 1,                        // Min. Chars length to start Engine | (Optional)
+              debounce: 300,                       // Post duration for engine to start | (Optional)
+              searchEngine: 'loose',               // Search Engine type/mode           | (Optional)
+              resultsList: {                       // Rendered results list object      | (Optional)
+                render: true,
+              },
+              maxResults: 10,                         // Max. number of rendered results | (Optional)
+              highlight: true,                       // Highlight matching results      | (Optional)
+              onSelection: feedback => {             // Action script onSelection event | (Optional)
+                //console.log(feedback.selection.value.image_url)
+                this.search()
+              }
             })
           })
         }
@@ -248,21 +255,18 @@ export default {
       }
     },
     fetchSuggestions (queryString, cb) {
-      if (this.$isEmpty(queryString)) {
-        this.autoCompleteList = []
-      } else {
-        this.autoCompleting = true
-        this.autoComplete.search(queryString, (status, result) => {
+      return new Promise((resolve, reject) => {
+        this.autoComplete.search(this.keyword, (status, result) => {
           if (status === 'complete' && result.info === 'OK') {
-            /*cb(result.tips?.map(v => {
-              v.value = v.name
-              return v
-            }))*/
-            this.autoCompleteList = result.tips
+            resolve(result.tips || [])
+          } else if (status === 'no_data') {
+            resolve([])
+          } else {
+            this.$err(result)
+            reject()
           }
-          this.autoCompleting = false
         })
-      }
+      })
     },
     confirm () {
       this.$emit('update:lat', this.curSpot.lat)
@@ -425,6 +429,7 @@ export default {
 #map-container {
   flex: 1;
   height: 100%;
+  cursor: crosshair !important;
 }
 
 ::v-deep .el-dialog.is-fullscreen {
@@ -485,22 +490,14 @@ export default {
     background-image: linear-gradient(to left, #e6e9f0 0%, #eef1f5 100%);
     backdrop-filter: blur(4px);
 
-    .el-autocomplete, .el-select {
-      width: 100%;
-    }
-
-    .el-input input {
+    /*#autoComplete {
       border-color: #003371;
       border-radius: 20px;
     }
 
-    .el-input input::-webkit-input-placeholder {
+    #autoComplete::-webkit-input-placeholder {
       color: #003371;
-    }
-
-    .el-input {
-      margin-bottom: 16px;
-    }
+    }*/
 
     .item {
       padding: 0.5rem;

@@ -1,6 +1,6 @@
 {
   "name": "coord-picker",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "cloydlau",
   "license": "MIT",
   "description": "A coordinates picker for amap, also available for image corner.",
@@ -26,9 +26,9 @@
   },
   "dependencies": {
     "@amap/amap-jsapi-loader": "^0.0.1",
+    "@tarekraafat/autocomplete.js": "^7.2.0",
     "core-js": "^3.6.0",
-    "lodash": "^4.17.15",
-    "normalize.css": "^8.0.1"
+    "lodash": "^4.17.15"
   },
   "peerDependencies": {
     "element-ui": "^2.13.1",
