@@ -136,49 +136,51 @@ export default {
     show (newVal, oldVal) {
       if (newVal) {
         this.customClass = 'animated zoomIn'
-        AMapLoader.load({
-          'key': this.key,   // 申请好的Web端开发者Key，首次调用 load 时必填
-          'version': '2.0',   // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
-          'plugins': [
-            'AMap.ControlBar',
-            'AMap.Rectangle',
-            'AMap.RectangleEditor',
-            'AMap.Geocoder',
-            'AMap.CitySearch',
-            'AMap.AutoComplete',
-            'AMap.PlaceSearch'
-          ]
-        }).then(AMap => {
-          this.map = new AMap.Map('map-container', {
-            viewMode: '3D',
-            zoom: this.selfZoom,
-          })
-
-          this.map.on('complete', () => {
-          })
-
-          this.locate()
-
-          this.map.on('click', e => {
-            this.clearSelection()
-            this.curSpot.lng = e.lnglat.lng.toFixed(6)
-            this.curSpot.lat = e.lnglat.lat.toFixed(6)
-            this.geocoder.getAddress([this.curSpot.lng, this.curSpot.lat], (status, result) => {
-              if (status === 'complete' && result.info === 'OK') {
-                this.curSpot.address = result.regeocode?.formattedAddress || ''
-              }
+        if (!this.map) {
+          AMapLoader.load({
+            'key': this.key,   // 申请好的Web端开发者Key，首次调用 load 时必填
+            'version': '2.0',   // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
+            'plugins': [
+              'AMap.ControlBar',
+              'AMap.Rectangle',
+              'AMap.RectangleEditor',
+              'AMap.Geocoder',
+              'AMap.CitySearch',
+              'AMap.AutoComplete',
+              'AMap.PlaceSearch'
+            ]
+          }).then(AMap => {
+            this.map = new AMap.Map('map-container', {
+              viewMode: '3D',
+              zoom: this.selfZoom,
             })
-            this.drawMarker()
-          })
 
-          this.map.on('zoomchange', e => {
-            this.selfZoom = this.map.getZoom()
-          })
+            this.map.on('complete', () => {
+            })
 
-          this.map.addControl(new AMap.ControlBar())
-        }).catch(e => {
-          this.$err(e)
-        })
+            this.locate()
+
+            this.map.on('click', e => {
+              this.clearSelection()
+              this.curSpot.lng = e.lnglat.lng.toFixed(6)
+              this.curSpot.lat = e.lnglat.lat.toFixed(6)
+              this.geocoder.getAddress([this.curSpot.lng, this.curSpot.lat], (status, result) => {
+                if (status === 'complete' && result.info === 'OK') {
+                  this.curSpot.address = result.regeocode?.formattedAddress || ''
+                }
+              })
+              this.drawMarker()
+            })
+
+            this.map.on('zoomchange', e => {
+              this.selfZoom = this.map.getZoom()
+            })
+
+            this.map.addControl(new AMap.ControlBar())
+          }).catch(e => {
+            this.$err(e)
+          })
+        }
         if (!this.meny) {
           this.$nextTick(() => {
             this.meny = Meny.create({
@@ -306,8 +308,6 @@ export default {
         this.map.on('mouseup', e => {
           this.syncImg(this.rectangle.getBounds())
         })
-
-        console.log(rectangleEditor)
 
         //rectangleEditor.on('end', e => {
         //})
