@@ -16,13 +16,21 @@
     </div>
     <div style="display:flex;height:100%">
       <div class="drawer" v-loading="searching">
-        <el-autocomplete v-model.trim="keyword"
+        <!--<el-autocomplete v-model.trim="keyword"
                          :fetch-suggestions="fetchSuggestions"
                          placeholder="搜索"
                          :trigger-on-focus="false"
                          @select="search"
                          @clear="search"
                          clearable
+        />-->
+        <Selector v-model.trim="keyword"
+                  :loading="autoCompleting"
+                  placeholder="搜索"
+                  :search="fetchSuggestions"
+                  :options="autoCompleteList"
+                  optionKey="name/name"
+                  @change="search"
         />
         <div v-for="(v,i) of searchResult" :key="i" class="item" @click="locate(v)">
           <h3>{{v.name}}</h3>
@@ -40,7 +48,7 @@
 
 <script>
 import Vue from 'vue'
-import { isEmpty, err, Meny } from 'plain-kit'
+import { isEmpty, err, Meny, Selector } from 'plain-kit'
 import _ from 'lodash'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import { apiKey, city } from './config.ts'
@@ -56,6 +64,7 @@ Vue.prototype._ = _
 
 export default {
   name: 'CoordPicker',
+  components: { Selector },
   props: {
     show: {
       type: Boolean,
@@ -100,6 +109,8 @@ export default {
       geocoder: null,
       autoComplete: null,
       placeSearch: null,
+      autoCompleting: false,
+      autoCompleteList: []
     }
   },
   computed: {
@@ -237,14 +248,21 @@ export default {
       }
     },
     fetchSuggestions (queryString, cb) {
-      this.autoComplete.search(this.keyword, (status, result) => {
-        if (status === 'complete' && result.info === 'OK') {
-          cb(result.tips?.map(v => {
-            v.value = v.name
-            return v
-          }))
-        }
-      })
+      if (this.$isEmpty(queryString)) {
+        this.autoCompleteList = []
+      } else {
+        this.autoCompleting = true
+        this.autoComplete.search(queryString, (status, result) => {
+          if (status === 'complete' && result.info === 'OK') {
+            /*cb(result.tips?.map(v => {
+              v.value = v.name
+              return v
+            }))*/
+            this.autoCompleteList = result.tips
+          }
+          this.autoCompleting = false
+        })
+      }
     },
     confirm () {
       this.$emit('update:lat', this.curSpot.lat)
@@ -467,7 +485,7 @@ export default {
     background-image: linear-gradient(to left, #e6e9f0 0%, #eef1f5 100%);
     backdrop-filter: blur(4px);
 
-    .el-autocomplete {
+    .el-autocomplete, .el-select {
       width: 100%;
     }
 

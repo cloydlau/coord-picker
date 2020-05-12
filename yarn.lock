@@ -5594,10 +5594,10 @@ pkg-up@^2.0.0:
   dependencies:
     find-up "^2.1.0"
 
-plain-kit@^0.1.22:
-  version "0.1.22"
-  resolved "https://registry.npmjs.org/plain-kit/-/plain-kit-0.1.22.tgz#d107ab0523cb61f092ece96f156b9a9181dd4fdc"
-  integrity sha512-ukoAhh90DnsR7wD/ykGvXZlO1f+pHN3mGpeSTWW8kSJ08fvfWQ8KtmXp5sZnUUkps1vJ0wFbF2C8H3p8zyeZ1Q==
+plain-kit@^0.1.23:
+  version "0.1.23"
+  resolved "https://registry.npmjs.org/plain-kit/-/plain-kit-0.1.23.tgz#bd59a2bddc9456fd38e6efdbbeb88c333ec029c5"
+  integrity sha512-IOQmfeNs3FQthz4ufI0bfAbeBHFJ30pQvT2A30Te30CCf1Dy2e2bIlXwSlma9PdmMLac+p9kt2+IDnpIRv/ndA==
   dependencies:
     animate.css "^3.7.2"
     core-js "^3.6.0"

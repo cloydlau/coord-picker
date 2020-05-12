@@ -1,6 +1,6 @@
 {
   "name": "coord-picker",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": "cloydlau",
   "license": "MIT",
   "description": "A coordinates picker for amap, also available for image corner.",
@@ -8,6 +8,7 @@
     "地图选点",
     "坐标抓取",
     "手绘地图角坐标选择器",
+    "高德地图",
     "coordinates",
     "amap"
   ],
@@ -31,14 +32,14 @@
   },
   "peerDependencies": {
     "element-ui": "^2.13.1",
-    "plain-kit": "^0.1.22",
+    "plain-kit": "^0.1.23",
     "vue": "^2.6.11"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.3.0",
     "@vue/cli-service": "~4.3.0",
     "element-ui": "^2.13.1",
-    "plain-kit": "^0.1.22",
+    "plain-kit": "^0.1.23",
     "sass": "^1.26.0",
     "sass-loader": "^8.0.2",
     "vue": "^2.6.11",
