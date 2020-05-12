@@ -490,14 +490,25 @@ export default {
     background-image: linear-gradient(to left, #e6e9f0 0%, #eef1f5 100%);
     backdrop-filter: blur(4px);
 
-    /*#autoComplete {
+    #autoComplete {
       border-color: #003371;
-      border-radius: 20px;
     }
 
-    #autoComplete::-webkit-input-placeholder {
+    #autoComplete:hover {
       color: #003371;
-    }*/
+      width: 16.3rem;
+    }
+
+    #autoComplete:focus {
+      color: #003371;
+      width: 16.3rem;
+      border-color: #003371;
+      box-shadow: rgba(0, 51, 113, 0.1) 0 0 20px 5px;
+    }
+
+    #autoComplete:hover::placeholder, #autoComplete:focus::placeholder {
+      color: #003371;
+    }
 
     .item {
       padding: 0.5rem;
