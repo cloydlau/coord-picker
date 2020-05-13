@@ -9,6 +9,7 @@
                  :lng.sync="lng"
                  :lat.sync="lat"
                  :address.sync="address"
+                 :zoom.sync="zoom"
 
                  :img="img"
                  :imgNorthEastLng.sync="imgNorthEastLng"
@@ -16,7 +17,7 @@
                  :imgSouthWestLng.sync="imgSouthWestLng"
                  :imgSouthWestLat.sync="imgSouthWestLat"
 
-                 :zoom.sync="zoom"
+                 :polygon.sync="polygon"
     />
 
 
@@ -54,6 +55,9 @@
       <el-form-item label="图片西南角纬度">
         <el-input v-model="imgSouthWestLat" clearable/>
       </el-form-item>
+      <el-form-item label="多边形">
+        <el-input v-model="JSON.stringify(polygon)" clearable disabled/>
+      </el-form-item>
     </el-form>
     <div slot="footer">
       <el-button @click="show=true" type="danger">开启</el-button>
@@ -65,6 +69,7 @@
 //import CoordPicker from '../src/AMap'
 //todo: import 'coord-picker/dist/coord-picker.css'
 //todo: import {CoordPicker} from 'coord-picker'
+
 export default {
   //components: { CoordPicker },
   data () {
@@ -76,7 +81,6 @@ export default {
       show: false,
       //高德地图js api key（如果全局引入时已经传入 这里可以不传）
       apiKey: '',
-
 
       /**
        * 点位相关
@@ -90,20 +94,27 @@ export default {
       //初始城市
       city: '',
 
-
       /**
        * 图片相关
        */
       //图片地址
-      img: 'https://pic4.zhimg.com/80/v2-670a8e55fc0dcb76fc4860c18963aaa8_720w.jpg',
+      img: '',
       //图片东北角经度
-      imgNorthEastLng: '106.693901',
+      imgNorthEastLng: '',
       //图片东北角维度
-      imgNorthEastLat: '26.335105',
+      imgNorthEastLat: '',
       //图片西南角经度
-      imgSouthWestLng: '106.683712',
+      imgSouthWestLng: '',
       //图片西南角维度
-      imgSouthWestLat: '26.324563',
+      imgSouthWestLat: '',
+
+      /*polygon: [
+        { longitude: '116.368904', latitude: '39.913423' },
+        { longitude: '116.382122', latitude: '39.901176' },
+        { longitude: '116.387271', latitude: '39.912501' },
+        { longitude: '116.398258', latitude: '39.904600' },
+      ],*/
+      polygon: null,
 
       //初始缩放比例
       zoom: '',

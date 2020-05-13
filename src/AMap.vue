@@ -11,6 +11,7 @@
       <span v-text="title||'地图选点'" class="title-text"/>
       <span>
         <el-button @click="$emit('update:show', false)" round>关 闭</el-button>
+        <el-button v-if="!curPolygon" @click="drawPolygon" round>添加区域</el-button>
         <el-button type="primary" @click="confirm" round>确 定</el-button>
       </span>
     </div>
@@ -80,6 +81,9 @@ export default {
     imgNorthEastLat: [Number, String],
     imgSouthWestLng: [Number, String],
     imgSouthWestLat: [Number, String],
+    polygon: {
+      validator: value => ['Array', 'Null'].includes(({}).toString.call(value).slice(8, -1)),
+    }
   },
   data () {
     return {
@@ -93,12 +97,12 @@ export default {
       customClass: 'animated zoomIn',
       imageLayer: null,
       loading: true,
-      selfZoom: null,
       geocoder: null,
       autoComplete: null,
       placeSearch: null,
       autoCompleting: false,
-      autoCompleteList: []
+      autoCompleteList: [],
+      selfZoom: null,
     }
   },
   computed: {
@@ -120,12 +124,8 @@ export default {
         imgSouthWestLat: this.$isEmpty(this.imgSouthWestLat) ? '' : Number(this.imgSouthWestLat),
       })
     },
-    enableImgEditor () {
-      return this.img &&
-        !this.$isEmpty(this.imgNorthEastLng) &&
-        !this.$isEmpty(this.imgNorthEastLat) &&
-        !this.$isEmpty(this.imgSouthWestLng) &&
-        !this.$isEmpty(this.imgSouthWestLat)
+    curPolygon () {
+      return this.polygon
     },
     key () {
       return this.apiKey || apiKey
@@ -146,7 +146,9 @@ export default {
               'AMap.Geocoder',
               'AMap.CitySearch',
               'AMap.AutoComplete',
-              'AMap.PlaceSearch'
+              'AMap.PlaceSearch',
+              'AMap.Polygon',
+              'AMap.PolyEditor',
             ]
           }).then(AMap => {
             this.map = new AMap.Map('map-container', {
@@ -207,7 +209,7 @@ export default {
                 key: ['name'],
                 cache: false
               },
-              placeHolder: '搜索地点',     // Place Holder text                 | (Optional)
+              placeHolder: '搜索地点',              // Place Holder text                 | (Optional)
               selector: '#autoComplete',           // Input field selector              | (Optional)
               threshold: 1,                        // Min. Chars length to start Engine | (Optional)
               debounce: 300,                       // Post duration for engine to start | (Optional)
@@ -215,9 +217,9 @@ export default {
               resultsList: {                       // Rendered results list object      | (Optional)
                 render: true,
               },
-              maxResults: 10,                         // Max. number of rendered results | (Optional)
-              highlight: true,                       // Highlight matching results      | (Optional)
-              onSelection: feedback => {             // Action script onSelection event | (Optional)
+              maxResults: 10,                      // Max. number of rendered results | (Optional)
+              highlight: true,                     // Highlight matching results      | (Optional)
+              onSelection: feedback => {           // Action script onSelection event | (Optional)
                 //console.log(feedback.selection.value.image_url)
                 this.search()
               }
@@ -228,23 +230,9 @@ export default {
         this.customClass = 'animated zoomOut'
       }
     },
-    baseCity (newVal) {
-      if (newVal) {
-        this.geocoder = new AMap.Geocoder({
-          city: this.baseCity
-        })
-        this.autoComplete = new AMap.AutoComplete({
-          city: this.baseCity
-        })
-        this.placeSearch = new AMap.PlaceSearch({
-          city: this.baseCity
-        })
-        this.loading = false
-      }
-    }
   },
   created () {
-    this.selfZoom = this.zoom
+    this.selfZoom = this.zoom || 11
   },
   methods: {
     syncImg (bounds) {
@@ -275,11 +263,14 @@ export default {
       this.$emit('update:lng', this.curSpot.lng)
       this.$emit('update:address', this.curSpot.address)
       this.$emit('update:zoom', this.selfZoom)
-      if (this.enableImgEditor) {
+      if (this.img) {
         this.$emit('update:imgNorthEastLng', this.curImg.imgNorthEastLng)
         this.$emit('update:imgNorthEastLat', this.curImg.imgNorthEastLat)
         this.$emit('update:imgSouthWestLng', this.curImg.imgSouthWestLng)
         this.$emit('update:imgSouthWestLat', this.curImg.imgSouthWestLat)
+      }
+      if (this.polygon) {
+        this.$emit('update:polygon', this.curPolygon)
       }
       this.$emit('update:show', false)
     },
@@ -291,6 +282,35 @@ export default {
         this.map.remove(this.marker)
       }
     },
+    drawPolygon (polygon) {
+      let path
+      if (polygon) {
+        path = polygon.map(v => [v.longitude, v.latitude])
+      } else {
+        const { northEastLng, northEastLat, southWestLng, southWestLat } = this.getCurViewRect()
+        path = [
+          [northEastLng, northEastLat],
+          [southWestLng, southWestLat],
+          [northEastLng, southWestLat],
+          [southWestLng, northEastLat],
+        ]
+      }
+
+      const p = new AMap.Polygon({
+        map: this.map,
+        path,
+        strokeColor: '#0000ff',
+        strokeOpacity: 1,
+        strokeWeight: 3,
+        fillColor: '#f5deb3',
+        fillOpacity: 0.35
+      })
+
+      p.setMap(this.map)
+      this.polylineEditor = new AMap.PolyEditor(this.map, p)
+      this.polylineEditor.open()
+      this.map.setFitView()
+    },
     drawMarker () {
       const position = [this.curSpot.lng, this.curSpot.lat]
       this.marker = new AMap.Marker({
@@ -300,7 +320,7 @@ export default {
       this.map.panTo(position)
     },
     drawImgEditor () {
-      const editRectangle = (bounds) => {
+      const editRectangle = bounds => {
         this.rectangle = new AMap.Rectangle({
           bounds,
           strokeColor: 'red',
@@ -341,17 +361,62 @@ export default {
         this.map.setFitView()
       }
 
-      const bounds = new AMap.Bounds(
-        [this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat],
-        [this.curImg.imgNorthEastLng, this.curImg.imgNorthEastLat],
-      )
-      this.imageLayer = new AMap.ImageLayer({
-        url: this.img,
-        bounds,
-      })
-      this.map.add(this.imageLayer)
+      if (this.$isEmpty(this.curImg.imgSouthWestLng) ||
+        this.$isEmpty(this.curImg.imgSouthWestLat) ||
+        this.$isEmpty(this.curImg.imgNorthEastLng) ||
+        this.$isEmpty(this.curImg.imgNorthEastLat)
+      ) {
+        //图片角坐标不全时 定位至当前地图视野
+        this.getBaseCity(true, () => {
+          const { northEastLng, northEastLat, southWestLng, southWestLat } = this.getCurViewRect()
+          this.curImg.imgNorthEastLng = northEastLng
+          this.curImg.imgNorthEastLat = northEastLat
+          this.curImg.imgSouthWestLng = southWestLng
+          this.curImg.imgSouthWestLat = southWestLat
+          exec()
+        })
+      } else {
+        exec()
+      }
 
-      editRectangle(bounds)
+      const exec = () => {
+        const bounds = new AMap.Bounds(
+          [this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat],
+          [this.curImg.imgNorthEastLng, this.curImg.imgNorthEastLat],
+        )
+        this.imageLayer = new AMap.ImageLayer({
+          url: this.img,
+          bounds,
+        })
+        this.map.add(this.imageLayer)
+
+        editRectangle(bounds)
+      }
+    },
+    getCurViewRect () {
+      const curBounds = this.map.getBounds()
+      const northEast = curBounds.getNorthEast()
+      const southWest = curBounds.getSouthWest()
+      const lngQuarter = (northEast.lng - southWest.lng) / 4
+      const latQuarter = (northEast.lng - southWest.lng) / 4
+      return {
+        northEastLng: northEast.lng - lngQuarter,
+        northEastLat: northEast.lat - latQuarter,
+        southWestLng: southWest.lng + lngQuarter,
+        southWestLat: southWest.lat + latQuarter
+      }
+    },
+    initPlugins () {
+      this.geocoder = new AMap.Geocoder({
+        city: this.baseCity
+      })
+      this.autoComplete = new AMap.AutoComplete({
+        city: this.baseCity
+      })
+      this.placeSearch = new AMap.PlaceSearch({
+        city: this.baseCity
+      })
+      this.loading = false
     },
     locate (selectedLocation) {
       //选中搜索项
@@ -367,40 +432,56 @@ export default {
       else {
         //直辖市：['110100000000', '120100000000', '310100000000', '500100000000']
         this.baseCity = this.city || city || ''
-        const hasInitSpot = !this.$isEmpty(this.curSpot.lat) && !this.$isEmpty(this.curSpot.lng)
+        this.initPlugins()
+        let centerDesignated = false
 
-        //传了图片及其相关坐标 定位至该图片
-        if (this.enableImgEditor) {
+        //传了图片 定位至该图片
+        if (this.img) {
+          centerDesignated = true
           this.drawImgEditor()
         }
-        //传了点位坐标 定位至该点位
-        else if (hasInitSpot) {
+        //传了多边形 定位至多边形
+        else if (this.polygon && this.polygon.length > 0) {
+          centerDesignated = true
+          this.drawPolygon(this.polygon)
+        }
+        //传了点位 定位至该点位
+        else if (!this.$isEmpty(this.curSpot.lat) && !this.$isEmpty(this.curSpot.lng)) {
+          centerDesignated = true
           this.drawMarker()
         }
-        //传了城市 定位至该城市
-        else if (this.baseCity) {
+        this.getBaseCity(centerDesignated)
+      }
+    },
+    getBaseCity (centerDesignated, callback) {
+      //传了城市且未指定地图中心 定位至该城市
+      if (this.baseCity) {
+        if (!centerDesignated) {
           this.geocoder.getLocation(this.baseCity, (status, result) => {
             if (status === 'complete' && result.info === 'OK') {
               const { lng, lat } = result.geocodes[0]?.location
               if (!this.$isEmpty(lng) && !this.$isEmpty(lat)) {
-                this.map.panTo([lng, lat])
+                this.map.setCenter([lng, lat])
+                callback && callback()
               }
             }
           })
         }
-        //没有传城市 ip定位城市
-        if (!this.baseCity) {
-          const citySearch = new AMap.CitySearch()
-          citySearch.getLocalCity((status, result) => {
-            if (status === 'complete' && result.info === 'OK') {
-              this.baseCity = result.city
-              //图片和点位都没有的话 定位至该城市
-              if (!this.enableImgEditor && !hasInitSpot) {
-                this.map.setCity(this.baseCity)
-              }
+      }
+      //没有传城市 ip定位城市
+      else {
+        const citySearch = new AMap.CitySearch()
+        citySearch.getLocalCity((status, result) => {
+          if (status === 'complete' && result.info === 'OK') {
+            this.baseCity = result.city
+            this.initPlugins()
+            //未指定地图中心 定位至该城市
+            if (!centerDesignated) {
+              this.map.setCity(this.baseCity)
             }
-          })
-        }
+            callback && callback()
+          }
+        })
       }
     },
     search () {
