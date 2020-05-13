@@ -1,6 +1,6 @@
 {
   "name": "coord-picker",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "author": "cloydlau",
   "license": "MIT",
   "description": "A coordinates picker for amap, also available for image corner.",

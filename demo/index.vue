@@ -63,8 +63,8 @@
 
 <script>
 //import CoordPicker from '../src/AMap'
+//todo: import 'coord-picker/dist/coord-picker.css'
 //todo: import {CoordPicker} from 'coord-picker'
-
 export default {
   //components: { CoordPicker },
   data () {

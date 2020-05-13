@@ -7,6 +7,8 @@ import ElementUI from 'element-ui'
 Vue.use(ElementUI)
 
 import CoordPicker from '../src/main.ts'
+//import '../dist/coord-picker.css'
+//import CoordPicker from '../dist/coord-picker.umd.js'
 
 Vue.use(CoordPicker, {
     //全局高德地图js api key（权重低于props）

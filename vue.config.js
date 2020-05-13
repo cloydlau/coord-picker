@@ -4,12 +4,21 @@ module.exports = {
   pages: {
     index: {
       entry: 'demo/main.ts',
-      template: 'public/index.html',
-      filename: 'index.html'
     }
   },
-  css: { extract: false },
+  // 删除 HTML 相关的 webpack 插件
+  chainWebpack: config => {
+    config.plugins.delete('html')
+    config.plugins.delete('preload')
+    config.plugins.delete('prefetch')
+  },
+  css: {
+    extract: {
+      //filename: 'index.css',
+    }
+  },
   publicPath: './',
+  assetsDir: 'static',
   outputDir: path.resolve(__dirname, './dist'),
   configureWebpack: {
     output: {
