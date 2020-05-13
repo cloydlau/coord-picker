@@ -38,6 +38,8 @@ import _ from 'lodash'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
 import autoComplete from '@tarekraafat/autocomplete.js/dist/js/autoComplete'
+import './styles/meny-arrow.scss'
+import './styles/autocomplete.scss'
 import { apiKey, city } from './config.ts'
 
 Vue.mixin({
@@ -490,26 +492,6 @@ export default {
     background-image: linear-gradient(to left, #e6e9f0 0%, #eef1f5 100%);
     backdrop-filter: blur(4px);
 
-    #autoComplete {
-      border-color: #003371;
-    }
-
-    #autoComplete:hover {
-      color: #003371;
-      width: 16.3rem;
-    }
-
-    #autoComplete:focus {
-      color: #003371;
-      width: 16.3rem;
-      border-color: #003371;
-      box-shadow: rgba(0, 51, 113, 0.1) 0 0 20px 5px;
-    }
-
-    #autoComplete:hover::placeholder, #autoComplete:focus::placeholder {
-      color: #003371;
-    }
-
     .item {
       padding: 0.5rem;
       cursor: pointer;
@@ -519,25 +501,6 @@ export default {
       background-color: #add8e65c;
       border-radius: 25px;
     }
-  }
-}
-
-.meny-arrow {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 70px;
-  margin-top: unset; //reset default
-  border: unset; //reset default
-  top: calc(50% - 35px); //reset default
-
-  & > i {
-    font-size: 40px;
-  }
-
-  & > span {
-    font-size: 16px;
   }
 }
 </style>

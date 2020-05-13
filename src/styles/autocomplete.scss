@@ -1,0 +1,49 @@
+#autoComplete {
+  border-color: #003371;
+  caret-color: #1296db;
+  background-image: url(../assets/magnifier.svg);
+}
+
+#autoComplete:hover {
+  color: #003371;
+  width: 16.3rem;
+  background-image: url(../assets/magnifier.svg);
+}
+
+#autoComplete:focus {
+  color: #003371;
+  width: 16.3rem;
+  border-color: #003371;
+  box-shadow: rgba(0, 51, 113, 0.1) 0 0 20px 5px;
+  background-image: url(../assets/magnifier.svg);
+}
+
+#autoComplete:hover::placeholder, #autoComplete:focus::placeholder {
+  color: #003371;
+}
+
+#autoComplete:focus::selection {
+  background-color: #1296db;
+}
+
+.autoComplete_result:hover {
+  background-color: rgba(194, 233, 251, 0.02);
+  border-left: 2px solid #a1c4fd;
+  border-right: 2px solid #a1c4fd;
+}
+
+.autoComplete_result:focus {
+  background-color: rgba(194, 233, 251, 0.02);
+  border-left: 2px solid #a1c4fd;
+  border-right: 2px solid #a1c4fd;
+}
+
+.autoComplete_selected {
+  background-color: rgba(194, 233, 251, 0.02);
+  border-left: 2px solid #a1c4fd;
+  border-right: 2px solid #a1c4fd;
+}
+
+.autoComplete_highlighted {
+  color: #1296db;
+}
