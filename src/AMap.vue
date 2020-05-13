@@ -11,7 +11,6 @@
       <span v-text="title||'地图选点'" class="title-text"/>
       <span>
         <el-button @click="$emit('update:show', false)" round>关 闭</el-button>
-        <el-button v-if="!curPolygon" @click="drawPolygon" round>添加区域</el-button>
         <el-button type="primary" @click="confirm" round>确 定</el-button>
       </span>
     </div>
@@ -81,7 +80,7 @@ export default {
     imgNorthEastLat: [Number, String],
     imgSouthWestLng: [Number, String],
     imgSouthWestLat: [Number, String],
-    polygon: {
+    area: {
       validator: value => ['Array', 'Null'].includes(({}).toString.call(value).slice(8, -1)),
     }
   },
@@ -103,6 +102,9 @@ export default {
       autoCompleting: false,
       autoCompleteList: [],
       selfZoom: null,
+      contextMenu: null,
+      polygon: [],
+      polygonEditor: []
     }
   },
   computed: {
@@ -123,9 +125,6 @@ export default {
         imgSouthWestLng: this.$isEmpty(this.imgSouthWestLng) ? '' : Number(this.imgSouthWestLng),
         imgSouthWestLat: this.$isEmpty(this.imgSouthWestLat) ? '' : Number(this.imgSouthWestLat),
       })
-    },
-    curPolygon () {
-      return this.polygon
     },
     key () {
       return this.apiKey || apiKey
@@ -149,6 +148,8 @@ export default {
               'AMap.PlaceSearch',
               'AMap.Polygon',
               'AMap.PolyEditor',
+              'AMap.ContextMenu',
+              'AMap.MouseTool',
             ]
           }).then(AMap => {
             this.map = new AMap.Map('map-container', {
@@ -159,18 +160,32 @@ export default {
             this.map.on('complete', () => {
             })
 
-            this.locate()
+            this.map.on('click', this.onMapClick)
 
-            this.map.on('click', e => {
-              this.clearSelection()
-              this.curSpot.lng = e.lnglat.lng.toFixed(6)
-              this.curSpot.lat = e.lnglat.lat.toFixed(6)
-              this.geocoder.getAddress([this.curSpot.lng, this.curSpot.lat], (status, result) => {
-                if (status === 'complete' && result.info === 'OK') {
-                  this.curSpot.address = result.regeocode?.formattedAddress || ''
-                }
-              })
-              this.drawMarker()
+            this.mouseTool = new AMap.MouseTool(this.map)
+
+            this.mouseTool.on('draw', e => {
+              console.log(e)
+              if (e.obj.className === 'Overlay.Rectangle') {
+                this.rectangle = e.obj
+                this.editImg()
+              } else if (e.obj.className === 'Overlay.Polygon') {
+                this.polygon.push(e.obj)
+                this.editPolygon(this.polygon.length - 1)
+              }
+              this.map.on('click', this.onMapClick)
+              this.mouseTool.close()
+            })
+
+            this.contextMenu = new AMap.ContextMenu()
+            this.contextMenu.addItem('多边形套索', e => {
+              console.log(e)
+              this.map.off('click', this.onMapClick)
+              this.drawPolygon()
+            }, 0)
+
+            this.map.on('rightclick', e => {
+              this.contextMenu.open(this.map, e.lnglat)
             })
 
             this.map.on('zoomchange', e => {
@@ -178,6 +193,8 @@ export default {
             })
 
             this.map.addControl(new AMap.ControlBar())
+
+            this.locate()
           }).catch(e => {
             this.$err(e)
           })
@@ -235,6 +252,17 @@ export default {
     this.selfZoom = this.zoom || 11
   },
   methods: {
+    onMapClick (e) {
+      this.clearSelection()
+      this.curSpot.lng = e.lnglat.lng.toFixed(6)
+      this.curSpot.lat = e.lnglat.lat.toFixed(6)
+      this.geocoder.getAddress([this.curSpot.lng, this.curSpot.lat], (status, result) => {
+        if (status === 'complete' && result.info === 'OK') {
+          this.curSpot.address = result.regeocode?.formattedAddress || ''
+        }
+      })
+      this.drawMarker()
+    },
     syncImg (bounds) {
       if (this.imageLayer) {
         this.curImg.imgNorthEastLng = bounds.northEast.lng
@@ -282,34 +310,24 @@ export default {
         this.map.remove(this.marker)
       }
     },
-    drawPolygon (polygon) {
-      let path
-      if (polygon) {
-        path = polygon.map(v => [v.longitude, v.latitude])
-      } else {
-        const { northEastLng, northEastLat, southWestLng, southWestLat } = this.getCurViewRect()
-        path = [
-          [northEastLng, northEastLat],
-          [southWestLng, southWestLat],
-          [northEastLng, southWestLat],
-          [southWestLng, northEastLat],
-        ]
+    editPolygon (i) {
+      if (!this.polygonContextMenu) {
+        this.polygonContextMenu = new AMap.ContextMenu()
+        this.polygonContextMenu.addItem('删除', e => {
+          console.log(e)
+          this.polygon[i].setMap(null)
+          this.polygonEditor[i].setMap(null)
+          this.polygon.splice(i, 1)
+        }, 0)
       }
 
-      const p = new AMap.Polygon({
-        map: this.map,
-        path,
-        strokeColor: '#0000ff',
-        strokeOpacity: 1,
-        strokeWeight: 3,
-        fillColor: '#f5deb3',
-        fillOpacity: 0.35
+      this.polygon[i].on('rightclick', e => {
+        this.polygonContextMenu.open(this.map, e.lnglat)
       })
 
-      p.setMap(this.map)
-      this.polylineEditor = new AMap.PolyEditor(this.map, p)
-      this.polylineEditor.open()
-      this.map.setFitView()
+      this.polygon[i].setMap(this.map)
+      this.polygonEditor.push(new AMap.PolyEditor(this.map, this.polygon[i]))
+      this.polygonEditor[this.polygonEditor.length - 1].open()
     },
     drawMarker () {
       const position = [this.curSpot.lng, this.curSpot.lat]
@@ -319,23 +337,55 @@ export default {
       this.map.add(this.marker)
       this.map.panTo(position)
     },
-    drawImgEditor () {
-      const editRectangle = bounds => {
-        this.rectangle = new AMap.Rectangle({
-          bounds,
-          strokeColor: 'red',
+    drawPolygon (area) {
+      if (area) {
+        for (let i = 0; i < path.length; i++) {
+          new AMap.Polygon({
+            map: this.map,
+            path: area[i]?.data?.map(v => [v.longitude, v.latitude]),
+            strokeColor: '#0000ff',
+            strokeOpacity: 1,
+            strokeWeight: 3,
+            fillColor: '#f5deb3',
+            fillOpacity: 0.35
+          })
+          this.editPolygon(i)
+        }
+      } else {
+        this.mouseTool.polygon({
+          strokeColor: '#FF33FF',
           strokeWeight: 6,
-          strokeOpacity: 0.5,
-          strokeDasharray: [30, 10],
-          // strokeStyle还支持 solid
-          strokeStyle: 'dashed',
-          fillColor: 'transparent',
-          fillOpacity: 0,
-          cursor: 'pointer',
-          zIndex: 50,
+          strokeOpacity: 0.2,
+          fillColor: '#1791fc',
+          fillOpacity: 0.4,
+          // 线样式还支持 'dashed'
+          strokeStyle: 'solid',
+          // strokeStyle是dashed时有效
+          // strokeDasharray: [30,10],
         })
+      }
+    },
+    drawImg (bounds) {
+      this.rectangle = new AMap.Rectangle({
+        bounds,
+        strokeColor: 'red',
+        strokeWeight: 6,
+        strokeOpacity: 0.5,
+        strokeDasharray: [30, 10],
+        // strokeStyle还支持 solid
+        strokeStyle: 'dashed',
+        fillColor: 'transparent',
+        fillOpacity: 0,
+        cursor: 'pointer',
+        zIndex: 50,
+      })
 
-        this.rectangle.setMap(this.map)
+      this.rectangle.setMap(this.map)
+
+      this.editImg(bounds)
+    },
+    editImg (bounds) {
+      const editRectangle = bounds => {
 
         let rectangleEditor = new AMap.RectangleEditor(this.map, this.rectangle)
 
@@ -358,53 +408,15 @@ export default {
 
         rectangleEditor.open()
         //rectangleEditor.close()
-        this.map.setFitView()
       }
 
-      if (this.$isEmpty(this.curImg.imgSouthWestLng) ||
-        this.$isEmpty(this.curImg.imgSouthWestLat) ||
-        this.$isEmpty(this.curImg.imgNorthEastLng) ||
-        this.$isEmpty(this.curImg.imgNorthEastLat)
-      ) {
-        //图片角坐标不全时 定位至当前地图视野
-        this.getBaseCity(true, () => {
-          const { northEastLng, northEastLat, southWestLng, southWestLat } = this.getCurViewRect()
-          this.curImg.imgNorthEastLng = northEastLng
-          this.curImg.imgNorthEastLat = northEastLat
-          this.curImg.imgSouthWestLng = southWestLng
-          this.curImg.imgSouthWestLat = southWestLat
-          exec()
-        })
-      } else {
-        exec()
-      }
+      this.imageLayer = new AMap.ImageLayer({
+        url: this.img,
+        bounds,
+      })
+      this.map.add(this.imageLayer)
 
-      const exec = () => {
-        const bounds = new AMap.Bounds(
-          [this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat],
-          [this.curImg.imgNorthEastLng, this.curImg.imgNorthEastLat],
-        )
-        this.imageLayer = new AMap.ImageLayer({
-          url: this.img,
-          bounds,
-        })
-        this.map.add(this.imageLayer)
-
-        editRectangle(bounds)
-      }
-    },
-    getCurViewRect () {
-      const curBounds = this.map.getBounds()
-      const northEast = curBounds.getNorthEast()
-      const southWest = curBounds.getSouthWest()
-      const lngQuarter = (northEast.lng - southWest.lng) / 4
-      const latQuarter = (northEast.lng - southWest.lng) / 4
-      return {
-        northEastLng: northEast.lng - lngQuarter,
-        northEastLat: northEast.lat - latQuarter,
-        southWestLng: southWest.lng + lngQuarter,
-        southWestLat: southWest.lat + latQuarter
-      }
+      editRectangle(bounds)
     },
     initPlugins () {
       this.geocoder = new AMap.Geocoder({
@@ -438,12 +450,40 @@ export default {
         //传了图片 定位至该图片
         if (this.img) {
           centerDesignated = true
-          this.drawImgEditor()
+          if (this.img) {
+            if (this.$isEmpty(this.curImg.imgSouthWestLng) ||
+              this.$isEmpty(this.curImg.imgSouthWestLat) ||
+              this.$isEmpty(this.curImg.imgNorthEastLng) ||
+              this.$isEmpty(this.curImg.imgNorthEastLat)
+            ) {
+              this.contextMenu.addItem('绘制图像', e => {
+                console.log(e)
+                this.map.off('click', this.onMapClick)
+                this.mouseTool.rectangle({
+                  strokeColor: 'red',
+                  strokeOpacity: 0.5,
+                  strokeWeight: 6,
+                  fillColor: 'blue',
+                  fillOpacity: 0.5,
+                  // strokeStyle还支持 solid
+                  strokeStyle: 'solid',
+                  // strokeDasharray: [30,10],
+                })
+              }, 0)
+            } else {
+              this.drawImg([
+                [this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat],
+                [this.curImg.imgNorthEastLng, this.curImg.imgNorthEastLat],
+              ])
+              this.map.setFitView()
+            }
+          }
         }
         //传了多边形 定位至多边形
-        else if (this.polygon && this.polygon.length > 0) {
+        else if (this.area && this.area.length > 0) {
           centerDesignated = true
-          this.drawPolygon(this.polygon)
+          this.drawPolygon(this.area)
+          this.map.setFitView()
         }
         //传了点位 定位至该点位
         else if (!this.$isEmpty(this.curSpot.lat) && !this.$isEmpty(this.curSpot.lng)) {

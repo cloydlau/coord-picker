@@ -17,7 +17,7 @@
                  :imgSouthWestLng.sync="imgSouthWestLng"
                  :imgSouthWestLat.sync="imgSouthWestLat"
 
-                 :polygon.sync="polygon"
+                 :area.sync="area"
     />
 
 
@@ -56,7 +56,7 @@
         <el-input v-model="imgSouthWestLat" clearable/>
       </el-form-item>
       <el-form-item label="多边形">
-        <el-input v-model="JSON.stringify(polygon)" clearable disabled/>
+        <el-input v-model="JSON.stringify(area)" clearable disabled/>
       </el-form-item>
     </el-form>
     <div slot="footer">
@@ -98,7 +98,7 @@ export default {
        * 图片相关
        */
       //图片地址
-      img: '',
+      img: 'https://pic4.zhimg.com/80/v2-670a8e55fc0dcb76fc4860c18963aaa8_720w.jpg',
       //图片东北角经度
       imgNorthEastLng: '',
       //图片东北角维度
@@ -108,13 +108,13 @@ export default {
       //图片西南角维度
       imgSouthWestLat: '',
 
-      /*polygon: [
-        { longitude: '116.368904', latitude: '39.913423' },
+      /*area: [
+        {data:[{ longitude: '116.368904', latitude: '39.913423' },
         { longitude: '116.382122', latitude: '39.901176' },
         { longitude: '116.387271', latitude: '39.912501' },
-        { longitude: '116.398258', latitude: '39.904600' },
+        { longitude: '116.398258', latitude: '39.904600' },]}
       ],*/
-      polygon: null,
+      area: null,
 
       //初始缩放比例
       zoom: '',
