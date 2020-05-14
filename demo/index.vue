@@ -55,8 +55,8 @@
       <el-form-item label="图片西南角纬度">
         <el-input v-model="imgSouthWestLat" clearable/>
       </el-form-item>
-      <el-form-item label="多边形">
-        <el-input v-model="JSON.stringify(area)" clearable disabled/>
+      <el-form-item label="区域轮廓">
+        <span>{{area&&area.length>0?JSON.stringify(area):''}}</span>
       </el-form-item>
     </el-form>
     <div slot="footer">
@@ -98,7 +98,8 @@ export default {
        * 图片相关
        */
       //图片地址
-      img: 'https://pic4.zhimg.com/80/v2-670a8e55fc0dcb76fc4860c18963aaa8_720w.jpg',
+      //img: 'https://pic4.zhimg.com/80/v2-670a8e55fc0dcb76fc4860c18963aaa8_720w.jpg',
+      img: '',
       //图片东北角经度
       imgNorthEastLng: '',
       //图片东北角维度
@@ -108,13 +109,17 @@ export default {
       //图片西南角维度
       imgSouthWestLat: '',
 
-      /*area: [
-        {data:[{ longitude: '116.368904', latitude: '39.913423' },
-        { longitude: '116.382122', latitude: '39.901176' },
-        { longitude: '116.387271', latitude: '39.912501' },
-        { longitude: '116.398258', latitude: '39.904600' },]}
-      ],*/
-      area: null,
+      area: [{
+        'data': [{ 'longitude': 106.44294, 'latitude': 26.644338 }, {
+          'longitude': 106.431267,
+          'latitude': 26.504937
+        }, { 'longitude': 106.569282, 'latitude': 26.585405 }]
+      }, {
+        'data': [{ 'longitude': 106.623527, 'latitude': 26.52767 }, {
+          'longitude': 106.602241,
+          'latitude': 26.415188
+        }, { 'longitude': 106.721031, 'latitude': 26.472979 }]
+      }],
 
       //初始缩放比例
       zoom: '',

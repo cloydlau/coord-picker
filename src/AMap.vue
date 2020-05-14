@@ -5,7 +5,6 @@
              :show-close="false"
              @close="$emit('update:show', false)"
              :custom-class="customClass"
-             v-loading="loading"
   >
     <div slot="title" class="title">
       <span v-text="title||'地图选点'" class="title-text"/>
@@ -26,7 +25,7 @@
         <i class="el-icon-search"/>
         <span>搜索</span>
       </div>
-      <div ref="map-container" id="map-container"/>
+      <div ref="map-container" id="map-container" v-loading="loading"/>
     </div>
   </el-dialog>
 </template>
@@ -40,6 +39,8 @@ import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
 import autoComplete from '@tarekraafat/autocomplete.js/dist/js/autoComplete'
 import './styles/meny-arrow.scss'
 import './styles/autocomplete.scss'
+import polygon from '@/mixins/polygon'
+import rectangle from '@/mixins/rectangle'
 import { apiKey, city } from './config.ts'
 
 Vue.mixin({
@@ -53,6 +54,7 @@ Vue.prototype._ = _
 
 export default {
   name: 'CoordPicker',
+  mixins: [polygon, rectangle],
   props: {
     show: {
       type: Boolean,
@@ -94,7 +96,6 @@ export default {
       marker: null,
       meny: null,
       customClass: 'animated zoomIn',
-      imageLayer: null,
       loading: true,
       geocoder: null,
       autoComplete: null,
@@ -103,8 +104,6 @@ export default {
       autoCompleteList: [],
       selfZoom: null,
       contextMenu: null,
-      polygon: [],
-      polygonEditor: []
     }
   },
   computed: {
@@ -158,6 +157,51 @@ export default {
             })
 
             this.map.on('complete', () => {
+              this.$nextTick(() => {
+                this.meny = Meny.create({
+                  // The element that will be animated in from off screen
+                  menuElement: document.querySelector('.drawer'),
+                  // The contents that gets pushed aside while Meny is active
+                  contentsElement: document.querySelector('#map-container'),
+                  // [optional] The alignment of the menu (top/right/bottom/left)
+                  position: Meny.getQuery().p || 'left',
+                  // [optional] The height of the menu (when using top/bottom position)
+                  height: 200,
+                  // [optional] The width of the menu (when using left/right position)
+                  width: 384,
+                  // [optional] Distance from mouse (in pixels) when menu should open
+                  threshold: 40,
+                  // [optional] Use mouse movement to automatically open/close
+                  mouse: true,
+                  // [optional] Use touch swipe events to open/close
+                  touch: true,
+                  angle: 15.5
+                })
+
+                new autoComplete({
+                  data: {                              // Data src [Array, Function, Async] | (REQUIRED)
+                    src: async () => this.$isEmpty(this.keyword) ? [] : await this.fetchSuggestions(),
+                    key: ['name'],
+                    cache: false
+                  },
+                  placeHolder: '搜索地点',              // Place Holder text                 | (Optional)
+                  selector: '#autoComplete',           // Input field selector              | (Optional)
+                  threshold: 1,                        // Min. Chars length to start Engine | (Optional)
+                  debounce: 300,                       // Post duration for engine to start | (Optional)
+                  searchEngine: 'loose',               // Search Engine type/mode           | (Optional)
+                  resultsList: {                       // Rendered results list object      | (Optional)
+                    render: true,
+                  },
+                  maxResults: 10,                      // Max. number of rendered results | (Optional)
+                  highlight: true,                     // Highlight matching results      | (Optional)
+                  onSelection: feedback => {           // Action script onSelection event | (Optional)
+                    //console.log(feedback.selection.value.image_url)
+                    this.search()
+                  }
+                })
+
+                this.loading = false
+              })
             })
 
             this.map.on('click', this.onMapClick)
@@ -165,28 +209,35 @@ export default {
             this.mouseTool = new AMap.MouseTool(this.map)
 
             this.mouseTool.on('draw', e => {
-              console.log(e)
               if (e.obj.className === 'Overlay.Rectangle') {
+                if (this.rectangle) {
+                  this.rectangleEditor.close()
+                  this.rectangle.setMap(null)
+                }
                 this.rectangle = e.obj
-                this.editImg()
+                this.editImg(this.rectangle.getBounds())
               } else if (e.obj.className === 'Overlay.Polygon') {
-                this.polygon.push(e.obj)
-                this.editPolygon(this.polygon.length - 1)
+                this.polygon.obj.push(e.obj)
+                this.editPolygon(e.obj.getPath())
               }
-              this.map.on('click', this.onMapClick)
               this.mouseTool.close()
             })
 
             this.contextMenu = new AMap.ContextMenu()
-            this.contextMenu.addItem('多边形套索', e => {
-              console.log(e)
-              this.map.off('click', this.onMapClick)
-              this.drawPolygon()
+            this.contextMenu.addItem('坐标拾取', e => {
+              this.map.on('click', this.onMapClick)
             }, 0)
+            this.contextMenu.addItem('绘制区域', e => {
+              this.drawPolygon()
+            }, 2)
+            /*this.contextMenu.addItem('清除所有', e => {
+              this.map.clearMap()
+            }, 3)*/
 
-            this.map.on('rightclick', e => {
+            /*this.map.on('rightclick', e => {
+              this.map.off('click', this.onMapClick)
               this.contextMenu.open(this.map, e.lnglat)
-            })
+            })*/
 
             this.map.on('zoomchange', e => {
               this.selfZoom = this.map.getZoom()
@@ -197,50 +248,6 @@ export default {
             this.locate()
           }).catch(e => {
             this.$err(e)
-          })
-
-          this.$nextTick(() => {
-            this.meny = Meny.create({
-              // The element that will be animated in from off screen
-              menuElement: document.querySelector('.drawer'),
-              // The contents that gets pushed aside while Meny is active
-              contentsElement: document.querySelector('#map-container'),
-              // [optional] The alignment of the menu (top/right/bottom/left)
-              position: Meny.getQuery().p || 'left',
-              // [optional] The height of the menu (when using top/bottom position)
-              height: 200,
-              // [optional] The width of the menu (when using left/right position)
-              width: 384,
-              // [optional] Distance from mouse (in pixels) when menu should open
-              threshold: 40,
-              // [optional] Use mouse movement to automatically open/close
-              mouse: true,
-              // [optional] Use touch swipe events to open/close
-              touch: true,
-              angle: 15.5
-            })
-
-            new autoComplete({
-              data: {                              // Data src [Array, Function, Async] | (REQUIRED)
-                src: async () => this.$isEmpty(this.keyword) ? [] : await this.fetchSuggestions(),
-                key: ['name'],
-                cache: false
-              },
-              placeHolder: '搜索地点',              // Place Holder text                 | (Optional)
-              selector: '#autoComplete',           // Input field selector              | (Optional)
-              threshold: 1,                        // Min. Chars length to start Engine | (Optional)
-              debounce: 300,                       // Post duration for engine to start | (Optional)
-              searchEngine: 'loose',               // Search Engine type/mode           | (Optional)
-              resultsList: {                       // Rendered results list object      | (Optional)
-                render: true,
-              },
-              maxResults: 10,                      // Max. number of rendered results | (Optional)
-              highlight: true,                     // Highlight matching results      | (Optional)
-              onSelection: feedback => {           // Action script onSelection event | (Optional)
-                //console.log(feedback.selection.value.image_url)
-                this.search()
-              }
-            })
           })
         }
       } else {
@@ -262,15 +269,6 @@ export default {
         }
       })
       this.drawMarker()
-    },
-    syncImg (bounds) {
-      if (this.imageLayer) {
-        this.curImg.imgNorthEastLng = bounds.northEast.lng
-        this.curImg.imgNorthEastLat = bounds.northEast.lat
-        this.curImg.imgSouthWestLng = bounds.southWest.lng
-        this.curImg.imgSouthWestLat = bounds.southWest.lat
-        this.imageLayer.setBounds(bounds)
-      }
     },
     fetchSuggestions (queryString, cb) {
       return new Promise((resolve, reject) => {
@@ -297,9 +295,7 @@ export default {
         this.$emit('update:imgSouthWestLng', this.curImg.imgSouthWestLng)
         this.$emit('update:imgSouthWestLat', this.curImg.imgSouthWestLat)
       }
-      if (this.polygon) {
-        this.$emit('update:polygon', this.curPolygon)
-      }
+      this.$emit('update:area', this.polygon.area.filter(v => v))
       this.$emit('update:show', false)
     },
     clearSelection () {
@@ -310,25 +306,6 @@ export default {
         this.map.remove(this.marker)
       }
     },
-    editPolygon (i) {
-      if (!this.polygonContextMenu) {
-        this.polygonContextMenu = new AMap.ContextMenu()
-        this.polygonContextMenu.addItem('删除', e => {
-          console.log(e)
-          this.polygon[i].setMap(null)
-          this.polygonEditor[i].setMap(null)
-          this.polygon.splice(i, 1)
-        }, 0)
-      }
-
-      this.polygon[i].on('rightclick', e => {
-        this.polygonContextMenu.open(this.map, e.lnglat)
-      })
-
-      this.polygon[i].setMap(this.map)
-      this.polygonEditor.push(new AMap.PolyEditor(this.map, this.polygon[i]))
-      this.polygonEditor[this.polygonEditor.length - 1].open()
-    },
     drawMarker () {
       const position = [this.curSpot.lng, this.curSpot.lat]
       this.marker = new AMap.Marker({
@@ -336,87 +313,6 @@ export default {
       })
       this.map.add(this.marker)
       this.map.panTo(position)
-    },
-    drawPolygon (area) {
-      if (area) {
-        for (let i = 0; i < path.length; i++) {
-          new AMap.Polygon({
-            map: this.map,
-            path: area[i]?.data?.map(v => [v.longitude, v.latitude]),
-            strokeColor: '#0000ff',
-            strokeOpacity: 1,
-            strokeWeight: 3,
-            fillColor: '#f5deb3',
-            fillOpacity: 0.35
-          })
-          this.editPolygon(i)
-        }
-      } else {
-        this.mouseTool.polygon({
-          strokeColor: '#FF33FF',
-          strokeWeight: 6,
-          strokeOpacity: 0.2,
-          fillColor: '#1791fc',
-          fillOpacity: 0.4,
-          // 线样式还支持 'dashed'
-          strokeStyle: 'solid',
-          // strokeStyle是dashed时有效
-          // strokeDasharray: [30,10],
-        })
-      }
-    },
-    drawImg (bounds) {
-      this.rectangle = new AMap.Rectangle({
-        bounds,
-        strokeColor: 'red',
-        strokeWeight: 6,
-        strokeOpacity: 0.5,
-        strokeDasharray: [30, 10],
-        // strokeStyle还支持 solid
-        strokeStyle: 'dashed',
-        fillColor: 'transparent',
-        fillOpacity: 0,
-        cursor: 'pointer',
-        zIndex: 50,
-      })
-
-      this.rectangle.setMap(this.map)
-
-      this.editImg(bounds)
-    },
-    editImg (bounds) {
-      const editRectangle = bounds => {
-
-        let rectangleEditor = new AMap.RectangleEditor(this.map, this.rectangle)
-
-        rectangleEditor.on('adjust', e => {
-          this.syncImg(e.bounds)
-        })
-
-        //短距离平移触发
-        this.rectangle.on('mouseup', e => {
-          this.syncImg(this.rectangle.getBounds())
-        })
-
-        //长距离平移触发
-        this.map.on('mouseup', e => {
-          this.syncImg(this.rectangle.getBounds())
-        })
-
-        //rectangleEditor.on('end', e => {
-        //})
-
-        rectangleEditor.open()
-        //rectangleEditor.close()
-      }
-
-      this.imageLayer = new AMap.ImageLayer({
-        url: this.img,
-        bounds,
-      })
-      this.map.add(this.imageLayer)
-
-      editRectangle(bounds)
     },
     initPlugins () {
       this.geocoder = new AMap.Geocoder({
@@ -428,7 +324,6 @@ export default {
       this.placeSearch = new AMap.PlaceSearch({
         city: this.baseCity
       })
-      this.loading = false
     },
     locate (selectedLocation) {
       //选中搜索项
@@ -457,19 +352,8 @@ export default {
               this.$isEmpty(this.curImg.imgNorthEastLat)
             ) {
               this.contextMenu.addItem('绘制图像', e => {
-                console.log(e)
-                this.map.off('click', this.onMapClick)
-                this.mouseTool.rectangle({
-                  strokeColor: 'red',
-                  strokeOpacity: 0.5,
-                  strokeWeight: 6,
-                  fillColor: 'blue',
-                  fillOpacity: 0.5,
-                  // strokeStyle还支持 solid
-                  strokeStyle: 'solid',
-                  // strokeDasharray: [30,10],
-                })
-              }, 0)
+                this.mouseTool.rectangle(this.rectangleStyle)
+              }, 1)
             } else {
               this.drawImg([
                 [this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat],
@@ -493,7 +377,7 @@ export default {
         this.getBaseCity(centerDesignated)
       }
     },
-    getBaseCity (centerDesignated, callback) {
+    getBaseCity (centerDesignated) {
       //传了城市且未指定地图中心 定位至该城市
       if (this.baseCity) {
         if (!centerDesignated) {
@@ -502,7 +386,6 @@ export default {
               const { lng, lat } = result.geocodes[0]?.location
               if (!this.$isEmpty(lng) && !this.$isEmpty(lat)) {
                 this.map.setCenter([lng, lat])
-                callback && callback()
               }
             }
           })
@@ -519,7 +402,6 @@ export default {
             if (!centerDesignated) {
               this.map.setCity(this.baseCity)
             }
-            callback && callback()
           }
         })
       }
