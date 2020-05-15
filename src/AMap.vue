@@ -27,12 +27,33 @@
       </div>
       <div ref="map-container" id="map-container" v-loading="loading"/>
     </div>
+
+    <Toolbar v-if="!loading">
+      <el-tooltip effect="dark" content="坐标拾取" placement="left">
+        <a @click.stop="map.on('click', onMapClick)" class="btn">
+          <svg-icon icon-class="locate"/>
+        </a>
+      </el-tooltip>
+      <el-tooltip effect="dark" content="绘制图像" placement="left">
+        <a v-if="img" @click.stop="() => {
+          map.off('click', onMapClick)
+          mouseTool.rectangle(rectangleStyle)
+        }" class="btn">
+          <svg-icon icon-class="draw-img"/>
+        </a>
+      </el-tooltip>
+      <el-tooltip effect="dark" content="绘制区域" placement="left">
+        <a v-if="boundary" @click.stop="()=>{drawPolygon()}" class="btn">
+          <svg-icon icon-class="draw-polygon"/>
+        </a>
+      </el-tooltip>
+    </Toolbar>
   </el-dialog>
 </template>
 
 <script>
 import Vue from 'vue'
-import { isEmpty, err, Meny } from 'plain-kit'
+import { isEmpty, err, Meny, SvgIcon } from 'plain-kit'
 import _ from 'lodash'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
@@ -41,7 +62,12 @@ import './styles/meny-arrow.scss'
 import './styles/autocomplete.scss'
 import polygon from '@/mixins/polygon'
 import rectangle from '@/mixins/rectangle'
+import Toolbar from '@/components/Toolbar'
 import { apiKey, city } from './config.ts'
+
+const requireAll = requireContext => requireContext.keys().map(requireContext)
+requireAll(require.context('@/assets/svg-sprite', false, /\.svg$/))
+Vue.component('SvgIcon', SvgIcon)
 
 Vue.mixin({
   methods: {
@@ -55,6 +81,7 @@ Vue.prototype._ = _
 export default {
   name: 'CoordPicker',
   mixins: [polygon, rectangle],
+  components: { Toolbar },
   props: {
     show: {
       type: Boolean,
@@ -82,9 +109,9 @@ export default {
     imgNorthEastLat: [Number, String],
     imgSouthWestLng: [Number, String],
     imgSouthWestLat: [Number, String],
-    area: {
-      validator: value => ['Array', 'Null'].includes(({}).toString.call(value).slice(8, -1)),
-    }
+    boundary: {
+      validator: value => ['Array'].includes(({}).toString.call(value).slice(8, -1)),
+    },
   },
   data () {
     return {
@@ -93,17 +120,16 @@ export default {
       searchResult: [],
       baseCity: '',
       map: null,
+      loading: true,
       marker: null,
       meny: null,
       customClass: 'animated zoomIn',
-      loading: true,
       geocoder: null,
       autoComplete: null,
       placeSearch: null,
       autoCompleting: false,
       autoCompleteList: [],
       selfZoom: null,
-      contextMenu: null,
     }
   },
   computed: {
@@ -115,14 +141,6 @@ export default {
         lng: this.$isEmpty(this.lng) ? '' : Number(this.lng),
         lat: this.$isEmpty(this.lat) ? '' : Number(this.lat),
         address: this.address || ((this.$isEmpty(this.lng) && this.$isEmpty(this.lat)) ? this.baseCity : '')
-      })
-    },
-    curImg () {
-      return Vue.observable({
-        imgNorthEastLng: this.$isEmpty(this.imgNorthEastLng) ? '' : Number(this.imgNorthEastLng),
-        imgNorthEastLat: this.$isEmpty(this.imgNorthEastLat) ? '' : Number(this.imgNorthEastLat),
-        imgSouthWestLng: this.$isEmpty(this.imgSouthWestLng) ? '' : Number(this.imgSouthWestLng),
-        imgSouthWestLat: this.$isEmpty(this.imgSouthWestLat) ? '' : Number(this.imgSouthWestLat),
       })
     },
     key () {
@@ -217,27 +235,11 @@ export default {
                 this.rectangle = e.obj
                 this.editImg(this.rectangle.getBounds())
               } else if (e.obj.className === 'Overlay.Polygon') {
-                this.polygon.obj.push(e.obj)
-                this.editPolygon(e.obj.getPath())
+                this.polygonObj.push(e.obj)
+                this.editPolygon()
               }
               this.mouseTool.close()
             })
-
-            this.contextMenu = new AMap.ContextMenu()
-            this.contextMenu.addItem('坐标拾取', e => {
-              this.map.on('click', this.onMapClick)
-            }, 0)
-            this.contextMenu.addItem('绘制区域', e => {
-              this.drawPolygon()
-            }, 2)
-            /*this.contextMenu.addItem('清除所有', e => {
-              this.map.clearMap()
-            }, 3)*/
-
-            /*this.map.on('rightclick', e => {
-              this.map.off('click', this.onMapClick)
-              this.contextMenu.open(this.map, e.lnglat)
-            })*/
 
             this.map.on('zoomchange', e => {
               this.selfZoom = this.map.getZoom()
@@ -295,7 +297,10 @@ export default {
         this.$emit('update:imgSouthWestLng', this.curImg.imgSouthWestLng)
         this.$emit('update:imgSouthWestLat', this.curImg.imgSouthWestLat)
       }
-      this.$emit('update:area', this.polygon.area.filter(v => v))
+      if (this.boundary) {
+        this.syncPolygon()
+        this.$emit('update:boundary', this.curBoundary)
+      }
       this.$emit('update:show', false)
     },
     clearSelection () {
@@ -343,30 +348,23 @@ export default {
         let centerDesignated = false
 
         //传了图片 定位至该图片
-        if (this.img) {
+        if (this.img &&
+          !this.$isEmpty(this.curImg.imgSouthWestLng) &&
+          !this.$isEmpty(this.curImg.imgSouthWestLat) &&
+          !this.$isEmpty(this.curImg.imgNorthEastLng) &&
+          !this.$isEmpty(this.curImg.imgNorthEastLat)
+        ) {
           centerDesignated = true
-          if (this.img) {
-            if (this.$isEmpty(this.curImg.imgSouthWestLng) ||
-              this.$isEmpty(this.curImg.imgSouthWestLat) ||
-              this.$isEmpty(this.curImg.imgNorthEastLng) ||
-              this.$isEmpty(this.curImg.imgNorthEastLat)
-            ) {
-              this.contextMenu.addItem('绘制图像', e => {
-                this.mouseTool.rectangle(this.rectangleStyle)
-              }, 1)
-            } else {
-              this.drawImg([
-                [this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat],
-                [this.curImg.imgNorthEastLng, this.curImg.imgNorthEastLat],
-              ])
-              this.map.setFitView()
-            }
-          }
+          this.drawImg([
+            [this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat],
+            [this.curImg.imgNorthEastLng, this.curImg.imgNorthEastLat],
+          ])
+          this.map.setFitView()
         }
         //传了多边形 定位至多边形
-        else if (this.area && this.area.length > 0) {
+        else if (this.boundary && this.boundary.length > 0) {
           centerDesignated = true
-          this.drawPolygon(this.area)
+          this.drawPolygon(this.boundary)
           this.map.setFitView()
         }
         //传了点位 定位至该点位

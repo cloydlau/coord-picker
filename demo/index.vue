@@ -17,7 +17,7 @@
                  :imgSouthWestLng.sync="imgSouthWestLng"
                  :imgSouthWestLat.sync="imgSouthWestLat"
 
-                 :area.sync="area"
+                 :boundary.sync="boundary"
     />
 
 
@@ -56,7 +56,7 @@
         <el-input v-model="imgSouthWestLat" clearable/>
       </el-form-item>
       <el-form-item label="区域轮廓">
-        <span>{{area&&area.length>0?JSON.stringify(area):''}}</span>
+        <el-input :value="boundary&&boundary.length>0?JSON.stringify(boundary):''" disabled/>
       </el-form-item>
     </el-form>
     <div slot="footer">
@@ -71,7 +71,6 @@
 //todo: import {CoordPicker} from 'coord-picker'
 
 export default {
-  //components: { CoordPicker },
   data () {
     return {
       /**
@@ -98,8 +97,8 @@ export default {
        * 图片相关
        */
       //图片地址
-      //img: 'https://pic4.zhimg.com/80/v2-670a8e55fc0dcb76fc4860c18963aaa8_720w.jpg',
-      img: '',
+      img: 'https://pic4.zhimg.com/80/v2-670a8e55fc0dcb76fc4860c18963aaa8_720w.jpg',
+      //img: '',
       //图片东北角经度
       imgNorthEastLng: '',
       //图片东北角维度
@@ -109,7 +108,7 @@ export default {
       //图片西南角维度
       imgSouthWestLat: '',
 
-      area: [{
+      /*boundary: [{
         'data': [{ 'longitude': 106.44294, 'latitude': 26.644338 }, {
           'longitude': 106.431267,
           'latitude': 26.504937
@@ -119,7 +118,8 @@ export default {
           'longitude': 106.602241,
           'latitude': 26.415188
         }, { 'longitude': 106.721031, 'latitude': 26.472979 }]
-      }],
+      }],*/
+      boundary: null,
 
       //初始缩放比例
       zoom: '',

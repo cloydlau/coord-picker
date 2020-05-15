@@ -1,5 +1,9 @@
 const path = require('path')
 
+function resolve (dir) {
+  return path.join(__dirname, dir)
+}
+
 module.exports = {
   pages: {
     index: {
@@ -11,6 +15,22 @@ module.exports = {
     config.plugins.delete('html')
     config.plugins.delete('preload')
     config.plugins.delete('prefetch')
+
+    config.module
+      .rule('svg')
+      .exclude.add(resolve('src/assets/svg-sprite'))
+      .end()
+    config.module
+      .rule('svg-sprite')
+      .test(/\.svg$/)
+      .include.add(resolve('src/assets/svg-sprite'))
+      .end()
+      .use('svg-sprite-loader')
+      .loader('svg-sprite-loader')
+      .options({
+        symbolId: 'icon-[name]'
+      })
+      .end()
   },
   css: {
     extract: {

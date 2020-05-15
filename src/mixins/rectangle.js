@@ -1,3 +1,4 @@
+import Vue from 'vue'
 export default {
   data () {
     return {
@@ -15,6 +16,16 @@ export default {
       rectangle: null,
       rectangleEditor: null,
     }
+  },
+  computed: {
+    curImg () {
+      return Vue.observable({
+        imgNorthEastLng: this.$isEmpty(this.imgNorthEastLng) ? '' : Number(this.imgNorthEastLng),
+        imgNorthEastLat: this.$isEmpty(this.imgNorthEastLat) ? '' : Number(this.imgNorthEastLat),
+        imgSouthWestLng: this.$isEmpty(this.imgSouthWestLng) ? '' : Number(this.imgSouthWestLng),
+        imgSouthWestLat: this.$isEmpty(this.imgSouthWestLat) ? '' : Number(this.imgSouthWestLat),
+      })
+    },
   },
   methods: {
     syncImgBounds (bounds) {

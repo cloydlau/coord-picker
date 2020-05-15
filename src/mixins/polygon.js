@@ -1,3 +1,4 @@
+import Vue from 'vue'
 export default {
   data () {
     return {
@@ -11,56 +12,58 @@ export default {
         cursor: 'pointer',
         zIndex: 50,
       },
-      polygon: {
-        obj: [],
-        editor: [],
-        area: [],
-        contextMenu: null
-      },
+      polygonObj: [],
+      polygonEditor: [],
+      curBoundary: []
     }
   },
   methods: {
-    drawPolygon (area) {
-      if (area) {
-        for (let i = 0; i < area.length; i++) {
-          this.polygon.obj.push(new AMap.Polygon({
+    syncPolygon () {
+      //同步可能经过删除、节点变化的多边形
+      this.curBoundary = []
+      this.polygonObj.map(v => {
+        if (v) {
+          this.curBoundary.push({
+            data: Array.from(v.getPath(), v => ({ longitude: v.lng, latitude: v.lat }))
+          })
+        }
+      })
+    },
+    drawPolygon (boundary) {
+      console.log(boundary)
+      if (boundary) {
+        for (let i = 0; i < boundary.length; i++) {
+          this.polygonObj.push(new AMap.Polygon({
             ...this.polygonStyle,
             map: this.map,
-            path: area[i]?.data?.map(v => [v.longitude, v.latitude]),
+            path: boundary[i]?.data?.map(v => [v.longitude, v.latitude]),
           }))
           this.editPolygon()
         }
       } else {
+        this.map.off('click', this.onMapClick)
         this.mouseTool.polygon(this.polygonStyle)
       }
     },
-    editPolygon (path) {
-      if (path) {
-        this.polygon.area.push({
-          data: path.map(v => ({ longitude: v.lng, latitude: v.lat }))
-        })
-      }
-      const i = this.polygon.obj.length - 1
-      let polygon = this.polygon.obj[i]
+    editPolygon () {
+      const i = this.polygonObj.length - 1
+      let polygon = this.polygonObj[i]
 
-      /*const polygonContextMenu = new AMap.ContextMenu()
+      const polygonContextMenu = new AMap.ContextMenu()
       polygonContextMenu.addItem('删除', e => {
-        this.polygon.area[i] = null
-        this.polygon.editor[i].close()
-        this.polygon.editor[i] = null
-        polygon.setMap(null)
-        polygon = null
+        this.polygonEditor[i].close()
+        this.polygonEditor[i] = null
+        this.polygonObj[i].setMap(null)
+        this.polygonObj[i] = null
       }, 0)
 
       polygon.on('rightclick', e => {
-        console.log(e.lnglat)
-        console.log(polygonContextMenu)
         polygonContextMenu.open(this.map, e.lnglat)
-      })*/
+      })
 
       polygon.setMap(this.map)
-      this.polygon.editor.push(new AMap.PolyEditor(this.map, polygon))
-      this.polygon.editor[i].open()
+      this.polygonEditor.push(new AMap.PolyEditor(this.map, polygon))
+      this.polygonEditor[i].open()
     },
   }
 }
