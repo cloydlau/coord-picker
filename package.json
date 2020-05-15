@@ -11,7 +11,8 @@
     "腾讯地图",
     "coordinate",
     "coordinates",
-    "amap"
+    "amap",
+    "tmap"
   ],
   "private": false,
   "main": "dist/coord-picker.umd.min.js",
