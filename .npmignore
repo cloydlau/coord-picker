@@ -26,3 +26,5 @@ vue.config.js
 babel.config.js
 .browserslistrc
 tsconfig.json
+.env.development
+/preview.*

@@ -1,77 +1,52 @@
 <template>
   <div class="toolbar">
-    <a :class="{active: showMore}" @click="showMore=!showMore" class="more">
-      <svg-icon icon-class="more"/>
+    <div class="panel">
       <slot/>
-    </a>
+    </div>
   </div>
 </template>
-
-<script>
-export default {
-  data () {
-    return {
-      showMore: false
-    }
-  },
-}
-</script>
 
 <style lang="scss" scoped>
 $btnSize: 24px;
 .toolbar {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  height: 40px;
+  background: #ffffff96;
+  border-color: #003371;
+
   & ::v-deep svg {
     width: 100%;
     height: 100%;
     cursor: pointer;
   }
-}
 
-.more {
-  width: 40px;
-  height: 40px;
-  display: block;
-  position: fixed;
-  top: 15px;
-  right: 15px;
-  z-index: 9999;
-  transition: 0.5s;
-  transform: rotate3d(0, 0, 1, 180deg);
+  .panel {
+    position: absolute;
+    top: 0;
+    right: 20px;
+    height: 100%;
+    border-radius: 20px;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 15px;
+    border: 2px solid #0033714a;
 
-  &.active {
-    transform: rotate3d(0, 0, 1, 0deg);
+    & > a {
+      width: $btnSize;
+      height: $btnSize;
+      transition: 0.5s;
+      display: inline-block;
+      padding: 0 10px;
 
-    .btn, {
-      opacity: 1;
+      &:hover {
+        transform: scale3d(1.4, 1.4, 1);
+      }
     }
-  }
-}
-
-.btn {
-  width: $btnSize;
-  height: $btnSize;
-  transition: 0.5s;
-  display: block;
-  position: absolute;
-  opacity: 0;
-
-  &:hover {
-    transform: scale3d(1.4, 1.4, 1);
-  }
-
-  &:first-of-type {
-    bottom: 30%;
-    left: -80%;
-  }
-
-  &:nth-of-type(2) {
-    bottom: -50%;
-    left: -50%;
-  }
-
-  &:nth-of-type(3) {
-    bottom: -85%;
-    right: 10%;
   }
 }
 </style>

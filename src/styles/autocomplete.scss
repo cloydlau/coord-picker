@@ -1,3 +1,14 @@
+.autoComplete-wrapper {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+}
+
+#autoComplete_list {
+  position: absolute;
+}
+
 #autoComplete {
   border-color: #003371;
   caret-color: #1296db;
@@ -6,13 +17,13 @@
 
 #autoComplete:hover {
   color: #003371;
-  width: 16.3rem;
+  width: 250px;
   background-image: url(../assets/magnifier.svg);
 }
 
 #autoComplete:focus {
   color: #003371;
-  width: 16.3rem;
+  width: 250px;
   border-color: #003371;
   box-shadow: rgba(0, 51, 113, 0.1) 0 0 20px 5px;
   background-image: url(../assets/magnifier.svg);
@@ -27,19 +38,19 @@
 }
 
 .autoComplete_result:hover {
-  background-color: rgba(194, 233, 251, 0.02);
+  background-color: rgba(194, 233, 251, 0.8);
   border-left: 2px solid #a1c4fd;
   border-right: 2px solid #a1c4fd;
 }
 
 .autoComplete_result:focus {
-  background-color: rgba(194, 233, 251, 0.02);
+  background-color: rgba(194, 233, 251, 0.8);
   border-left: 2px solid #a1c4fd;
   border-right: 2px solid #a1c4fd;
 }
 
 .autoComplete_selected {
-  background-color: rgba(194, 233, 251, 0.02);
+  background-color: rgba(194, 233, 251, 0.8);
   border-left: 2px solid #a1c4fd;
   border-right: 2px solid #a1c4fd;
 }

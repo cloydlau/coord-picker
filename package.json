@@ -1,14 +1,16 @@
 {
   "name": "coord-picker",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "author": "cloydlau",
   "license": "MIT",
-  "description": "A coordinates picker for amap/tmap.",
+  "description": "高德/腾讯地图坐标拾取器 / A coordinates picker for amap/tmap",
   "keywords": [
     "地图选点",
     "坐标拾取",
     "高德地图",
     "腾讯地图",
+    "多边形",
+    "轮廓",
     "coordinate",
     "coordinates",
     "amap",
@@ -34,14 +36,14 @@
   },
   "peerDependencies": {
     "element-ui": "^2.13.1",
-    "plain-kit": "^0.2.0",
+    "plain-kit": "^0.2.2",
     "vue": "^2.6.11"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.3.0",
     "@vue/cli-service": "~4.3.0",
     "element-ui": "^2.13.1",
-    "plain-kit": "^0.2.0",
+    "plain-kit": "^0.2.2",
     "sass": "^1.26.0",
     "sass-loader": "^8.0.2",
     "svg-sprite-loader": "^5.0.0",

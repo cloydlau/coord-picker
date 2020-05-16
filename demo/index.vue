@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :visible.sync="showDialog" :close-on-click-modal="false" title="地图选点">
+  <el-dialog :visible.sync="showDialog" :close-on-click-modal="false" title="坐标拾取">
 
 
     <CoordPicker :show.sync="show"
@@ -101,14 +101,14 @@ export default {
       //img: '',
       //图片东北角经度
       imgNorthEastLng: '',
-      //图片东北角维度
+      //图片东北角纬度
       imgNorthEastLat: '',
       //图片西南角经度
       imgSouthWestLng: '',
-      //图片西南角维度
+      //图片西南角纬度
       imgSouthWestLat: '',
 
-      /*boundary: [{
+      boundary: [{
         'data': [{ 'longitude': 106.44294, 'latitude': 26.644338 }, {
           'longitude': 106.431267,
           'latitude': 26.504937
@@ -118,8 +118,8 @@ export default {
           'longitude': 106.602241,
           'latitude': 26.415188
         }, { 'longitude': 106.721031, 'latitude': 26.472979 }]
-      }],*/
-      boundary: null,
+      }],
+      //boundary: null,
 
       //初始缩放比例
       zoom: '',

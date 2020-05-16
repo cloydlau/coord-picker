@@ -71,7 +71,7 @@ export default {
       marker: null,
       zoom: 11,
       meny: null,
-      customClass: 'animated zoomIn'
+      customClass: 'animate__animated animate__zoomIn'
     }
   },
   computed: {
@@ -92,7 +92,7 @@ export default {
   watch: {
     show (newVal, oldVal) {
       if (newVal) {
-        this.customClass = 'animated zoomIn'
+        this.customClass = 'animate__animated animate__zoomIn'
         if (!this.map) {
           if (window.qq) {
             this.$nextTick(__initCoordPicker)
@@ -126,7 +126,7 @@ export default {
           })
         }
       } else {
-        this.customClass = 'animated zoomOut'
+        this.customClass = 'animate__animated animate__zoomOut'
       }
     }
   },

@@ -7,44 +7,58 @@
              :custom-class="customClass"
   >
     <div slot="title" class="title">
-      <span v-text="title||'地图选点'" class="title-text"/>
-      <span>
-        <el-button @click="$emit('update:show', false)" round>关 闭</el-button>
-        <el-button type="primary" @click="confirm" round>确 定</el-button>
-      </span>
+      <span v-text="title||'坐标拾取'" class="title-text"/>
     </div>
-    <div style="display:flex;height:100%">
-      <div class="drawer" v-loading="searching">
+    <div style="height:100%">
+      <div class="autoComplete-wrapper">
         <input id="autoComplete" tabindex="1" v-model="keyword">
-        <div v-for="(v,i) of searchResult" :key="i" class="item" @click="locate(v)">
-          <h3>{{v.name}}</h3>
-          <div style="margin:1rem;color:grey">{{v.address}}</div>
-        </div>
       </div>
-      <div class="meny-arrow">
+      <transition enter-active-class="animate__animated animate__backInLeft"
+                  leave-active-class="animate__animated animate__backOutLeft">
+        <div v-loading="searching"
+             class="drawer"
+             v-show="searchResult.length>0"
+        >
+          <div v-for="(v,i) of searchResult" :key="i" class="item" @click="locate(v)">
+            <h3>{{v.name}}</h3>
+            <div style="margin:1rem;color:grey">{{v.address}}</div>
+          </div>
+        </div>
+      </transition>
+      <!--<div class="meny-arrow">
         <i class="el-icon-search"/>
         <span>搜索</span>
-      </div>
+      </div>-->
       <div ref="map-container" id="map-container" v-loading="loading"/>
     </div>
 
     <Toolbar v-if="!loading">
-      <el-tooltip effect="dark" content="坐标拾取" placement="left">
-        <a @click.stop="map.on('click', onMapClick)" class="btn">
+      <el-tooltip effect="dark" content="打点" placement="bottom">
+        <a @click.stop="map.on('click', onMapClick)">
           <svg-icon icon-class="locate"/>
         </a>
       </el-tooltip>
-      <el-tooltip effect="dark" content="绘制图像" placement="left">
+      <el-tooltip effect="dark" content="绘制图像" placement="bottom">
         <a v-if="img" @click.stop="() => {
           map.off('click', onMapClick)
           mouseTool.rectangle(rectangleStyle)
-        }" class="btn">
+        }">
           <svg-icon icon-class="draw-img"/>
         </a>
       </el-tooltip>
-      <el-tooltip effect="dark" content="绘制区域" placement="left">
-        <a v-if="boundary" @click.stop="()=>{drawPolygon()}" class="btn">
+      <el-tooltip effect="dark" content="绘制区域" placement="bottom">
+        <a v-if="boundary" @click.stop="()=>{drawPolygon()}">
           <svg-icon icon-class="draw-polygon"/>
+        </a>
+      </el-tooltip>
+      <el-tooltip effect="dark" content="退出" placement="bottom">
+        <a @click.stop="$emit('update:show', false)">
+          <svg-icon icon-class="close"/>
+        </a>
+      </el-tooltip>
+      <el-tooltip effect="dark" content="确定" placement="bottom">
+        <a @click.stop="confirm">
+          <svg-icon icon-class="save"/>
         </a>
       </el-tooltip>
     </Toolbar>
@@ -53,12 +67,12 @@
 
 <script>
 import Vue from 'vue'
-import { isEmpty, err, Meny, SvgIcon } from 'plain-kit'
+import { isEmpty, err, SvgIcon } from 'plain-kit'
 import _ from 'lodash'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
 import autoComplete from '@tarekraafat/autocomplete.js/dist/js/autoComplete'
-import './styles/meny-arrow.scss'
+//import './styles/meny-arrow.scss'
 import './styles/autocomplete.scss'
 import polygon from '@/mixins/polygon'
 import rectangle from '@/mixins/rectangle'
@@ -122,8 +136,8 @@ export default {
       map: null,
       loading: true,
       marker: null,
-      meny: null,
-      customClass: 'animated zoomIn',
+      //meny: null,
+      customClass: 'animate__animated animate__zoomIn',
       geocoder: null,
       autoComplete: null,
       placeSearch: null,
@@ -150,13 +164,13 @@ export default {
   watch: {
     show (newVal, oldVal) {
       if (newVal) {
-        this.customClass = 'animated zoomIn'
+        this.customClass = 'animate__animated animate__zoomIn'
         if (!this.map) {
           AMapLoader.load({
             'key': this.key,   // 申请好的Web端开发者Key，首次调用 load 时必填
             'version': '2.0',   // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
             'plugins': [
-              'AMap.ControlBar',
+              //'AMap.ControlBar',
               'AMap.Rectangle',
               'AMap.RectangleEditor',
               'AMap.Geocoder',
@@ -176,7 +190,7 @@ export default {
 
             this.map.on('complete', () => {
               this.$nextTick(() => {
-                this.meny = Meny.create({
+                /*this.meny = Meny.create({
                   // The element that will be animated in from off screen
                   menuElement: document.querySelector('.drawer'),
                   // The contents that gets pushed aside while Meny is active
@@ -194,11 +208,18 @@ export default {
                   // [optional] Use touch swipe events to open/close
                   touch: true,
                   angle: 15.5
-                })
+                })*/
 
                 new autoComplete({
                   data: {                              // Data src [Array, Function, Async] | (REQUIRED)
-                    src: async () => this.$isEmpty(this.keyword) ? [] : await this.fetchSuggestions(),
+                    src: async () => {
+                      if (this.$isEmpty(this.keyword)) {
+                        this.searchResult = []
+                        return []
+                      } else {
+                        return await this.fetchSuggestions()
+                      }
+                    },
                     key: ['name'],
                     cache: false
                   },
@@ -245,7 +266,7 @@ export default {
               this.selfZoom = this.map.getZoom()
             })
 
-            this.map.addControl(new AMap.ControlBar())
+            //this.map.addControl(new AMap.ControlBar())
 
             this.locate()
           }).catch(e => {
@@ -253,7 +274,7 @@ export default {
           })
         }
       } else {
-        this.customClass = 'animated zoomOut'
+        this.customClass = 'animate__animated animate__zoomOut'
       }
     },
   },
@@ -334,7 +355,7 @@ export default {
       //选中搜索项
       if (selectedLocation) {
         this.clearSelection()
-        this.meny.close()
+        //this.meny.close()
         this.curSpot.lat = selectedLocation.location.lat
         this.curSpot.lng = selectedLocation.location.lng
         this.curSpot.address = (selectedLocation.address || '') + (selectedLocation.title || '')
@@ -430,8 +451,8 @@ export default {
 
 <style lang="scss" scoped>
 #map-container {
-  flex: 1;
   height: 100%;
+  width: 100%;
   cursor: crosshair !important;
 }
 
@@ -465,11 +486,13 @@ export default {
       text-overflow: ellipsis;
       white-space: normal;
       word-break: break-all;
-      display: -webkit-box;
+      //display: -webkit-box;
+      text-align: center;
       //-webkit-box-orient: vertical;
       -webkit-line-clamp: 1;
       overflow: hidden;
-      line-height: normal;
+      line-height: 22px;
+      font-size: 22px;
       flex: 1;
       color: #003371;
     }
@@ -490,17 +513,52 @@ export default {
     padding: 1rem;
     position: absolute;
     z-index: 1;
-    background-image: linear-gradient(to left, #e6e9f0 0%, #eef1f5 100%);
-    backdrop-filter: blur(4px);
+    //background-image: linear-gradient(to left, #e6e9f0 0%, #eef1f5 100%);
+    backdrop-filter: blur(2px);
+    background-color: #f7f7f7ab;
 
     .item {
       padding: 0.5rem;
       cursor: pointer;
+
+      &:first-of-type {
+        margin-top: 60px;
+      }
+
+      &:last-of-type {
+        margin-bottom: 60px;
+      }
+
+      &:hover {
+        background-color: #add8e69e;
+        border-radius: 25px;
+      }
     }
 
-    .item:hover {
-      background-color: #add8e65c;
-      border-radius: 25px;
+    &::-webkit-scrollbar {
+      width: 10px;
+      height: 1px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 10px;
+      background-color: skyblue;
+      background-image: -webkit-linear-gradient(
+                      45deg,
+                      rgba(255, 255, 255, 0.2) 25%,
+                      transparent 25%,
+                      transparent 50%,
+                      rgba(255, 255, 255, 0.2) 50%,
+                      rgba(255, 255, 255, 0.2) 75%,
+                      transparent 75%,
+                      transparent
+      );
+    }
+
+    &::-webkit-scrollbar-track {
+      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+      background: #ededed;
+      //border-radius: 10px;
     }
   }
 }
