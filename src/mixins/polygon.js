@@ -30,7 +30,6 @@ export default {
       })
     },
     drawPolygon (boundary) {
-      console.log(boundary)
       if (boundary) {
         for (let i = 0; i < boundary.length; i++) {
           this.polygonObj.push(new AMap.Polygon({

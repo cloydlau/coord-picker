@@ -34,20 +34,32 @@
 
     <Toolbar v-if="!loading">
       <el-tooltip effect="dark" content="打点" placement="bottom">
-        <a @click.stop="map.on('click', onMapClick)">
+        <a @click.stop="()=>{
+             map.on('click', onMapClick)
+             active = 'marker'
+           }"
+           :class="{active:active==='marker'}">
           <svg-icon icon-class="locate"/>
         </a>
       </el-tooltip>
       <el-tooltip effect="dark" content="绘制图像" placement="bottom">
-        <a v-if="img" @click.stop="() => {
-          map.off('click', onMapClick)
-          mouseTool.rectangle(rectangleStyle)
-        }">
+        <a v-if="img"
+           :class="{active:active==='rectangle'}"
+           @click.stop="() => {
+             map.off('click', onMapClick)
+             mouseTool.rectangle(rectangleStyle)
+             active = 'rectangle'
+           }"
+        >
           <svg-icon icon-class="draw-img"/>
         </a>
       </el-tooltip>
       <el-tooltip effect="dark" content="绘制区域" placement="bottom">
-        <a v-if="boundary" @click.stop="()=>{drawPolygon()}">
+        <a v-if="boundary" @click.stop="()=>{
+             drawPolygon()
+             active = 'polygon'
+           }"
+           :class="{active:active==='polygon'}">
           <svg-icon icon-class="draw-polygon"/>
         </a>
       </el-tooltip>
@@ -129,6 +141,7 @@ export default {
   },
   data () {
     return {
+      active: 'marker',
       searching: false,
       keyword: '',
       searchResult: [],
@@ -184,7 +197,7 @@ export default {
             ]
           }).then(AMap => {
             this.map = new AMap.Map('map-container', {
-              viewMode: '3D',
+              //viewMode: '3D',
               zoom: this.selfZoom,
             })
 
@@ -248,6 +261,7 @@ export default {
             this.mouseTool = new AMap.MouseTool(this.map)
 
             this.mouseTool.on('draw', e => {
+              this.active = null
               if (e.obj.className === 'Overlay.Rectangle') {
                 if (this.rectangle) {
                   this.rectangleEditor.close()
