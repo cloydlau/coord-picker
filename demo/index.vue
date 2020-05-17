@@ -57,7 +57,7 @@
         <el-input v-model="imgSouthWestLat" clearable/>
       </el-form-item>
       <el-form-item label="区域轮廓">
-        <el-input :value="boundary&&boundary.length>0?JSON.stringify(boundary):''" clearable/>
+        <el-input :value="boundary&&boundary.length>0?JSON.stringify(boundary):''" clearable @clear="boundary=null"/>
       </el-form-item>
     </el-form>
     <div slot="footer">

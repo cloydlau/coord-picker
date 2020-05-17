@@ -1,3 +1,5 @@
+import Vue from 'vue'
+
 export default {
   data () {
     return {
@@ -13,12 +15,23 @@ export default {
       },
     }
   },
+  computed: {
+    curImg () {
+      return Vue.observable({
+        imgNorthEastLng: this.$isEmpty(this.imgNorthEastLng) ? '' : this.imgNorthEastLng,
+        imgNorthEastLat: this.$isEmpty(this.imgNorthEastLat) ? '' : this.imgNorthEastLat,
+        imgSouthWestLng: this.$isEmpty(this.imgSouthWestLng) ? '' : this.imgSouthWestLng,
+        imgSouthWestLat: this.$isEmpty(this.imgSouthWestLat) ? '' : this.imgSouthWestLat,
+      })
+    }
+  },
   methods: {
     syncImgBounds (bounds) {
-      this.curImg.imgNorthEastLng = bounds.northEast.lng
-      this.curImg.imgNorthEastLat = bounds.northEast.lat
-      this.curImg.imgSouthWestLng = bounds.southWest.lng
-      this.curImg.imgSouthWestLat = bounds.southWest.lat
+      //兼容1.x
+      this.curImg.imgNorthEastLng = bounds.northEast ? bounds.northEast.lng : bounds.northeast.lng
+      this.curImg.imgNorthEastLat = bounds.northEast ? bounds.northEast.lat : bounds.northeast.lat
+      this.curImg.imgSouthWestLng = bounds.southWest ? bounds.southWest.lng : bounds.southwest.lng
+      this.curImg.imgSouthWestLat = bounds.southWest ? bounds.southWest.lat : bounds.southwest.lat
       this.imageLayer.setBounds(bounds)
     },
     drawImg (bounds) {
@@ -45,7 +58,8 @@ export default {
        * 移动选框时 同步图片
        */
       this.rectangleEditor.on('adjust', e => {
-        this.syncImgBounds(e.bounds)
+        //兼容1.x
+        this.syncImgBounds(e.bounds || e.Rd)
       })
       //短距离平移触发
       this.rectangle.on('mouseup', e => {

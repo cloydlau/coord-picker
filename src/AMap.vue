@@ -4,9 +4,6 @@
              :append-to-body="true"
              :show-close="false"
              @close="$emit('update:show', false)"
-             :custom-class="customClass"
-             destroy-on-close
-             v-if="show"
   >
     <div slot="title" class="title">
       <span v-text="title||'坐标拾取'" class="title-text"/>
@@ -66,7 +63,7 @@
         </a>
       </el-tooltip>
       <!--<el-tooltip effect="dark" content="重置" placement="bottom">
-        <a @click.stop="reset">
+        <a @click.stop="()=>{reset();locate()}">
           <svg-icon icon-class="reset"/>
         </a>
       </el-tooltip>-->
@@ -168,6 +165,9 @@ export default {
     }
   },
   computed: {
+    version () {
+      return this.boundary ? '' : '2.0'
+    },
     title () {
       return this.curSpot.address + ((this.$isEmpty(this.curSpot.lng) || this.$isEmpty(this.curSpot.lat)) ? '' : `（${this.curSpot.lng}，${this.curSpot.lat}）`)
     },
@@ -194,17 +194,18 @@ export default {
         } else {*/
         AMapLoader.load({
           'key': this.key,   // 申请好的Web端开发者Key，首次调用 load 时必填
-          'version': '2.0',   // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
+          ...this.version ? { version: this.version, } : {}, // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
           'plugins': [
+            ...this.version && this.version.startsWith('2.') ?
+              ['AMap.AutoComplete', 'AMap.PolygonEditor',] :
+              ['AMap.Autocomplete', 'AMap.PolyEditor',],
             //'AMap.ControlBar',
             'AMap.Rectangle',
             'AMap.RectangleEditor',
             'AMap.Geocoder',
             'AMap.CitySearch',
-            'AMap.AutoComplete',
             'AMap.PlaceSearch',
             'AMap.Polygon',
-            'AMap.PolyEditor',
             'AMap.ContextMenu',
             'AMap.MouseTool',
           ]
@@ -275,7 +276,8 @@ export default {
 
           this.mouseTool.on('draw', e => {
             this.active = null
-            if (e.obj.className === 'Overlay.Rectangle') {
+            //兼容1.x
+            if (e.obj.className === 'Overlay.Rectangle' || e.obj.CLASS_NAME === 'AMap.Rectangle') {
               if (this.rectangle) {
                 this.rectangleEditor.close()
                 this.rectangleEditor = null
@@ -283,7 +285,9 @@ export default {
               }
               this.rectangle = e.obj
               this.editImg(this.rectangle.getBounds())
-            } else if (e.obj.className === 'Overlay.Polygon') {
+            }
+            //兼容1.x
+            else if (e.obj.className === 'Overlay.Polygon' || e.obj.CLASS_NAME === 'AMap.Polygon') {
               this.polygonObj.push(e.obj)
               this.editPolygon()
             }
@@ -307,19 +311,6 @@ export default {
         this.map.destroy()
       }
     },
-    baseCity (newVal) {
-      if (newVal) {
-        this.geocoder = new AMap.Geocoder({
-          city: newVal
-        })
-        this.autoComplete = new AMap.AutoComplete({
-          city: newVal
-        })
-        this.placeSearch = new AMap.PlaceSearch({
-          city: newVal
-        })
-      }
-    }
   },
   methods: {
     /*convertLngLat () {
@@ -329,18 +320,26 @@ export default {
         }
       })
     },*/
+    initPlugins () {
+      /**
+       * 不写在watch原因：需要同步执行
+       */
+      const param = {
+        city: this.baseCity
+      }
+      this.geocoder = new AMap.Geocoder(param)
+      //兼容1.x
+      this.autoComplete = AMap.AutoComplete ?
+        new AMap.AutoComplete(param) :
+        new AMap.Autocomplete(param)
+      this.placeSearch = new AMap.PlaceSearch(param)
+    },
     getInitData () {
       return this._.cloneDeep({
         selfZoom: this.zoom || 12,
         imageLayer: null,
         rectangle: null,
         rectangleEditor: null,
-        curImg: {
-          imgNorthEastLng: this.$isEmpty(this.imgNorthEastLng) ? '' : this.imgNorthEastLng,
-          imgNorthEastLat: this.$isEmpty(this.imgNorthEastLat) ? '' : this.imgNorthEastLat,
-          imgSouthWestLng: this.$isEmpty(this.imgSouthWestLng) ? '' : this.imgSouthWestLng,
-          imgSouthWestLat: this.$isEmpty(this.imgSouthWestLat) ? '' : this.imgSouthWestLat,
-        },
         polygonObj: [],
         polygonEditor: [],
         curBoundary: []
@@ -360,10 +359,13 @@ export default {
       }
       this.map.clearMap()
       Object.assign(this.$data, this.getInitData())
+      this.curImg.imgNorthEastLng = this.$isEmpty(this.imgNorthEastLng) ? '' : this.imgNorthEastLng
+      this.curImg.imgNorthEastLat = this.$isEmpty(this.imgNorthEastLat) ? '' : this.imgNorthEastLat
+      this.curImg.imgSouthWestLng = this.$isEmpty(this.imgSouthWestLng) ? '' : this.imgSouthWestLng
+      this.curImg.imgSouthWestLat = this.$isEmpty(this.imgSouthWestLat) ? '' : this.imgSouthWestLat
       this.curSpot.lng = this.$isEmpty(this.lng) ? '' : this.lng
       this.curSpot.lat = this.$isEmpty(this.lat) ? '' : this.lat
       this.curSpot.address = this.address || ((this.$isEmpty(this.lng) && this.$isEmpty(this.lat)) ? this.baseCity : '')
-      //this.locate()
     },
     onMapClick (e) {
       this.clearMarker()
@@ -437,6 +439,7 @@ export default {
       else {
         //直辖市：['110100000000', '120100000000', '310100000000', '500100000000']
         this.baseCity = this.city || city || ''
+        this.initPlugins()
         let centerDesignated = false
 
         //传了图片 定位至该图片
@@ -487,6 +490,7 @@ export default {
         citySearch.getLocalCity((status, result) => {
           if (status === 'complete' && result.info === 'OK') {
             this.baseCity = result.city
+            this.initPlugins()
             //未指定地图中心 定位至该城市
             if (!centerDesignated) {
               this.map.setCity(this.baseCity)
@@ -523,7 +527,7 @@ export default {
 #map-container {
   height: 100%;
   width: 100%;
-  cursor: crosshair !important;
+  //cursor: crosshair !important;
 }
 
 ::v-deep .el-dialog.is-fullscreen {

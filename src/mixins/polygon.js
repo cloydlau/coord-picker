@@ -55,11 +55,11 @@ export default {
         polygonContextMenu.open(this.map, e.lnglat)
       })
 
-      this.polygonObj[i].on('dblclick', e => {
-        this.polygonEditor.push(new AMap.PolyEditor(this.map, this.polygonObj[i]))
-        this.polygonEditor[i].open()
-      })
-
+      this.polygonEditor.push(AMap.PolygonEditor ?
+        new AMap.PolygonEditor(this.map, this.polygonObj[i]) :
+        new AMap.PolyEditor(this.map, this.polygonObj[i])
+      )
+      this.polygonEditor[i].open()
       this.polygonObj[i].setMap(this.map)
     },
   }
