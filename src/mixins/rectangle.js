@@ -1,4 +1,3 @@
-import Vue from 'vue'
 export default {
   data () {
     return {
@@ -12,20 +11,7 @@ export default {
         cursor: 'pointer',
         zIndex: 50,
       },
-      imageLayer: null,
-      rectangle: null,
-      rectangleEditor: null,
     }
-  },
-  computed: {
-    curImg () {
-      return Vue.observable({
-        imgNorthEastLng: this.$isEmpty(this.imgNorthEastLng) ? '' : Number(this.imgNorthEastLng),
-        imgNorthEastLat: this.$isEmpty(this.imgNorthEastLat) ? '' : Number(this.imgNorthEastLat),
-        imgSouthWestLng: this.$isEmpty(this.imgSouthWestLng) ? '' : Number(this.imgSouthWestLng),
-        imgSouthWestLat: this.$isEmpty(this.imgSouthWestLat) ? '' : Number(this.imgSouthWestLat),
-      })
-    },
   },
   methods: {
     syncImgBounds (bounds) {
@@ -44,15 +30,14 @@ export default {
       this.editImg(bounds)
     },
     editImg (bounds) {
-      if (this.imageLayer) {
-        this.syncImgBounds(bounds)
-      } else {
+      if (!this.imageLayer) {
         this.imageLayer = new AMap.ImageLayer({
           url: this.img,
           bounds,
         })
         this.map.add(this.imageLayer)
       }
+      this.syncImgBounds(bounds)
 
       this.rectangleEditor = new AMap.RectangleEditor(this.map, this.rectangle)
 
@@ -68,7 +53,9 @@ export default {
       })
       //长距离平移触发
       this.map.on('mouseup', e => {
-        this.syncImgBounds(this.rectangle.getBounds())
+        if (this.rectangle) {
+          this.syncImgBounds(this.rectangle.getBounds())
+        }
       })
 
       this.rectangleEditor.open()

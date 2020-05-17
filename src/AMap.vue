@@ -5,6 +5,8 @@
              :show-close="false"
              @close="$emit('update:show', false)"
              :custom-class="customClass"
+             destroy-on-close
+             v-if="show"
   >
     <div slot="title" class="title">
       <span v-text="title||'坐标拾取'" class="title-text"/>
@@ -55,7 +57,7 @@
         </a>
       </el-tooltip>
       <el-tooltip effect="dark" content="绘制区域" placement="bottom">
-        <a v-if="boundary" @click.stop="()=>{
+        <a v-if="boundary" @click.stop="() => {
              drawPolygon()
              active = 'polygon'
            }"
@@ -63,6 +65,11 @@
           <svg-icon icon-class="draw-polygon"/>
         </a>
       </el-tooltip>
+      <!--<el-tooltip effect="dark" content="重置" placement="bottom">
+        <a @click.stop="reset">
+          <svg-icon icon-class="reset"/>
+        </a>
+      </el-tooltip>-->
       <el-tooltip effect="dark" content="退出" placement="bottom">
         <a @click.stop="$emit('update:show', false)">
           <svg-icon icon-class="close"/>
@@ -89,7 +96,7 @@ import './styles/autocomplete.scss'
 import polygon from '@/mixins/polygon'
 import rectangle from '@/mixins/rectangle'
 import Toolbar from '@/components/Toolbar'
-import { apiKey, city } from './config.ts'
+import { apiKey, city, precision } from './config.ts'
 
 const requireAll = requireContext => requireContext.keys().map(requireContext)
 requireAll(require.context('@/assets/svg-sprite', false, /\.svg$/))
@@ -138,9 +145,11 @@ export default {
     boundary: {
       validator: value => ['Array'].includes(({}).toString.call(value).slice(8, -1)),
     },
+    precision: Number
   },
   data () {
     return {
+      ...this.getInitData(),
       active: 'marker',
       searching: false,
       keyword: '',
@@ -156,7 +165,6 @@ export default {
       placeSearch: null,
       autoCompleting: false,
       autoCompleteList: [],
-      selfZoom: null,
     }
   },
   computed: {
@@ -165,141 +173,202 @@ export default {
     },
     curSpot () {
       return Vue.observable({
-        lng: this.$isEmpty(this.lng) ? '' : Number(this.lng),
-        lat: this.$isEmpty(this.lat) ? '' : Number(this.lat),
+        lng: this.$isEmpty(this.lng) ? '' : this.lng,
+        lat: this.$isEmpty(this.lat) ? '' : this.lat,
         address: this.address || ((this.$isEmpty(this.lng) && this.$isEmpty(this.lat)) ? this.baseCity : '')
       })
     },
     key () {
       return this.apiKey || apiKey
     },
+    Precision () {
+      return this.precision || precision || 6
+    }
   },
   watch: {
     show (newVal, oldVal) {
       if (newVal) {
         this.customClass = 'animate__animated animate__zoomIn'
-        if (!this.map) {
-          AMapLoader.load({
-            'key': this.key,   // 申请好的Web端开发者Key，首次调用 load 时必填
-            'version': '2.0',   // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
-            'plugins': [
-              //'AMap.ControlBar',
-              'AMap.Rectangle',
-              'AMap.RectangleEditor',
-              'AMap.Geocoder',
-              'AMap.CitySearch',
-              'AMap.AutoComplete',
-              'AMap.PlaceSearch',
-              'AMap.Polygon',
-              'AMap.PolyEditor',
-              'AMap.ContextMenu',
-              'AMap.MouseTool',
-            ]
-          }).then(AMap => {
-            this.map = new AMap.Map('map-container', {
-              //viewMode: '3D',
-              zoom: this.selfZoom,
-            })
-
-            this.map.on('complete', () => {
-              this.$nextTick(() => {
-                /*this.meny = Meny.create({
-                  // The element that will be animated in from off screen
-                  menuElement: document.querySelector('.drawer'),
-                  // The contents that gets pushed aside while Meny is active
-                  contentsElement: document.querySelector('#map-container'),
-                  // [optional] The alignment of the menu (top/right/bottom/left)
-                  position: Meny.getQuery().p || 'left',
-                  // [optional] The height of the menu (when using top/bottom position)
-                  height: 200,
-                  // [optional] The width of the menu (when using left/right position)
-                  width: 384,
-                  // [optional] Distance from mouse (in pixels) when menu should open
-                  threshold: 40,
-                  // [optional] Use mouse movement to automatically open/close
-                  mouse: true,
-                  // [optional] Use touch swipe events to open/close
-                  touch: true,
-                  angle: 15.5
-                })*/
-
-                new autoComplete({
-                  data: {                              // Data src [Array, Function, Async] | (REQUIRED)
-                    src: async () => {
-                      if (this.$isEmpty(this.keyword)) {
-                        this.searchResult = []
-                        return []
-                      } else {
-                        return await this.fetchSuggestions()
-                      }
-                    },
-                    key: ['name'],
-                    cache: false
-                  },
-                  placeHolder: '搜索地点',              // Place Holder text                 | (Optional)
-                  selector: '#autoComplete',           // Input field selector              | (Optional)
-                  threshold: 1,                        // Min. Chars length to start Engine | (Optional)
-                  debounce: 300,                       // Post duration for engine to start | (Optional)
-                  searchEngine: 'loose',               // Search Engine type/mode           | (Optional)
-                  resultsList: {                       // Rendered results list object      | (Optional)
-                    render: true,
-                  },
-                  maxResults: 10,                      // Max. number of rendered results | (Optional)
-                  highlight: true,                     // Highlight matching results      | (Optional)
-                  onSelection: feedback => {           // Action script onSelection event | (Optional)
-                    //console.log(feedback.selection.value.image_url)
-                    this.search()
-                  }
-                })
-
-                this.loading = false
-              })
-            })
-
-            this.map.on('click', this.onMapClick)
-
-            this.mouseTool = new AMap.MouseTool(this.map)
-
-            this.mouseTool.on('draw', e => {
-              this.active = null
-              if (e.obj.className === 'Overlay.Rectangle') {
-                if (this.rectangle) {
-                  this.rectangleEditor.close()
-                  this.rectangle.setMap(null)
-                }
-                this.rectangle = e.obj
-                this.editImg(this.rectangle.getBounds())
-              } else if (e.obj.className === 'Overlay.Polygon') {
-                this.polygonObj.push(e.obj)
-                this.editPolygon()
-              }
-              this.mouseTool.close()
-            })
-
-            this.map.on('zoomchange', e => {
-              this.selfZoom = this.map.getZoom()
-            })
-
-            //this.map.addControl(new AMap.ControlBar())
-
-            this.locate()
-          }).catch(e => {
-            this.$err(e)
+        /*if (this.map) {
+          this.reset()
+        } else {*/
+        AMapLoader.load({
+          'key': this.key,   // 申请好的Web端开发者Key，首次调用 load 时必填
+          'version': '2.0',   // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
+          'plugins': [
+            //'AMap.ControlBar',
+            'AMap.Rectangle',
+            'AMap.RectangleEditor',
+            'AMap.Geocoder',
+            'AMap.CitySearch',
+            'AMap.AutoComplete',
+            'AMap.PlaceSearch',
+            'AMap.Polygon',
+            'AMap.PolyEditor',
+            'AMap.ContextMenu',
+            'AMap.MouseTool',
+          ]
+        }).then(AMap => {
+          this.map = new AMap.Map('map-container', {
+            //viewMode: '3D',
+            zoom: this.selfZoom,
           })
-        }
+
+          this.map.on('complete', () => {
+            this.$nextTick(() => {
+              /*this.meny = Meny.create({
+                // The element that will be animated in from off screen
+                menuElement: document.querySelector('.drawer'),
+                // The contents that gets pushed aside while Meny is active
+                contentsElement: document.querySelector('#map-container'),
+                // [optional] The alignment of the menu (top/right/bottom/left)
+                position: Meny.getQuery().p || 'left',
+                // [optional] The height of the menu (when using top/bottom position)
+                height: 200,
+                // [optional] The width of the menu (when using left/right position)
+                width: 384,
+                // [optional] Distance from mouse (in pixels) when menu should open
+                threshold: 40,
+                // [optional] Use mouse movement to automatically open/close
+                mouse: true,
+                // [optional] Use touch swipe events to open/close
+                touch: true,
+                angle: 15.5
+              })*/
+
+              new autoComplete({
+                data: {                              // Data src [Array, Function, Async] | (REQUIRED)
+                  src: async () => {
+                    if (this.$isEmpty(this.keyword)) {
+                      this.searchResult = []
+                      return []
+                    } else {
+                      return await this.fetchSuggestions()
+                    }
+                  },
+                  key: ['name'],
+                  cache: false
+                },
+                placeHolder: '搜索地点',              // Place Holder text                 | (Optional)
+                selector: '#autoComplete',           // Input field selector              | (Optional)
+                threshold: 1,                        // Min. Chars length to start Engine | (Optional)
+                debounce: 300,                       // Post duration for engine to start | (Optional)
+                searchEngine: 'loose',               // Search Engine type/mode           | (Optional)
+                resultsList: {                       // Rendered results list object      | (Optional)
+                  render: true,
+                },
+                maxResults: 10,                      // Max. number of rendered results | (Optional)
+                highlight: true,                     // Highlight matching results      | (Optional)
+                onSelection: feedback => {           // Action script onSelection event | (Optional)
+                  //console.log(feedback.selection.value.image_url)
+                  this.search()
+                }
+              })
+
+              this.loading = false
+            })
+          })
+
+          this.map.on('click', this.onMapClick)
+
+          this.mouseTool = new AMap.MouseTool(this.map)
+
+          this.mouseTool.on('draw', e => {
+            this.active = null
+            if (e.obj.className === 'Overlay.Rectangle') {
+              if (this.rectangle) {
+                this.rectangleEditor.close()
+                this.rectangleEditor = null
+                this.rectangle.setMap(null)
+              }
+              this.rectangle = e.obj
+              this.editImg(this.rectangle.getBounds())
+            } else if (e.obj.className === 'Overlay.Polygon') {
+              this.polygonObj.push(e.obj)
+              this.editPolygon()
+            }
+            this.mouseTool.close()
+          })
+
+          this.map.on('zoomchange', e => {
+            this.selfZoom = this.map.getZoom()
+          })
+
+          //this.map.addControl(new AMap.ControlBar())
+
+          this.locate()
+        }).catch(e => {
+          this.$err(e)
+        })
+        //}
       } else {
         this.customClass = 'animate__animated animate__zoomOut'
+        this.reset()
+        this.map.destroy()
       }
     },
-  },
-  created () {
-    this.selfZoom = this.zoom || 11
+    baseCity (newVal) {
+      if (newVal) {
+        this.geocoder = new AMap.Geocoder({
+          city: newVal
+        })
+        this.autoComplete = new AMap.AutoComplete({
+          city: newVal
+        })
+        this.placeSearch = new AMap.PlaceSearch({
+          city: newVal
+        })
+      }
+    }
   },
   methods: {
+    /*convertLngLat () {
+      new AMap.convertFrom(gps, 'gps', function (status, result) {
+        if (result.info === 'ok') {
+          var lnglats = result.locations // Array.<LngLat>
+        }
+      })
+    },*/
+    getInitData () {
+      return this._.cloneDeep({
+        selfZoom: this.zoom || 12,
+        imageLayer: null,
+        rectangle: null,
+        rectangleEditor: null,
+        curImg: {
+          imgNorthEastLng: this.$isEmpty(this.imgNorthEastLng) ? '' : this.imgNorthEastLng,
+          imgNorthEastLat: this.$isEmpty(this.imgNorthEastLat) ? '' : this.imgNorthEastLat,
+          imgSouthWestLng: this.$isEmpty(this.imgSouthWestLng) ? '' : this.imgSouthWestLng,
+          imgSouthWestLat: this.$isEmpty(this.imgSouthWestLat) ? '' : this.imgSouthWestLat,
+        },
+        polygonObj: [],
+        polygonEditor: [],
+        curBoundary: []
+      })
+    },
+    reset () {
+      if (this.imageLayer) {
+        this.imageLayer.setMap(null)
+        this.rectangleEditor.close()
+      }
+      if (this.polygonEditor.length > 0) {
+        this.polygonEditor.map(v => {
+          if (v) {
+            v.close()
+          }
+        })
+      }
+      this.map.clearMap()
+      Object.assign(this.$data, this.getInitData())
+      this.curSpot.lng = this.$isEmpty(this.lng) ? '' : this.lng
+      this.curSpot.lat = this.$isEmpty(this.lat) ? '' : this.lat
+      this.curSpot.address = this.address || ((this.$isEmpty(this.lng) && this.$isEmpty(this.lat)) ? this.baseCity : '')
+      //this.locate()
+    },
     onMapClick (e) {
-      this.clearSelection()
-      this.curSpot.lng = e.lnglat.lng.toFixed(6)
-      this.curSpot.lat = e.lnglat.lat.toFixed(6)
+      this.clearMarker()
+      this.curSpot.lng = e.lnglat.lng.toFixed(this.Precision)
+      this.curSpot.lat = e.lnglat.lat.toFixed(this.Precision)
       this.geocoder.getAddress([this.curSpot.lng, this.curSpot.lat], (status, result) => {
         if (status === 'complete' && result.info === 'OK') {
           this.curSpot.address = result.regeocode?.formattedAddress || ''
@@ -338,7 +407,7 @@ export default {
       }
       this.$emit('update:show', false)
     },
-    clearSelection () {
+    clearMarker () {
       if (this.marker) {
         this.curSpot.lng = ''
         this.curSpot.lat = ''
@@ -354,21 +423,10 @@ export default {
       this.map.add(this.marker)
       this.map.panTo(position)
     },
-    initPlugins () {
-      this.geocoder = new AMap.Geocoder({
-        city: this.baseCity
-      })
-      this.autoComplete = new AMap.AutoComplete({
-        city: this.baseCity
-      })
-      this.placeSearch = new AMap.PlaceSearch({
-        city: this.baseCity
-      })
-    },
     locate (selectedLocation) {
       //选中搜索项
       if (selectedLocation) {
-        this.clearSelection()
+        this.clearMarker()
         //this.meny.close()
         this.curSpot.lat = selectedLocation.location.lat
         this.curSpot.lng = selectedLocation.location.lng
@@ -379,7 +437,6 @@ export default {
       else {
         //直辖市：['110100000000', '120100000000', '310100000000', '500100000000']
         this.baseCity = this.city || city || ''
-        this.initPlugins()
         let centerDesignated = false
 
         //传了图片 定位至该图片
@@ -390,10 +447,10 @@ export default {
           !this.$isEmpty(this.curImg.imgNorthEastLat)
         ) {
           centerDesignated = true
-          this.drawImg([
-            [this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat],
-            [this.curImg.imgNorthEastLng, this.curImg.imgNorthEastLat],
-          ])
+          this.drawImg(new AMap.Bounds(
+            new AMap.LngLat(this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat),
+            new AMap.LngLat(this.curImg.imgNorthEastLng, this.curImg.imgNorthEastLat),
+          ))
           this.map.setFitView()
         }
         //传了多边形 定位至多边形
@@ -430,7 +487,6 @@ export default {
         citySearch.getLocalCity((status, result) => {
           if (status === 'complete' && result.info === 'OK') {
             this.baseCity = result.city
-            this.initPlugins()
             //未指定地图中心 定位至该城市
             if (!centerDesignated) {
               this.map.setCity(this.baseCity)

@@ -1,4 +1,3 @@
-import Vue from 'vue'
 export default {
   data () {
     return {
@@ -12,9 +11,6 @@ export default {
         cursor: 'pointer',
         zIndex: 50,
       },
-      polygonObj: [],
-      polygonEditor: [],
-      curBoundary: []
     }
   },
   methods: {
@@ -46,7 +42,6 @@ export default {
     },
     editPolygon () {
       const i = this.polygonObj.length - 1
-      let polygon = this.polygonObj[i]
 
       const polygonContextMenu = new AMap.ContextMenu()
       polygonContextMenu.addItem('删除', e => {
@@ -56,13 +51,16 @@ export default {
         this.polygonObj[i] = null
       }, 0)
 
-      polygon.on('rightclick', e => {
+      this.polygonObj[i].on('rightclick', e => {
         polygonContextMenu.open(this.map, e.lnglat)
       })
 
-      polygon.setMap(this.map)
-      this.polygonEditor.push(new AMap.PolyEditor(this.map, polygon))
-      this.polygonEditor[i].open()
+      this.polygonObj[i].on('dblclick', e => {
+        this.polygonEditor.push(new AMap.PolyEditor(this.map, this.polygonObj[i]))
+        this.polygonEditor[i].open()
+      })
+
+      this.polygonObj[i].setMap(this.map)
     },
   }
 }

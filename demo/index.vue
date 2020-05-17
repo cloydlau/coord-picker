@@ -10,6 +10,7 @@
                  :lat.sync="lat"
                  :address.sync="address"
                  :zoom.sync="zoom"
+                 :precision="precision"
 
                  :img="img"
                  :imgNorthEastLng.sync="imgNorthEastLng"
@@ -56,7 +57,7 @@
         <el-input v-model="imgSouthWestLat" clearable/>
       </el-form-item>
       <el-form-item label="区域轮廓">
-        <el-input :value="boundary&&boundary.length>0?JSON.stringify(boundary):''" disabled/>
+        <el-input :value="boundary&&boundary.length>0?JSON.stringify(boundary):''" clearable/>
       </el-form-item>
     </el-form>
     <div slot="footer">
@@ -98,33 +99,34 @@ export default {
        */
       //图片地址
       img: 'https://pic4.zhimg.com/80/v2-670a8e55fc0dcb76fc4860c18963aaa8_720w.jpg',
-      //img: '',
       //图片东北角经度
-      imgNorthEastLng: '',
+      imgNorthEastLng: '106.44294',
       //图片东北角纬度
-      imgNorthEastLat: '',
+      imgNorthEastLat: '26.644338',
       //图片西南角经度
-      imgSouthWestLng: '',
+      imgSouthWestLng: '106.431267',
       //图片西南角纬度
-      imgSouthWestLat: '',
+      imgSouthWestLat: '26.504937',
 
       boundary: [{
-        'data': [{ 'longitude': 106.44294, 'latitude': 26.644338 }, {
-          'longitude': 106.431267,
-          'latitude': 26.504937
-        }, { 'longitude': 106.569282, 'latitude': 26.585405 }]
+        'data': [{ 'longitude': '106.44294', 'latitude': '26.644338' }, {
+          'longitude': '106.431267',
+          'latitude': '26.504937'
+        }, { 'longitude': '106.569282', 'latitude': '26.585405' }]
       }, {
-        'data': [{ 'longitude': 106.623527, 'latitude': 26.52767 }, {
-          'longitude': 106.602241,
-          'latitude': 26.415188
-        }, { 'longitude': 106.721031, 'latitude': 26.472979 }]
+        'data': [{ 'longitude': '106.623527', 'latitude': '26.52767' }, {
+          'longitude': '106.602241',
+          'latitude': '26.415188'
+        }, { 'longitude': '106.721031', 'latitude': '26.472979' }]
       }],
-      //boundary: null,
 
       //初始缩放比例
       zoom: '',
 
       showDialog: true,
+
+      //坐标精度 默认6位小数
+      precision: 6,
     }
   },
   methods: {}
