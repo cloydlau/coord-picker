@@ -24,10 +24,12 @@ yarn add coord-picker / npm i coord-picker
 依赖项：vue element-ui plain-kit
 
 全局引入：
+import 'coord-picker/dist/coord-picker.css'
 import CoordPicker from 'coord-picker'
 Vue.use(CoordPicker)
 
 局部引入：
+import 'coord-picker/dist/coord-picker.css'
 import { CoordPicker } from 'coord-picker'
 components: { CoordPicker }
 ```
