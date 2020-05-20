@@ -516,7 +516,7 @@ export default {
     },
     getBaseCity (centerDesignated) {
       //传了城市（非城市编码）且未指定地图中心 定位至该城市
-      if (this.baseCity && !isNaN(this.baseCity)) {
+      if (this.baseCity && isNaN(this.baseCity)) {
         if (!centerDesignated) {
           this.geocoder.getLocation(this.baseCity, (status, result) => {
             console.log('【city解析】')
@@ -649,7 +649,7 @@ export default {
         margin-top: 60px;
       }
 
-      &:last-of-type {
+      &:last-of-type, &:last-child {
         margin-bottom: 60px;
       }
 

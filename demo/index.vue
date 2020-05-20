@@ -91,7 +91,7 @@ export default {
       lat: '',
       //初始地址
       address: '',
-      //初始城市
+      //初始城市（也支持省份）
       city: '',
 
       /**
