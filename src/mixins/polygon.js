@@ -51,6 +51,8 @@ export default {
         this.polygonObj[i] = null
       }, 0)
 
+      this.polygonObj[i].on('click', this.onMapClick)
+
       this.polygonObj[i].on('rightclick', e => {
         polygonContextMenu.open(this.map, e.lnglat)
       })

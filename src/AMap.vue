@@ -10,7 +10,10 @@
     </div>
     <div style="height:100%">
       <div class="autoComplete-wrapper">
-        <input id="autoComplete" tabindex="1" v-model="keyword">
+        <input id="autoComplete" tabindex="1" v-model="keyword" @keyup.enter="e=>{
+          search()
+          e.currentTarget.blur()
+        }">
       </div>
       <transition enter-active-class="animate__animated animate__backInLeft"
                   leave-active-class="animate__animated animate__backOutLeft">
@@ -83,7 +86,7 @@
 
 <script>
 import Vue from 'vue'
-import { isEmpty, err, SvgIcon } from 'plain-kit'
+import { isEmpty, err, warn, SvgIcon } from 'plain-kit'
 import _ from 'lodash'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
@@ -103,6 +106,7 @@ Vue.mixin({
   methods: {
     $isEmpty: isEmpty,
     $err: err,
+    $warn: warn,
   }
 })
 
@@ -175,7 +179,7 @@ export default {
       return Vue.observable({
         lng: this.$isEmpty(this.lng) ? '' : this.lng,
         lat: this.$isEmpty(this.lat) ? '' : this.lat,
-        address: this.address || ((this.$isEmpty(this.lng) && this.$isEmpty(this.lat)) ? this.baseCity : '')
+        address: this.address || ''
       })
     },
     key () {
@@ -237,6 +241,14 @@ export default {
                 angle: 15.5
               })*/
 
+              const autoCompleteEl = document.querySelector('#autoComplete')
+              autoCompleteEl.addEventListener('blur', e => {
+                document.querySelector('#autoComplete_list').style.visibility = 'hidden'
+              })
+              autoCompleteEl.addEventListener('focus', e => {
+                document.querySelector('#autoComplete_list').style.visibility = 'visible'
+              })
+
               new autoComplete({
                 data: {                              // Data src [Array, Function, Async] | (REQUIRED)
                   src: async () => {
@@ -262,7 +274,8 @@ export default {
                 highlight: true,                     // Highlight matching results      | (Optional)
                 onSelection: feedback => {           // Action script onSelection event | (Optional)
                   //console.log(feedback.selection.value.image_url)
-                  this.search()
+                  this.keyword = feedback.selection.value.name
+                  document.querySelector('#autoComplete_list').style.visibility = 'hidden'
                 }
               })
 
@@ -311,6 +324,9 @@ export default {
         this.map.destroy()
       }
     },
+    keyword () {
+      this.search()
+    }
   },
   methods: {
     /*convertLngLat () {
@@ -423,7 +439,6 @@ export default {
         position,
       })
       this.map.add(this.marker)
-      this.map.panTo(position)
     },
     locate (selectedLocation) {
       //选中搜索项
@@ -432,49 +447,80 @@ export default {
         //this.meny.close()
         this.curSpot.lat = selectedLocation.location.lat
         this.curSpot.lng = selectedLocation.location.lng
-        this.curSpot.address = (selectedLocation.address || '') + (selectedLocation.title || '')
+        this.geocoder.getAddress([this.curSpot.lng, this.curSpot.lat], (status, result) => {
+          if (status === 'complete' && result.info === 'OK') {
+            const { province, city, district } = result.regeocode?.addressComponent
+            this.curSpot.address = (province || '') + (city || '') + (district || '') + (selectedLocation.address || '') + (selectedLocation.name || '')
+          }
+        })
         this.drawMarker()
+        this.map.setCenter([this.curSpot.lng, this.curSpot.lat])
       }
       //初始化
       else {
         //直辖市：['110100000000', '120100000000', '310100000000', '500100000000']
         this.baseCity = this.city || city || ''
-        this.initPlugins()
-        let centerDesignated = false
+        if (this.baseCity) {
+          this.initPlugins()
+        }
 
-        //传了图片 定位至该图片
-        if (this.img &&
-          !this.$isEmpty(this.curImg.imgSouthWestLng) &&
-          !this.$isEmpty(this.curImg.imgSouthWestLat) &&
-          !this.$isEmpty(this.curImg.imgNorthEastLng) &&
-          !this.$isEmpty(this.curImg.imgNorthEastLat)
-        ) {
-          centerDesignated = true
-          this.drawImg(new AMap.Bounds(
-            new AMap.LngLat(this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat),
-            new AMap.LngLat(this.curImg.imgNorthEastLng, this.curImg.imgNorthEastLat),
-          ))
-          this.map.setFitView()
-        }
-        //传了多边形 定位至多边形
-        else if (this.boundary && this.boundary.length > 0) {
-          centerDesignated = true
-          this.drawPolygon(this.boundary)
-          this.map.setFitView()
-        }
-        //传了点位 定位至该点位
-        else if (!this.$isEmpty(this.curSpot.lat) && !this.$isEmpty(this.curSpot.lng)) {
-          centerDesignated = true
-          this.drawMarker()
-        }
-        this.getBaseCity(centerDesignated)
+        new Promise((resolve, reject) => {
+          //传了图片 定位至该图片
+          if (this.img &&
+            !this.$isEmpty(this.curImg.imgSouthWestLng) &&
+            !this.$isEmpty(this.curImg.imgSouthWestLat) &&
+            !this.$isEmpty(this.curImg.imgNorthEastLng) &&
+            !this.$isEmpty(this.curImg.imgNorthEastLat)
+          ) {
+            this.drawImg(new AMap.Bounds(
+              new AMap.LngLat(this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat),
+              new AMap.LngLat(this.curImg.imgNorthEastLng, this.curImg.imgNorthEastLat),
+            ))
+            this.map.setFitView()
+            resolve(true)
+          }
+          //传了多边形 定位至多边形
+          else if (this.boundary && this.boundary.length > 0) {
+            this.drawPolygon(this.boundary)
+            this.map.setFitView()
+            resolve(true)
+          }
+          //传了点位 定位至该点位
+          else if (!this.$isEmpty(this.curSpot.lat) && !this.$isEmpty(this.curSpot.lng)) {
+            this.drawMarker()
+            this.map.panTo([this.curSpot.lng, this.curSpot.lat])
+            resolve(true)
+          }
+          //传了地址 定位至该地址 并设置该地址所在的baseCity
+          else if (this.curSpot.address) {
+            this.geocoder.getLocation(this.curSpot.address, (status, result) => {
+              console.log('【address逆解析】')
+              console.log(result)
+              if (status === 'complete' && result.info === 'OK') {
+                const { lng, lat } = result.geocodes[0]?.location
+                this.baseCity = result.geocodes[0]?.addressComponent.city
+                this.initPlugins()
+                if (!this.$isEmpty(lng) && !this.$isEmpty(lat)) {
+                  this.map.setCenter([lng, lat])
+                }
+              }
+              resolve(true)
+            })
+          } else {
+            resolve(false)
+          }
+        }).then(centerDesignated => {
+          this.getBaseCity(centerDesignated)
+        })
       }
     },
     getBaseCity (centerDesignated) {
-      //传了城市且未指定地图中心 定位至该城市
-      if (this.baseCity) {
+      //传了城市（非城市编码）且未指定地图中心 定位至该城市
+      if (this.baseCity && !isNaN(this.baseCity)) {
         if (!centerDesignated) {
           this.geocoder.getLocation(this.baseCity, (status, result) => {
+            console.log('【city解析】')
+            console.log(result)
             if (status === 'complete' && result.info === 'OK') {
               const { lng, lat } = result.geocodes[0]?.location
               if (!this.$isEmpty(lng) && !this.$isEmpty(lat)) {
@@ -508,10 +554,14 @@ export default {
       if (!this.doSearch) {
         this.doSearch = this._.throttle(() => {
           this.placeSearch.search(this.keyword, (status, result) => {
-            if (status === 'complete' && result.info === 'OK' && result.poiList && result.poiList.pois) {
-              this.searchResult = result.poiList.pois
-            } else {
-              this.searchResult = []
+            console.log('【搜索结果】')
+            console.log(result)
+            if (status === 'complete') {
+              if (result.info === 'OK' && result.poiList && result.poiList.pois) {
+                this.searchResult = result.poiList.pois || []
+              } else if (result.info === 'TIP_CITIES') {
+                this.$warn('尝试输入更加精确的关键字哦')
+              }
             }
             this.searching = false
           })
@@ -595,7 +645,7 @@ export default {
       padding: 0.5rem;
       cursor: pointer;
 
-      &:first-of-type {
+      &:first-of-type, &:first-child {
         margin-top: 60px;
       }
 

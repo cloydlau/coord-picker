@@ -1,6 +1,6 @@
 # coord-picker / 坐标拾取
 
-![preview](./preview.png)
+![图片](./preview.png)
 
 ### Intro / 介绍
 
@@ -37,6 +37,5 @@ components: { CoordPicker }
 
 ### Usage / 使用
 ```
-请参考极简demo：
-cd node_modules/coord-picker/demo
+请参考/demo中极简示例
 ```
