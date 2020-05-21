@@ -180,7 +180,7 @@ export default {
       return Vue.observable({
         lng: this.$isEmpty(this.lng) ? '' : this.lng,
         lat: this.$isEmpty(this.lat) ? '' : this.lat,
-        address: this.address || ''
+        address: this.address || ((this.$isEmpty(this.lng) && this.$isEmpty(this.lat)) ? this.baseCity : '')
       })
     },
     key () {
