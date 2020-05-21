@@ -39,6 +39,7 @@ export default {
         ...this.rectangleStyle,
         bounds,
       })
+      this.rectangle.on('click', this.onMapClick)
       this.rectangle.setMap(this.map)
       this.editImg(bounds)
     },
