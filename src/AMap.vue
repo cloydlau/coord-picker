@@ -44,9 +44,8 @@
           <svg-icon icon-class="locate"/>
         </a>
       </el-tooltip>
-      <el-tooltip effect="dark" content="绘制图像" placement="bottom">
-        <a v-if="img"
-           :class="{active:active==='rectangle'}"
+      <el-tooltip effect="dark" content="绘制图像" placement="bottom" v-if="img">
+        <a :class="{active:active==='rectangle'}"
            @click.stop="() => {
              map.off('click', onMapClick)
              mouseTool.rectangle(rectangleStyle)
@@ -56,8 +55,8 @@
           <svg-icon icon-class="draw-img"/>
         </a>
       </el-tooltip>
-      <el-tooltip effect="dark" content="绘制区域" placement="bottom">
-        <a v-if="boundary" @click.stop="() => {
+      <el-tooltip effect="dark" content="绘制区域" placement="bottom" v-if="boundary">
+        <a @click.stop="() => {
              drawPolygon()
              active = 'polygon'
            }"
