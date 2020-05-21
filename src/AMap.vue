@@ -166,6 +166,7 @@ export default {
       placeSearch: null,
       autoCompleting: false,
       autoCompleteList: [],
+      autoCompleteInput: null
     }
   },
   computed: {
@@ -249,35 +250,37 @@ export default {
                 document.querySelector('#autoComplete_list').style.visibility = 'visible'
               })
 
-              new autoComplete({
-                data: {                              // Data src [Array, Function, Async] | (REQUIRED)
-                  src: async () => {
-                    if (this.$isEmpty(this.keyword)) {
-                      this.searchResult = []
-                      return []
-                    } else {
-                      return await this.fetchSuggestions()
-                    }
+              if (!this.autoCompleteInput) {
+                this.autoCompleteInput = new autoComplete({
+                  data: {                              // Data src [Array, Function, Async] | (REQUIRED)
+                    src: async () => {
+                      if (this.$isEmpty(this.keyword)) {
+                        this.searchResult = []
+                        return []
+                      } else {
+                        return await this.fetchSuggestions()
+                      }
+                    },
+                    key: ['name'],
+                    cache: false
                   },
-                  key: ['name'],
-                  cache: false
-                },
-                placeHolder: '搜索地点',              // Place Holder text                 | (Optional)
-                selector: '#autoComplete',           // Input field selector              | (Optional)
-                threshold: 1,                        // Min. Chars length to start Engine | (Optional)
-                debounce: 300,                       // Post duration for engine to start | (Optional)
-                searchEngine: 'loose',               // Search Engine type/mode           | (Optional)
-                resultsList: {                       // Rendered results list object      | (Optional)
-                  render: true,
-                },
-                maxResults: 10,                      // Max. number of rendered results | (Optional)
-                highlight: true,                     // Highlight matching results      | (Optional)
-                onSelection: feedback => {           // Action script onSelection event | (Optional)
-                  //console.log(feedback.selection.value.image_url)
-                  this.keyword = feedback.selection.value.name
-                  document.querySelector('#autoComplete_list').style.visibility = 'hidden'
-                }
-              })
+                  placeHolder: '搜索地点',              // Place Holder text                 | (Optional)
+                  selector: '#autoComplete',           // Input field selector              | (Optional)
+                  threshold: 1,                        // Min. Chars length to start Engine | (Optional)
+                  debounce: 300,                       // Post duration for engine to start | (Optional)
+                  searchEngine: 'loose',               // Search Engine type/mode           | (Optional)
+                  resultsList: {                       // Rendered results list object      | (Optional)
+                    render: true,
+                  },
+                  maxResults: 10,                      // Max. number of rendered results | (Optional)
+                  highlight: true,                     // Highlight matching results      | (Optional)
+                  onSelection: feedback => {           // Action script onSelection event | (Optional)
+                    //console.log(feedback.selection.value.image_url)
+                    this.keyword = feedback.selection.value.name
+                    document.querySelector('#autoComplete_list').style.visibility = 'hidden'
+                  }
+                })
+              }
 
               this.loading = false
             })
@@ -362,6 +365,8 @@ export default {
       })
     },
     reset () {
+      this.searchResult = []
+      this.keyword = ''
       if (this.imageLayer) {
         this.imageLayer.setMap(null)
         this.rectangleEditor.close()
@@ -634,24 +639,16 @@ export default {
     width: 384px;
     height: 100%;
     overflow-y: auto;
-    padding: 1rem;
+    padding: 75px 16px;
     position: absolute;
     z-index: 1;
     //background-image: linear-gradient(to left, #e6e9f0 0%, #eef1f5 100%);
     backdrop-filter: blur(2px);
     background-color: #f7f7f7ab;
 
-    .item {
+    & > .item {
       padding: 0.5rem;
       cursor: pointer;
-
-      &:first-of-type, &:first-child {
-        margin-top: 60px;
-      }
-
-      &:last-of-type, &:last-child {
-        margin-bottom: 60px;
-      }
 
       &:hover {
         background-color: #add8e69e;
