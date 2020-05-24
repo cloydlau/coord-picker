@@ -4,6 +4,12 @@ function resolve (dir) {
   return path.join(__dirname, dir)
 }
 
+const externals = process.env.NODE_ENV === 'development' ? {} : {
+  'element-ui': 'element-ui',
+  'plain-kit': 'plain-kit',
+  'vue': 'vue'
+}
+
 module.exports = {
   pages: {
     index: {
@@ -48,11 +54,7 @@ module.exports = {
       umdNamedDefine: true,
       libraryExport: 'default'
     },
-    externals: {
-      'element-ui': 'element-ui',
-      'plain-kit': 'plain-kit',
-      'vue': 'vue'
-    },
+    externals,
     devtool: 'source-map',
   }
 }
