@@ -27,4 +27,4 @@ babel.config.js
 .browserslistrc
 tsconfig.json
 .env.development
-/preview.*
+/preview*.*

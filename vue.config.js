@@ -48,6 +48,11 @@ module.exports = {
       umdNamedDefine: true,
       libraryExport: 'default'
     },
+    externals: {
+      'element-ui': 'element-ui',
+      'plain-kit': 'plain-kit',
+      'vue': 'vue'
+    },
     devtool: 'source-map',
   }
 }
