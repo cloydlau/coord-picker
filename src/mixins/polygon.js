@@ -36,7 +36,6 @@ export default {
           this.editPolygon()
         }
       } else {
-        this.map.off('click', this.onMapClick)
         this.mouseTool.polygon(this.polygonStyle)
       }
     },
@@ -50,6 +49,14 @@ export default {
         this.polygonObj[i].setMap(null)
         this.polygonObj[i] = null
       }, 0)
+
+      this.polygonObj[i].on('mousemove', e => {
+        this.text.setText('拖拽角可调整形状，右键可删除该区域')
+        this.setTextPosition(e)
+      })
+      this.polygonObj[i].on('mouseout', e => {
+        this.text.setText('点击获取坐标')
+      })
 
       this.polygonObj[i].on('click', this.onMapClick)
 

@@ -4,6 +4,8 @@
              :append-to-body="true"
              :show-close="false"
              @close="$emit('update:show', false)"
+             destroy-on-close
+             v-if="show"
   >
     <div slot="title" class="title">
       <span v-text="title||'坐标拾取'" class="title-text"/>
@@ -35,31 +37,21 @@
     </div>
 
     <Toolbar v-if="!loading">
-      <el-tooltip effect="dark" content="打点" placement="bottom">
-        <a @click.stop="()=>{
-             map.on('click', onMapClick)
-             active = 'marker'
-           }"
+      <el-tooltip effect="dark" content="选取点位" placement="bottom">
+        <a @click.stop="active='marker'"
            :class="{active:active==='marker'}">
           <svg-icon icon-class="locate"/>
         </a>
       </el-tooltip>
-      <el-tooltip effect="dark" content="绘制图像" placement="bottom" v-if="img">
+      <el-tooltip effect="dark" content="绘制图层" placement="bottom" v-if="img">
         <a :class="{active:active==='rectangle'}"
-           @click.stop="() => {
-             map.off('click', onMapClick)
-             mouseTool.rectangle(rectangleStyle)
-             active = 'rectangle'
-           }"
+           @click.stop="active='rectangle'"
         >
           <svg-icon icon-class="draw-img"/>
         </a>
       </el-tooltip>
-      <el-tooltip effect="dark" content="绘制区域" placement="bottom" v-if="boundary">
-        <a @click.stop="() => {
-             drawPolygon()
-             active = 'polygon'
-           }"
+      <el-tooltip effect="dark" content="绘制轮廓" placement="bottom" v-if="boundary">
+        <a @click.stop="active='polygon'"
            :class="{active:active==='polygon'}">
           <svg-icon icon-class="draw-polygon"/>
         </a>
@@ -150,7 +142,7 @@ export default {
   data () {
     return {
       ...this.getInitData(),
-      active: 'marker',
+      active: null,
       searching: false,
       keyword: '',
       searchResult: [],
@@ -170,7 +162,7 @@ export default {
   },
   computed: {
     version () {
-      return this.boundary ? '' : '2.0'
+      return ''
     },
     title () {
       return this.curSpot.address + ((this.$isEmpty(this.curSpot.lng) || this.$isEmpty(this.curSpot.lat)) ? '' : `（${this.curSpot.lng}，${this.curSpot.lat}）`)
@@ -204,7 +196,6 @@ export default {
               ['AMap.AutoComplete', 'AMap.PolygonEditor',] :
               ['AMap.Autocomplete', 'AMap.PolyEditor',],
             //'AMap.ControlBar',
-            'AMap.Rectangle',
             'AMap.RectangleEditor',
             'AMap.Geocoder',
             'AMap.CitySearch',
@@ -242,11 +233,16 @@ export default {
               })*/
 
               const autoCompleteEl = document.querySelector('#autoComplete')
+              const autoCompleteListEl = document.querySelector('#autoComplete_list')
               autoCompleteEl.addEventListener('blur', e => {
-                document.querySelector('#autoComplete_list').style.visibility = 'hidden'
+                if (autoCompleteListEl) {
+                  autoCompleteListEl.style.visibility = 'hidden'
+                }
               })
               autoCompleteEl.addEventListener('focus', e => {
-                document.querySelector('#autoComplete_list').style.visibility = 'visible'
+                if (autoCompleteListEl) {
+                  autoCompleteListEl.style.visibility = 'visible'
+                }
               })
 
               if (!this.autoCompleteInput) {
@@ -285,24 +281,45 @@ export default {
             })
           })
 
+          this.active = 'marker'
+
+          this.text = new AMap.Text({
+            anchor: 'center', // 设置文本标记锚点
+            offset: new AMap.Pixel(0, -20),
+            style: {
+              'border-radius': '17.5px',
+              'padding': '5px 10px',
+              'border-width': 0,
+              'box-shadow': '0 2px 6px 0 rgba(114, 124, 245, .5)',
+              'text-align': 'center',
+            },
+          })
+          this.text.setMap(this.map)
+          this.map.on('mousemove', this.setTextPosition)
+
           this.map.on('click', this.onMapClick)
 
           this.mouseTool = new AMap.MouseTool(this.map)
-
           this.mouseTool.on('draw', e => {
-            this.active = null
-            //兼容1.x
-            if (e.obj.className === 'Overlay.Rectangle' || e.obj.CLASS_NAME === 'AMap.Rectangle') {
-              if (this.rectangle) {
+            //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
+            //2.x：e.obj.className==='Overlay.Rectangle'
+            if (this.active === 'rectangle') {
+              this.active = 'marker'
+              //图层只允许有一个 清除之前绘制的
+              if (this.rectangleObj) {
                 this.rectangleEditor.close()
                 this.rectangleEditor = null
-                this.rectangle.setMap(null)
+                this.rectangleObj.setMap(null)
               }
-              this.rectangle = e.obj
-              this.editImg(this.rectangle.getBounds())
+              this.rectangleObj = e.obj
+              //this.editImg(this.rectangleObj.getBounds()) 1.x中编辑绘制出来矩形会报错
+              e.obj.setMap(null) //1.x改为销毁绘制出来的矩形并新建一个矩形对象
+              this.drawImg(this.rectangleObj.getBounds())
             }
-            //兼容1.x
-            else if (e.obj.className === 'Overlay.Polygon' || e.obj.CLASS_NAME === 'AMap.Polygon') {
+              //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
+            //2.x：e.obj.className==='Overlay.Polygon'
+            else if (this.active === 'polygon') {
+              this.active = 'marker'
               this.polygonObj.push(e.obj)
               this.editPolygon()
             }
@@ -328,6 +345,27 @@ export default {
     },
     keyword () {
       this.search()
+    },
+    active (newVal) {
+      ({
+        'marker': () => {
+          this.text.setText('点击获取坐标')
+          this.text.on('click', this.onMapClick)
+          this.map.on('click', this.onMapClick)
+        },
+        'rectangle': () => {
+          this.text.setText('按住左键并拖动绘制图层')
+          this.text.off('click', this.onMapClick)
+          this.map.off('click', this.onMapClick)
+          this.mouseTool.rectangle(this.rectangleStyle)
+        },
+        'polygon': () => {
+          this.text.setText('单击确定起点，双击结束绘制')
+          this.text.off('click', this.onMapClick)
+          this.map.off('click', this.onMapClick)
+          this.drawPolygon()
+        },
+      })[newVal]()
     }
   },
   methods: {
@@ -338,6 +376,19 @@ export default {
         }
       })
     },*/
+    throttle (fnName, fn, param, delay) {
+      //const functionName = /function\s*(\w*)/i.exec(fn.toString())[1]
+      fnName += 'Throttle'
+      if (!this[fnName]) {
+        this[fnName] = this._.throttle(fn, delay)
+      }
+      this[fnName](param)
+    },
+    setTextPosition (e) {
+      this.throttle('setTextPosition', e => {
+        this.text.setPosition([e.lnglat.lng, e.lnglat.lat])
+      }, e, 30)
+    },
     initPlugins () {
       /**
        * 不写在watch原因：需要同步执行
@@ -356,7 +407,7 @@ export default {
       return this._.cloneDeep({
         selfZoom: this.zoom || 12,
         imageLayer: null,
-        rectangle: null,
+        rectangleObj: null,
         rectangleEditor: null,
         polygonObj: [],
         polygonEditor: [],
@@ -377,12 +428,12 @@ export default {
           }
         })
       }
-      this.map.clearMap()
+      //this.map.clearMap() 某些情况下未知报错
       Object.assign(this.$data, this.getInitData())
-      this.curImg.imgNorthEastLng = this.$isEmpty(this.imgNorthEastLng) ? '' : this.imgNorthEastLng
-      this.curImg.imgNorthEastLat = this.$isEmpty(this.imgNorthEastLat) ? '' : this.imgNorthEastLat
-      this.curImg.imgSouthWestLng = this.$isEmpty(this.imgSouthWestLng) ? '' : this.imgSouthWestLng
-      this.curImg.imgSouthWestLat = this.$isEmpty(this.imgSouthWestLat) ? '' : this.imgSouthWestLat
+      this.curImg.imgNorthEastLng = Math.max(this.imgNorthEastLng, this.imgSouthWestLng)
+      this.curImg.imgNorthEastLat = this.imgNorthEastLat
+      this.curImg.imgSouthWestLng = Math.min(this.imgNorthEastLng, this.imgSouthWestLng)
+      this.curImg.imgSouthWestLat = this.imgSouthWestLat
       this.curSpot.lng = this.$isEmpty(this.lng) ? '' : this.lng
       this.curSpot.lat = this.$isEmpty(this.lat) ? '' : this.lat
       this.curSpot.address = this.address || ((this.$isEmpty(this.lng) && this.$isEmpty(this.lat)) ? this.baseCity : '')
@@ -469,7 +520,8 @@ export default {
         }
 
         new Promise((resolve, reject) => {
-          //传了图片 定位至该图片
+          let centerDesignated = false
+          //传了图片 绘制图层
           if (this.img &&
             !this.$isEmpty(this.curImg.imgSouthWestLng) &&
             !this.$isEmpty(this.curImg.imgSouthWestLat) &&
@@ -480,23 +532,25 @@ export default {
               new AMap.LngLat(this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat),
               new AMap.LngLat(this.curImg.imgNorthEastLng, this.curImg.imgNorthEastLat),
             ))
-            this.map.setFitView()
-            resolve(true)
+            centerDesignated = true
           }
-          //传了多边形 定位至多边形
-          else if (this.boundary && this.boundary.length > 0) {
+          //传了多边形 绘制多边形
+          if (this.boundary && this.boundary.length > 0) {
             this.drawPolygon(this.boundary)
-            this.map.setFitView()
-            resolve(true)
+            centerDesignated = true
           }
           //传了点位 定位至该点位
-          else if (!this.$isEmpty(this.curSpot.lat) && !this.$isEmpty(this.curSpot.lng)) {
+          if (!this.$isEmpty(this.curSpot.lat) && !this.$isEmpty(this.curSpot.lng)) {
             this.drawMarker()
-            this.map.panTo([this.curSpot.lng, this.curSpot.lat])
-            resolve(true)
+            this.map.setCenter([this.curSpot.lng, this.curSpot.lat])
+            centerDesignated = true
           }
-          //传了地址 定位至该地址 并设置该地址所在的baseCity
-          else if (this.curSpot.address) {
+          //否则将视图适配覆盖物
+          else if (centerDesignated) {
+            this.map.setFitView()
+          }
+          //仅传了地址 定位至该地址 并将该地址所在的城市设置为baseCity
+          if (!centerDesignated && this.curSpot.address) {
             this.geocoder.getLocation(this.curSpot.address, (status, result) => {
               console.log('【address逆解析】')
               console.log(result)
@@ -506,12 +560,13 @@ export default {
                 this.initPlugins()
                 if (!this.$isEmpty(lng) && !this.$isEmpty(lat)) {
                   this.map.setCenter([lng, lat])
+                  resolve(true)
                 }
               }
-              resolve(true)
+              resolve(false)
             })
           } else {
-            resolve(false)
+            resolve(centerDesignated)
           }
         }).then(centerDesignated => {
           this.getBaseCity(centerDesignated)
@@ -555,23 +610,20 @@ export default {
         return
       }
       this.searching = true
-      if (!this.doSearch) {
-        this.doSearch = this._.throttle(() => {
-          this.placeSearch.search(this.keyword, (status, result) => {
-            console.log('【搜索结果】')
-            console.log(result)
-            if (status === 'complete') {
-              if (result.info === 'OK' && result.poiList && result.poiList.pois) {
-                this.searchResult = result.poiList.pois || []
-              } else if (result.info === 'TIP_CITIES') {
-                this.$warn('尝试输入更加精确的关键字哦')
-              }
+      this.throttle('search', () => {
+        this.placeSearch.search(this.keyword, (status, result) => {
+          console.log('【搜索结果】')
+          console.log(result)
+          if (status === 'complete') {
+            if (result.info === 'OK' && result.poiList && result.poiList.pois) {
+              this.searchResult = result.poiList.pois || []
+            } else if (result.info === 'TIP_CITIES') {
+              this.$warn('尝试输入更加精确的关键字哦')
             }
-            this.searching = false
-          })
-        }, 500)
-      }
-      this.doSearch()
+          }
+          this.searching = false
+        }, null, 500)
+      })
     }
   }
 }
@@ -581,7 +633,7 @@ export default {
 #map-container {
   height: 100%;
   width: 100%;
-  //cursor: crosshair !important;
+  cursor: crosshair !important;
 }
 
 ::v-deep .el-dialog.is-fullscreen {

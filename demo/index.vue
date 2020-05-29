@@ -22,9 +22,8 @@
     />
 
 
-    <el-form
-            label-position="right"
-            label-width="113px"
+    <el-form label-position="right"
+             label-width="113px"
     >
       <el-form-item label="城市">
         <el-input v-model="city" clearable/>
@@ -57,11 +56,14 @@
         <el-input v-model="imgSouthWestLat" clearable/>
       </el-form-item>
       <el-form-item label="区域轮廓">
-        <el-input :value="boundary&&boundary.length>0?JSON.stringify(boundary):''" clearable @clear="boundary=null"/>
+        <el-input :value="boundary&&boundary.length>0?JSON.stringify(boundary):''"
+                  clearable
+                  @clear="boundary=null"
+        />
       </el-form-item>
     </el-form>
     <div slot="footer">
-      <el-button @click="show=true" type="danger">开启</el-button>
+      <el-button @click="show=true" type="primary">开启</el-button>
     </div>
   </el-dialog>
 </template>
@@ -86,9 +88,9 @@ export default {
        * 点位相关
        */
       //初始点位经度
-      lng: '',
+      lng: 106.679306,
       //初始点位维度
-      lat: '',
+      lat: 26.601421,
       //初始地址
       address: '',
       //初始城市（也支持省份）
@@ -100,33 +102,35 @@ export default {
       //图片地址
       img: 'https://pic4.zhimg.com/80/v2-670a8e55fc0dcb76fc4860c18963aaa8_720w.jpg',
       //图片东北角经度
-      imgNorthEastLng: '106.44294',
+      imgNorthEastLng: 106.682739,
       //图片东北角纬度
-      imgNorthEastLat: '26.644338',
+      imgNorthEastLat: 26.610016,
       //图片西南角经度
-      imgSouthWestLng: '106.431267',
+      imgSouthWestLng: 106.790543,
       //图片西南角纬度
-      imgSouthWestLat: '26.504937',
+      imgSouthWestLat: 26.506218,
 
-      boundary: [{
-        'data': [{ 'longitude': '106.44294', 'latitude': '26.644338' }, {
-          'longitude': '106.431267',
-          'latitude': '26.504937'
-        }, { 'longitude': '106.569282', 'latitude': '26.585405' }]
-      }, {
-        'data': [{ 'longitude': '106.623527', 'latitude': '26.52767' }, {
-          'longitude': '106.602241',
-          'latitude': '26.415188'
-        }, { 'longitude': '106.721031', 'latitude': '26.472979' }]
-      }],
+      boundary: [
+        {
+          'data': [{ 'longitude': '106.44294', 'latitude': '26.644338' }, {
+            'longitude': '106.431267',
+            'latitude': '26.504937'
+          }, { 'longitude': '106.569282', 'latitude': '26.585405' }]
+        }, {
+          'data': [{ 'longitude': '106.623527', 'latitude': '26.52767' }, {
+            'longitude': '106.602241',
+            'latitude': '26.415188'
+          }, { 'longitude': '106.721031', 'latitude': '26.472979' }]
+        }
+      ],
 
       //初始缩放比例
-      zoom: '',
-
-      showDialog: true,
+      zoom: 12,
 
       //坐标精度 默认6位小数
       precision: 6,
+
+      showDialog: true,
     }
   },
   methods: {}

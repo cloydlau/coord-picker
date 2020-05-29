@@ -18,10 +18,10 @@ export default {
   computed: {
     curImg () {
       return Vue.observable({
-        imgNorthEastLng: this.$isEmpty(this.imgNorthEastLng) ? '' : this.imgNorthEastLng,
-        imgNorthEastLat: this.$isEmpty(this.imgNorthEastLat) ? '' : this.imgNorthEastLat,
-        imgSouthWestLng: this.$isEmpty(this.imgSouthWestLng) ? '' : this.imgSouthWestLng,
-        imgSouthWestLat: this.$isEmpty(this.imgSouthWestLat) ? '' : this.imgSouthWestLat,
+        imgNorthEastLng: Math.max(this.imgNorthEastLng, this.imgSouthWestLng), //1.x版本不兼容输入西北角
+        imgNorthEastLat: this.imgNorthEastLat,
+        imgSouthWestLng: Math.min(this.imgNorthEastLng, this.imgSouthWestLng), //1.x版本不兼容输入东南角
+        imgSouthWestLat: this.imgSouthWestLat,
       })
     }
   },
@@ -35,12 +35,11 @@ export default {
       this.imageLayer.setBounds(bounds)
     },
     drawImg (bounds) {
-      this.rectangle = new AMap.Rectangle({
+      this.rectangleObj = new AMap.Rectangle({
         ...this.rectangleStyle,
         bounds,
       })
-      this.rectangle.on('click', this.onMapClick)
-      this.rectangle.setMap(this.map)
+      this.rectangleObj.setMap(this.map)
       this.editImg(bounds)
     },
     editImg (bounds) {
@@ -53,7 +52,17 @@ export default {
       }
       this.syncImgBounds(bounds)
 
-      this.rectangleEditor = new AMap.RectangleEditor(this.map, this.rectangle)
+      this.rectangleObj.on('click', this.onMapClick)
+
+      this.rectangleObj.on('mousemove', e => {
+        this.text.setText('拖拽角可改变形状')
+        this.setTextPosition(e)
+      })
+      this.rectangleObj.on('mouseout', e => {
+        this.text.setText('点击获取坐标')
+      })
+
+      this.rectangleEditor = new AMap.RectangleEditor(this.map, this.rectangleObj)
 
       /**
        * 移动选框时 同步图片
@@ -63,13 +72,17 @@ export default {
         this.syncImgBounds(e.bounds || e.Rd)
       })
       //短距离平移触发
-      this.rectangle.on('mouseup', e => {
-        this.syncImgBounds(this.rectangle.getBounds())
+      this.text.on('mouseup', e => {
+        this.syncImgBounds(this.rectangleObj.getBounds())
+      })
+      //短距离平移触发
+      this.rectangleObj.on('mouseup', e => {
+        this.syncImgBounds(this.rectangleObj.getBounds())
       })
       //长距离平移触发
       this.map.on('mouseup', e => {
-        if (this.rectangle) {
-          this.syncImgBounds(this.rectangle.getBounds())
+        if (this.rectangleObj) {
+          this.syncImgBounds(this.rectangleObj.getBounds())
         }
       })
 
