@@ -233,15 +233,16 @@ export default {
               })*/
 
               const autoCompleteEl = document.querySelector('#autoComplete')
-              const autoCompleteListEl = document.querySelector('#autoComplete_list')
               autoCompleteEl.addEventListener('blur', e => {
-                if (autoCompleteListEl) {
-                  autoCompleteListEl.style.visibility = 'hidden'
+                let el = document.querySelector('#autoComplete_list')
+                if (el) {
+                  el.style.visibility = 'hidden'
                 }
               })
               autoCompleteEl.addEventListener('focus', e => {
-                if (autoCompleteListEl) {
-                  autoCompleteListEl.style.visibility = 'visible'
+                let el = document.querySelector('#autoComplete_list')
+                if (el) {
+                  document.querySelector('#autoComplete_list').style.visibility = 'visible'
                 }
               })
 
