@@ -350,6 +350,7 @@ export default {
     active (newVal) {
       ({
         'marker': () => {
+          this.mouseTool.close()
           this.text.setText('点击获取坐标')
           this.text.on('click', this.onMapClick)
           this.map.on('click', this.onMapClick)
