@@ -125,7 +125,6 @@ export default {
     city: String,
     zoom: {
       validator: value => ['String', 'Null', 'Number'].includes(({}).toString.call(value).slice(8, -1)),
-      default: 5,
     },
     img: {
       validator: value => ['String', 'Null'].includes(({}).toString.call(value).slice(8, -1)),
@@ -158,7 +157,7 @@ export default {
       placeSearch: null,
       autoCompleting: false,
       autoCompleteList: [],
-      autoCompleteInput: null
+      autoCompleteInput: null,
     }
   },
   computed: {
@@ -194,7 +193,9 @@ export default {
         ...defaultValue,
         ...addressComponent,
       } : defaultValue
-
+    },
+    Zoom () {
+      return Vue.observable(Number(this.zoom) || 12)
     }
   },
   watch: {
@@ -223,7 +224,7 @@ export default {
         }).then(AMap => {
           this.map = new AMap.Map('map-container', {
             //viewMode: '3D',
-            zoom: this.selfZoom,
+            zoom: this.Zoom,
           })
 
           this.map.on('complete', () => {
@@ -348,7 +349,7 @@ export default {
           })
 
           this.map.on('zoomchange', e => {
-            this.selfZoom = this.map.getZoom()
+            this.Zoom = this.map.getZoom()
           })
 
           //this.map.addControl(new AMap.ControlBar())
@@ -427,7 +428,6 @@ export default {
     },
     getInitData () {
       return this._.cloneDeep({
-        selfZoom: this.zoom || 12,
         imageLayer: null,
         rectangleObj: null,
         rectangleEditor: null,
@@ -492,7 +492,7 @@ export default {
       this.$emit('update:lat', this.curSpot.lat)
       this.$emit('update:lng', this.curSpot.lng)
       this.$emit('update:address', this.curSpot.address)
-      this.$emit('update:zoom', this.selfZoom)
+      this.$emit('update:zoom', this.Zoom)
       if (this.img) {
         this.$emit('update:imgNorthEastLng', this.curImg.imgNorthEastLng)
         this.$emit('update:imgNorthEastLat', this.curImg.imgNorthEastLat)
