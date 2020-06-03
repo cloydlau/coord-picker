@@ -87,7 +87,7 @@ import './styles/autocomplete.scss'
 import polygon from '@/mixins/polygon'
 import rectangle from '@/mixins/rectangle'
 import Toolbar from '@/components/Toolbar'
-import { apiKey, city, precision } from './config.ts'
+import { apiKey, city, precision, addressComponent } from './config.ts'
 
 const requireAll = requireContext => requireContext.keys().map(requireContext)
 requireAll(require.context('@/assets/svg-sprite', false, /\.svg$/))
@@ -137,7 +137,8 @@ export default {
     boundary: {
       validator: value => ['Array'].includes(({}).toString.call(value).slice(8, -1)),
     },
-    precision: Number
+    precision: Number,
+    addressComponent: Object
   },
   data () {
     return {
@@ -179,6 +180,21 @@ export default {
     },
     Precision () {
       return this.precision || precision || 6
+    },
+    AddressComponent () {
+      const defaultValue = {
+        province: true,
+        city: true,
+        district: true
+      }
+      return this.addressComponent ? {
+        ...defaultValue,
+        ...this.addressComponent,
+      } : addressComponent ? {
+        ...defaultValue,
+        ...addressComponent,
+      } : defaultValue
+
     }
   },
   watch: {
@@ -321,6 +337,10 @@ export default {
             //2.x：e.obj.className==='Overlay.Polygon'
             else if (this.active === 'polygon') {
               this.active = 'marker'
+              e.obj.setOptions({
+                ...this.polygonStyle,
+                fillColor: '#00D3FC',
+              })
               this.polygonObj.push(e.obj)
               this.editPolygon()
             }
@@ -445,8 +465,11 @@ export default {
       this.curSpot.lng = e.lnglat.lng.toFixed(this.Precision)
       this.curSpot.lat = e.lnglat.lat.toFixed(this.Precision)
       this.geocoder.getAddress([this.curSpot.lng, this.curSpot.lat], (status, result) => {
-        if (status === 'complete' && result.info === 'OK') {
-          this.curSpot.address = result.regeocode?.formattedAddress || ''
+        if (status === 'complete' && result.info === 'OK' && result.regeocode?.formattedAddress) {
+          const { province, city, district } = result.regeocode.addressComponent
+          const { province: provinceFlag, city: cityFlag, district: districtFlag } = this.AddressComponent
+          const regionReplacement = (provinceFlag ? '' : province) + (cityFlag ? '' : city) + (districtFlag ? '' : district)
+          this.curSpot.address = result.regeocode.formattedAddress.replace(regionReplacement, '')
         }
       })
       this.drawMarker()
@@ -505,9 +528,10 @@ export default {
         this.curSpot.lat = selectedLocation.location.lat
         this.curSpot.lng = selectedLocation.location.lng
         this.geocoder.getAddress([this.curSpot.lng, this.curSpot.lat], (status, result) => {
-          if (status === 'complete' && result.info === 'OK') {
-            const { province, city, district } = result.regeocode?.addressComponent
-            this.curSpot.address = (province || '') + (city || '') + (district || '') + (selectedLocation.address || '') + (selectedLocation.name || '')
+          if (status === 'complete' && result.info === 'OK' && result.regeocode?.addressComponent) {
+            const { province, city, district } = result.regeocode.addressComponent
+            const { province: provinceFlag, city: cityFlag, district: districtFlag } = this.AddressComponent
+            this.curSpot.address = (provinceFlag ? province : '') + (cityFlag ? city : '') + (districtFlag ? district : '') + (selectedLocation.address || '') + (selectedLocation.name || '')
           }
         })
         this.drawMarker()

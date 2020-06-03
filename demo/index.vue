@@ -11,6 +11,7 @@
                  :address.sync="address"
                  :zoom.sync="zoom"
                  :precision="precision"
+                 :addressComponent="addressComponent"
 
                  :img="img"
                  :imgNorthEastLng.sync="imgNorthEastLng"
@@ -39,6 +40,17 @@
       </el-form-item>
       <el-form-item label="缩放级别">
         <el-input v-model="zoom" clearable/>
+      </el-form-item>
+      <el-form-item label="地址成分">
+        <el-radio-group v-model="addressComponent__" @change="e => {
+           addressComponent = e ? JSON.parse(e) : undefined
+        }">
+          <el-radio-button :label="undefined">完整地址</el-radio-button>
+          <el-radio-button :label="JSON.stringify({province:false})">去掉省</el-radio-button>
+          <el-radio-button :label="JSON.stringify({province:false,city:false})">去掉省市</el-radio-button>
+          <el-radio-button :label="JSON.stringify({province:false,city:false,district:false})">去掉省市县
+          </el-radio-button>
+        </el-radio-group>
       </el-form-item>
       <el-form-item label="图片地址">
         <el-input v-model="img" clearable/>
@@ -129,6 +141,10 @@ export default {
 
       //坐标精度 默认6位小数
       precision: 6,
+
+      //地址成分
+      addressComponent: undefined,
+      addressComponent__: undefined,
 
       showDialog: true,
     }
