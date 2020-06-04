@@ -196,7 +196,7 @@ export default {
     },
     Zoom () {
       return Vue.observable(Number(this.zoom) || 12)
-    }
+    },
   },
   watch: {
     show (newVal, oldVal) {
@@ -209,17 +209,25 @@ export default {
           'key': this.key,   // 申请好的Web端开发者Key，首次调用 load 时必填
           ...this.version ? { version: this.version, } : {}, // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
           'plugins': [
-            ...this.version && this.version.startsWith('2.') ?
-              ['AMap.AutoComplete', 'AMap.PolygonEditor',] :
-              ['AMap.Autocomplete', 'AMap.PolyEditor',],
             //'AMap.ControlBar',
-            'AMap.RectangleEditor',
             'AMap.Geocoder',
             'AMap.CitySearch',
             'AMap.PlaceSearch',
-            'AMap.Polygon',
-            'AMap.ContextMenu',
-            'AMap.MouseTool',
+            ...this.version && this.version.startsWith('2.') ?
+              ['AMap.AutoComplete'] :
+              ['AMap.Autocomplete'],
+            ...this.img ? [
+              'AMap.MouseTool',
+              'AMap.RectangleEditor',
+            ] : [],
+            ...this.boundary ? [
+              'AMap.MouseTool',
+              'AMap.Polygon',
+              'AMap.ContextMenu',
+              ...this.version && this.version.startsWith('2.') ?
+                ['AMap.PolygonEditor',] :
+                ['AMap.PolyEditor',],
+            ] : [],
           ]
         }).then(AMap => {
           this.map = new AMap.Map('map-container', {

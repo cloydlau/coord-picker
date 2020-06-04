@@ -17,7 +17,7 @@ Vue.use(CoordPicker, {
     city: '贵阳',
     //全局坐标精度 默认6位小数（权重低于props）
     precision: 6,
-    //地址成分 默认完整（权重低于props）
+    //全局地址成分 默认完整（权重低于props）
     addressComponent: {
         province: true,
         city: true,
