@@ -325,40 +325,42 @@ export default {
 
           this.map.on('click', this.onMapClick)
 
-          this.mouseTool = new AMap.MouseTool(this.map)
-          this.mouseTool.on('draw', e => {
-            //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
-            //2.x：e.obj.className==='Overlay.Rectangle'
-            if (this.active === 'rectangle') {
-              this.active = 'marker'
-              //图层只允许有一个 清除之前绘制的
-              if (this.rectangleObj) {
-                this.rectangleEditor.close()
-                this.rectangleEditor = null
-                this.rectangleObj.setMap(null)
-              }
-              this.rectangleObj = e.obj
-              //this.editImg(this.rectangleObj.getBounds()) 1.x中编辑绘制出来矩形会报错
-              e.obj.setMap(null) //1.x改为销毁绘制出来的矩形并新建一个矩形对象
-              this.drawImg(this.rectangleObj.getBounds())
-            }
-              //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
-            //2.x：e.obj.className==='Overlay.Polygon'
-            else if (this.active === 'polygon') {
-              this.active = 'marker'
-              e.obj.setOptions({
-                ...this.polygonStyle,
-                fillColor: '#00D3FC',
-              })
-              this.polygonObj.push(e.obj)
-              this.editPolygon()
-            }
-            this.mouseTool.close()
-          })
-
           this.map.on('zoomchange', e => {
             this.Zoom = this.map.getZoom()
           })
+
+          if (this.img || this.boundary) {
+            this.mouseTool = new AMap.MouseTool(this.map)
+            this.mouseTool.on('draw', e => {
+              //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
+              //2.x：e.obj.className==='Overlay.Rectangle'
+              if (this.active === 'rectangle') {
+                this.active = 'marker'
+                //图层只允许有一个 清除之前绘制的
+                if (this.rectangleObj) {
+                  this.rectangleEditor.close()
+                  this.rectangleEditor = null
+                  this.rectangleObj.setMap(null)
+                }
+                this.rectangleObj = e.obj
+                //this.editImg(this.rectangleObj.getBounds()) 1.x中编辑绘制出来矩形会报错
+                e.obj.setMap(null) //1.x改为销毁绘制出来的矩形并新建一个矩形对象
+                this.drawImg(this.rectangleObj.getBounds())
+              }
+                //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
+              //2.x：e.obj.className==='Overlay.Polygon'
+              else if (this.active === 'polygon') {
+                this.active = 'marker'
+                e.obj.setOptions({
+                  ...this.polygonStyle,
+                  fillColor: '#00D3FC',
+                })
+                this.polygonObj.push(e.obj)
+                this.editPolygon()
+              }
+              this.mouseTool.close()
+            })
+          }
 
           //this.map.addControl(new AMap.ControlBar())
 
@@ -379,7 +381,7 @@ export default {
     active (newVal) {
       ({
         'marker': () => {
-          this.mouseTool.close()
+          this.mouseTool && this.mouseTool.close()
           this.text.setText('点击获取坐标')
           this.text.on('click', this.onMapClick)
           this.map.on('click', this.onMapClick)
