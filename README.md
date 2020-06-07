@@ -16,9 +16,9 @@
 
 
 ### Installation / 安装
+![NPM](https://nodei.co/npm/coord-picker.png)
 ```
-yarn add coord-picker / npm i coord-picker
-依赖项：vue element-ui plain-kit
+Dependencies: vue element-ui plain-kit
 
 全局引入：
 import 'coord-picker/dist/coord-picker.css'
