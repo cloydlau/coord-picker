@@ -2,7 +2,7 @@
 
 ![图片](./preview.png)
 
-### Intro / 介绍
+### Feature / 特性
 
 - √ 坐标拾取（双向绑定）
 - √ 拖拉拽绘制/编辑图片图层（双向绑定角坐标）
@@ -32,7 +32,7 @@ components: { CoordPicker }
 ```
 
 
-### Usage / 使用
+### Quick Start / 快速上手
 ```
 请参考/demo中极简示例
 ```

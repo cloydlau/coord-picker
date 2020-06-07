@@ -16,7 +16,13 @@ Vue.use(CoordPicker, {
     //全局初始城市（也支持省份，权重低于props）
     city: '贵阳',
     //全局坐标精度 默认6位小数（权重低于props）
-    precision: 6
+    precision: 6,
+    //全局地址成分 默认完整（权重低于props）
+    addressComponent: {
+        province: true,
+        city: true,
+        district: true,
+    }
 })
 
 Vue.config.productionTip = false

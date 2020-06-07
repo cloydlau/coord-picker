@@ -87,7 +87,7 @@ import './styles/autocomplete.scss'
 import polygon from '@/mixins/polygon'
 import rectangle from '@/mixins/rectangle'
 import Toolbar from '@/components/Toolbar'
-import { apiKey, city, precision } from './config.ts'
+import { apiKey, city, precision, addressComponent } from './config.ts'
 
 const requireAll = requireContext => requireContext.keys().map(requireContext)
 requireAll(require.context('@/assets/svg-sprite', false, /\.svg$/))
@@ -125,7 +125,6 @@ export default {
     city: String,
     zoom: {
       validator: value => ['String', 'Null', 'Number'].includes(({}).toString.call(value).slice(8, -1)),
-      default: 5,
     },
     img: {
       validator: value => ['String', 'Null'].includes(({}).toString.call(value).slice(8, -1)),
@@ -137,7 +136,8 @@ export default {
     boundary: {
       validator: value => ['Array'].includes(({}).toString.call(value).slice(8, -1)),
     },
-    precision: Number
+    precision: Number,
+    addressComponent: Object
   },
   data () {
     return {
@@ -157,7 +157,7 @@ export default {
       placeSearch: null,
       autoCompleting: false,
       autoCompleteList: [],
-      autoCompleteInput: null
+      autoCompleteInput: null,
     }
   },
   computed: {
@@ -179,7 +179,24 @@ export default {
     },
     Precision () {
       return this.precision || precision || 6
-    }
+    },
+    AddressComponent () {
+      const defaultValue = {
+        province: true,
+        city: true,
+        district: true
+      }
+      return this.addressComponent ? {
+        ...defaultValue,
+        ...this.addressComponent,
+      } : addressComponent ? {
+        ...defaultValue,
+        ...addressComponent,
+      } : defaultValue
+    },
+    Zoom () {
+      return Vue.observable(Number(this.zoom) || 12)
+    },
   },
   watch: {
     show (newVal, oldVal) {
@@ -192,22 +209,30 @@ export default {
           'key': this.key,   // 申请好的Web端开发者Key，首次调用 load 时必填
           ...this.version ? { version: this.version, } : {}, // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
           'plugins': [
-            ...this.version && this.version.startsWith('2.') ?
-              ['AMap.AutoComplete', 'AMap.PolygonEditor',] :
-              ['AMap.Autocomplete', 'AMap.PolyEditor',],
             //'AMap.ControlBar',
-            'AMap.RectangleEditor',
             'AMap.Geocoder',
             'AMap.CitySearch',
             'AMap.PlaceSearch',
-            'AMap.Polygon',
-            'AMap.ContextMenu',
-            'AMap.MouseTool',
+            ...this.version && this.version.startsWith('2.') ?
+              ['AMap.AutoComplete'] :
+              ['AMap.Autocomplete'],
+            ...this.img ? [
+              'AMap.MouseTool',
+              'AMap.RectangleEditor',
+            ] : [],
+            ...this.boundary ? [
+              'AMap.MouseTool',
+              'AMap.Polygon',
+              'AMap.ContextMenu',
+              ...this.version && this.version.startsWith('2.') ?
+                ['AMap.PolygonEditor',] :
+                ['AMap.PolyEditor',],
+            ] : [],
           ]
         }).then(AMap => {
           this.map = new AMap.Map('map-container', {
             //viewMode: '3D',
-            zoom: this.selfZoom,
+            zoom: this.Zoom,
           })
 
           this.map.on('complete', () => {
@@ -300,36 +325,42 @@ export default {
 
           this.map.on('click', this.onMapClick)
 
-          this.mouseTool = new AMap.MouseTool(this.map)
-          this.mouseTool.on('draw', e => {
-            //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
-            //2.x：e.obj.className==='Overlay.Rectangle'
-            if (this.active === 'rectangle') {
-              this.active = 'marker'
-              //图层只允许有一个 清除之前绘制的
-              if (this.rectangleObj) {
-                this.rectangleEditor.close()
-                this.rectangleEditor = null
-                this.rectangleObj.setMap(null)
-              }
-              this.rectangleObj = e.obj
-              //this.editImg(this.rectangleObj.getBounds()) 1.x中编辑绘制出来矩形会报错
-              e.obj.setMap(null) //1.x改为销毁绘制出来的矩形并新建一个矩形对象
-              this.drawImg(this.rectangleObj.getBounds())
-            }
-              //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
-            //2.x：e.obj.className==='Overlay.Polygon'
-            else if (this.active === 'polygon') {
-              this.active = 'marker'
-              this.polygonObj.push(e.obj)
-              this.editPolygon()
-            }
-            this.mouseTool.close()
+          this.map.on('zoomchange', e => {
+            this.Zoom = this.map.getZoom()
           })
 
-          this.map.on('zoomchange', e => {
-            this.selfZoom = this.map.getZoom()
-          })
+          if (this.img || this.boundary) {
+            this.mouseTool = new AMap.MouseTool(this.map)
+            this.mouseTool.on('draw', e => {
+              //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
+              //2.x：e.obj.className==='Overlay.Rectangle'
+              if (this.active === 'rectangle') {
+                this.active = 'marker'
+                //图层只允许有一个 清除之前绘制的
+                if (this.rectangleObj) {
+                  this.rectangleEditor.close()
+                  this.rectangleEditor = null
+                  this.rectangleObj.setMap(null)
+                }
+                this.rectangleObj = e.obj
+                //this.editImg(this.rectangleObj.getBounds()) 1.x中编辑绘制出来矩形会报错
+                e.obj.setMap(null) //1.x改为销毁绘制出来的矩形并新建一个矩形对象
+                this.drawImg(this.rectangleObj.getBounds())
+              }
+                //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
+              //2.x：e.obj.className==='Overlay.Polygon'
+              else if (this.active === 'polygon') {
+                this.active = 'marker'
+                e.obj.setOptions({
+                  ...this.polygonStyle,
+                  fillColor: '#00D3FC',
+                })
+                this.polygonObj.push(e.obj)
+                this.editPolygon()
+              }
+              this.mouseTool.close()
+            })
+          }
 
           //this.map.addControl(new AMap.ControlBar())
 
@@ -350,7 +381,7 @@ export default {
     active (newVal) {
       ({
         'marker': () => {
-          this.mouseTool.close()
+          this.mouseTool && this.mouseTool.close()
           this.text.setText('点击获取坐标')
           this.text.on('click', this.onMapClick)
           this.map.on('click', this.onMapClick)
@@ -407,7 +438,6 @@ export default {
     },
     getInitData () {
       return this._.cloneDeep({
-        selfZoom: this.zoom || 12,
         imageLayer: null,
         rectangleObj: null,
         rectangleEditor: null,
@@ -445,8 +475,11 @@ export default {
       this.curSpot.lng = e.lnglat.lng.toFixed(this.Precision)
       this.curSpot.lat = e.lnglat.lat.toFixed(this.Precision)
       this.geocoder.getAddress([this.curSpot.lng, this.curSpot.lat], (status, result) => {
-        if (status === 'complete' && result.info === 'OK') {
-          this.curSpot.address = result.regeocode?.formattedAddress || ''
+        if (status === 'complete' && result.info === 'OK' && result.regeocode?.formattedAddress) {
+          const { province, city, district } = result.regeocode.addressComponent
+          const { province: provinceFlag, city: cityFlag, district: districtFlag } = this.AddressComponent
+          const regionReplacement = (provinceFlag ? '' : province) + (cityFlag ? '' : city) + (districtFlag ? '' : district)
+          this.curSpot.address = result.regeocode.formattedAddress.replace(regionReplacement, '')
         }
       })
       this.drawMarker()
@@ -469,7 +502,7 @@ export default {
       this.$emit('update:lat', this.curSpot.lat)
       this.$emit('update:lng', this.curSpot.lng)
       this.$emit('update:address', this.curSpot.address)
-      this.$emit('update:zoom', this.selfZoom)
+      this.$emit('update:zoom', this.Zoom)
       if (this.img) {
         this.$emit('update:imgNorthEastLng', this.curImg.imgNorthEastLng)
         this.$emit('update:imgNorthEastLat', this.curImg.imgNorthEastLat)
@@ -505,9 +538,10 @@ export default {
         this.curSpot.lat = selectedLocation.location.lat
         this.curSpot.lng = selectedLocation.location.lng
         this.geocoder.getAddress([this.curSpot.lng, this.curSpot.lat], (status, result) => {
-          if (status === 'complete' && result.info === 'OK') {
-            const { province, city, district } = result.regeocode?.addressComponent
-            this.curSpot.address = (province || '') + (city || '') + (district || '') + (selectedLocation.address || '') + (selectedLocation.name || '')
+          if (status === 'complete' && result.info === 'OK' && result.regeocode?.addressComponent) {
+            const { province, city, district } = result.regeocode.addressComponent
+            const { province: provinceFlag, city: cityFlag, district: districtFlag } = this.AddressComponent
+            this.curSpot.address = (provinceFlag ? province : '') + (cityFlag ? city : '') + (districtFlag ? district : '') + (selectedLocation.address || '') + (selectedLocation.name || '')
           }
         })
         this.drawMarker()

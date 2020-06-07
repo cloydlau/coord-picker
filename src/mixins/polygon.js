@@ -6,7 +6,6 @@ export default {
         strokeWeight: 2,
         strokeOpacity: 0.9,
         strokeStyle: 'solid',
-        fillColor: '#00D3FC',
         fillOpacity: 0.5,
         cursor: 'pointer',
         zIndex: 50,
@@ -30,13 +29,17 @@ export default {
         for (let i = 0; i < boundary.length; i++) {
           this.polygonObj.push(new AMap.Polygon({
             ...this.polygonStyle,
+            fillColor: '#00D3FC',
             map: this.map,
             path: boundary[i]?.data?.map(v => [v.longitude, v.latitude]),
           }))
           this.editPolygon()
         }
       } else {
-        this.mouseTool.polygon(this.polygonStyle)
+        this.mouseTool.polygon({
+          ...this.polygonStyle,
+          fillColor: 'transparent'
+        })
       }
     },
     editPolygon () {
