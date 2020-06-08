@@ -146,7 +146,6 @@ export default {
       searching: false,
       keyword: '',
       searchResult: [],
-      baseCity: '',
       map: null,
       loading: true,
       marker: null,
@@ -193,9 +192,6 @@ export default {
         ...defaultValue,
         ...addressComponent,
       } : defaultValue
-    },
-    Zoom () {
-      return Vue.observable(Number(this.zoom) || 12)
     },
   },
   watch: {
@@ -325,6 +321,7 @@ export default {
 
           this.map.on('click', this.onMapClick)
 
+          this.Zoom = this.$isEmpty(this.zoom) ? 12 : Number(this.zoom)
           this.map.on('zoomchange', e => {
             this.Zoom = this.map.getZoom()
           })
@@ -443,7 +440,9 @@ export default {
         rectangleEditor: null,
         polygonObj: [],
         polygonEditor: [],
-        curBoundary: []
+        curBoundary: [],
+        Zoom: null,
+        baseCity: '',
       })
     },
     reset () {
@@ -588,7 +587,7 @@ export default {
           //仅传了地址 定位至该地址 并将该地址所在的城市设置为baseCity
           if (!centerDesignated && this.curSpot.address) {
             this.geocoder.getLocation(this.curSpot.address, (status, result) => {
-              console.log('【address逆解析】')
+              console.log('【getLocation】')
               console.log(result)
               if (status === 'complete' && result.info === 'OK') {
                 const { lng, lat } = result.geocodes[0]?.location
@@ -614,7 +613,7 @@ export default {
       if (this.baseCity && isNaN(this.baseCity)) {
         if (!centerDesignated) {
           this.geocoder.getLocation(this.baseCity, (status, result) => {
-            console.log('【city解析】')
+            console.log('【getLocation】')
             console.log(result)
             if (status === 'complete' && result.info === 'OK') {
               const { lng, lat } = result.geocodes[0]?.location
@@ -629,6 +628,8 @@ export default {
       else {
         const citySearch = new AMap.CitySearch()
         citySearch.getLocalCity((status, result) => {
+          console.log('【getLocalCity】')
+          console.log(result)
           if (status === 'complete' && result.info === 'OK') {
             this.baseCity = result.city
             this.initPlugins()
@@ -648,7 +649,7 @@ export default {
       this.searching = true
       this.throttle('search', () => {
         this.placeSearch.search(this.keyword, (status, result) => {
-          console.log('【搜索结果】')
+          console.log('【search】')
           console.log(result)
           if (status === 'complete') {
             if (result.info === 'OK' && result.poiList && result.poiList.pois) {
