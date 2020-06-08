@@ -170,7 +170,7 @@ export default {
       return Vue.observable({
         lng: this.$isEmpty(this.lng) ? '' : this.lng,
         lat: this.$isEmpty(this.lat) ? '' : this.lat,
-        address: this.address || ((this.$isEmpty(this.lng) && this.$isEmpty(this.lat)) ? this.baseCity : '')
+        address: this.address || ((this.$isEmpty(this.lng) || this.$isEmpty(this.lat)) ? this.baseCity : '')
       })
     },
     key () {
@@ -585,14 +585,17 @@ export default {
             this.map.setFitView()
           }
           //仅传了地址 定位至该地址 并将该地址所在的城市设置为baseCity
-          if (!centerDesignated && this.curSpot.address) {
-            this.geocoder.getLocation(this.curSpot.address, (status, result) => {
+          if (!centerDesignated && this.address) {
+            this.geocoder.getLocation(this.address, (status, result) => {
               console.log('【getLocation】')
               console.log(result)
               if (status === 'complete' && result.info === 'OK') {
                 const { lng, lat } = result.geocodes[0]?.location
-                this.baseCity = result.geocodes[0]?.addressComponent.city
-                this.initPlugins()
+                const addressCity = result.geocodes[0]?.addressComponent.city
+                if (addressCity) {
+                  this.baseCity = addressCity
+                  this.initPlugins()
+                }
                 if (!this.$isEmpty(lng) && !this.$isEmpty(lat)) {
                   this.map.setCenter([lng, lat])
                   resolve(true)
