@@ -12,7 +12,7 @@ $btnSize: 35px;
 .toolbar {
   position: fixed;
   top: 15px;
-  right: 15px;
+  right: 0;
   height: 40px;
   background: #ffffff96;
   border-color: #003371;

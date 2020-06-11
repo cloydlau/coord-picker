@@ -205,6 +205,8 @@ export default {
           'key': this.key,   // 申请好的Web端开发者Key，首次调用 load 时必填
           ...this.version ? { version: this.version, } : {}, // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
           'plugins': [
+            'AMap.Scale',
+            'AMap.MapType',
             //'AMap.ControlBar',
             'AMap.Geocoder',
             'AMap.CitySearch',
@@ -230,6 +232,12 @@ export default {
             //viewMode: '3D',
             zoom: this.Zoom,
           })
+
+          // 在图面添加比例尺控件，展示地图在当前层级和纬度下的比例尺
+          this.map.addControl(new AMap.Scale())
+
+          // 在图面添加类别切换控件，实现默认图层与卫星图、实施交通图层之间切换的控制
+          this.map.addControl(new AMap.MapType())
 
           this.map.on('complete', () => {
             this.$nextTick(() => {
@@ -773,5 +781,10 @@ export default {
       //border-radius: 10px;
     }
   }
+}
+
+::v-deep .amap-maptypecontrol {
+  top: 70px;
+  right: 20px;
 }
 </style>

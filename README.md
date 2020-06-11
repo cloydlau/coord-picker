@@ -2,7 +2,7 @@
 
 ![图片](./preview.png)
 
-### Feature / 特性
+### Features
 
 - √ 坐标拾取（双向绑定）
 - √ 拖拉拽绘制/编辑图片图层（双向绑定角坐标）
@@ -15,7 +15,7 @@
 - 高德JS-API版本：1.4.15（曾采用动态版本，但2.0存在诸多问题，性能也不如1.x，等待后续更新吧）
 
 
-### Installation / 安装
+### Installation
 ![NPM](https://nodei.co/npm/coord-picker.png)
 ```
 Dependencies: vue element-ui plain-kit
@@ -32,7 +32,7 @@ components: { CoordPicker }
 ```
 
 
-### Quick Start / 快速上手
+### Quick Start
 ```
 请参考/demo中极简示例
 ```

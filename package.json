@@ -1,6 +1,6 @@
 {
   "name": "coord-picker",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "author": "cloydlau",
   "license": "MIT",
   "description": "高德/腾讯地图坐标拾取器 / A coordinates picker for amap/tmap",
@@ -25,8 +25,7 @@
   "scripts": {
     "dev": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lib": "vue-cli-service build --target lib --name coord-picker src/main.ts",
-    "pub": "npm run lib && yrm use npm && npm publish"
+    "lib": "vue-cli-service build --target lib --name coord-picker src/main.ts && yrm use npm"
   },
   "dependencies": {
     "@amap/amap-jsapi-loader": "^0.0.1",
@@ -36,14 +35,14 @@
   },
   "peerDependencies": {
     "element-ui": "^2.13.2",
-    "plain-kit": "^0.2.3",
+    "plain-kit": "^0.2.6",
     "vue": "^2.6.11"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.4.0",
     "@vue/cli-service": "~4.4.0",
     "element-ui": "^2.13.2",
-    "plain-kit": "^0.2.3",
+    "plain-kit": "^0.2.6",
     "sass": "^1.26.0",
     "sass-loader": "^8.0.2",
     "svg-sprite-loader": "^5.0.0",
