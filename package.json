@@ -25,7 +25,7 @@
   "scripts": {
     "dev": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lib": "vue-cli-service build --target lib --name coord-picker src/main.ts && yrm use npm"
+    "lib": "vue-cli-service build --target lib --name coord-picker src/main.ts"
   },
   "dependencies": {
     "@amap/amap-jsapi-loader": "^0.0.1",
