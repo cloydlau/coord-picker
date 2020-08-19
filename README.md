@@ -48,7 +48,7 @@ components: { CoordPicker }
 | lng.sync | 经度 | | Number / String | | |
 | lat.sync | 纬度 | | Number / String | | |
 | zoom.sync | 缩放级别 | | Number | | |
-| precision | 坐标精度（保留几位小数）（boundary不会受该参数影响） | 支持 | Number | | 6 |
+| precision | 坐标精度（保留几位小数） | 支持 | Number | | 6 |
 | addressComponent | 地址成分 可以指定选中的地点是否包含省/市/区 | 支持 | Object | | { province:true, city:true, district:true } |
 | img | 图片链接（用于图片图层） | | String | | |
 | imgNorthEastLng.sync | 图片东北角经度（用于图片图层） | | Number / String | | |
