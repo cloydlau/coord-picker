@@ -49,7 +49,7 @@ components: { CoordPicker }
 | lat.sync | 纬度 | | Number / String | | |
 | zoom.sync | 缩放级别 | | Number | | |
 | precision | 坐标精度（保留几位小数） | 支持 | Number | | 6 |
-| addressComponent | 地址成分 可以指定选中的地点是否包含省/市/区 | 支持 | Object | | { province:true, city:true, district:true } |
+| addressComponent | 地址成分 可以指定选中的address是否包含省/市/区 | 支持 | Object | | { province:true, city:true, district:true } |
 | img | 图片链接（用于图片图层） | | String | | |
 | imgNorthEastLng.sync | 图片东北角经度（用于图片图层） | | Number / String | | |
 | imgNorthEastLat.sync | 图片东北角纬度（用于图片图层） | | Number / String | | |
