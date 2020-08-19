@@ -11,13 +11,9 @@ import CoordPicker from '../src/main.ts'
 //import CoordPicker from '../dist/coord-picker.umd.js'
 
 Vue.use(CoordPicker, {
-    //全局高德地图js api key（权重低于props）
     apiKey: process.env.VUE_APP_AMAP_JS_API_KEY,
-    //全局初始城市（也支持省份，权重低于props）
     city: '',
-    //全局坐标精度 默认6位小数（权重低于props）
     precision: 6,
-    //全局地址成分 默认完整（权重低于props）
     addressComponent: {
         province: true,
         city: true,

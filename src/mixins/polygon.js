@@ -18,8 +18,9 @@ export default {
       this.curBoundary = []
       this.polygonObj.map(v => {
         if (v) {
+          //新创建的polygon getPath()获取的lng和lat默认只保留6位小数 而R和Q是完整的
           this.curBoundary.push({
-            data: Array.from(v.getPath(), v => ({ longitude: v.lng, latitude: v.lat }))
+            data: Array.from(v.getPath(), v => ({ longitude: this.roundOff(v.R), latitude: this.roundOff(v.Q) }))
           })
         }
       })

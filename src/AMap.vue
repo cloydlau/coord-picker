@@ -24,8 +24,8 @@
              v-show="searchResult.length>0"
         >
           <div v-for="(v,i) of searchResult" :key="i" class="item" @click="locate(v)">
-            <h3>{{v.name}}</h3>
-            <div style="margin:1rem;color:grey">{{v.address}}</div>
+            <h3>{{ v.name }}</h3>
+            <div style="margin:1rem;color:grey">{{ v.address }}</div>
           </div>
         </div>
       </transition>
@@ -77,7 +77,7 @@
 
 <script>
 import Vue from 'vue'
-import { isEmpty, err, warn, SvgIcon } from 'plain-kit'
+import { isEmpty, err, warn, typeOf, SvgIcon } from 'plain-kit'
 import _ from 'lodash'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
@@ -114,27 +114,27 @@ export default {
     },
     apiKey: String,
     lat: {
-      validator: value => ['String', 'Null', 'Number'].includes(({}).toString.call(value).slice(8, -1)),
+      validator: value => ['String', 'Null', 'Number'].includes(typeOf(value)),
     },
     lng: {
-      validator: value => ['String', 'Null', 'Number'].includes(({}).toString.call(value).slice(8, -1)),
+      validator: value => ['String', 'Null', 'Number'].includes(typeOf(value)),
     },
     address: {
-      validator: value => ['String', 'Null'].includes(({}).toString.call(value).slice(8, -1)),
+      validator: value => ['String', 'Null'].includes(typeOf(value)),
     },
     city: String,
     zoom: {
-      validator: value => ['String', 'Null', 'Number'].includes(({}).toString.call(value).slice(8, -1)),
+      validator: value => ['String', 'Null', 'Number'].includes(typeOf(value)),
     },
     img: {
-      validator: value => ['String', 'Null'].includes(({}).toString.call(value).slice(8, -1)),
+      validator: value => ['String', 'Null'].includes(typeOf(value)),
     },
     imgNorthEastLng: [Number, String],
     imgNorthEastLat: [Number, String],
     imgSouthWestLng: [Number, String],
     imgSouthWestLat: [Number, String],
     boundary: {
-      validator: value => ['Array'].includes(({}).toString.call(value).slice(8, -1)),
+      validator: value => ['Array'].includes(typeOf(value)),
     },
     precision: Number,
     addressComponent: Object
@@ -177,7 +177,10 @@ export default {
       return this.apiKey || apiKey
     },
     Precision () {
-      return this.precision || precision || 6
+      return typeof this.precision === 'number' ?
+        this.precision :
+        typeof precision === 'number' ?
+          precision : 6
     },
     AddressComponent () {
       const defaultValue = {
@@ -479,8 +482,8 @@ export default {
     },
     onMapClick (e) {
       this.clearMarker()
-      this.curSpot.lng = e.lnglat.lng.toFixed(this.Precision)
-      this.curSpot.lat = e.lnglat.lat.toFixed(this.Precision)
+      this.curSpot.lng = e.lnglat.lng
+      this.curSpot.lat = e.lnglat.lat
       this.geocoder.getAddress([this.curSpot.lng, this.curSpot.lat], (status, result) => {
         if (status === 'complete' && result.info === 'OK' && result.regeocode?.formattedAddress) {
           const { province, city, district } = result.regeocode.addressComponent
@@ -505,16 +508,26 @@ export default {
         })
       })
     },
+    roundOff (value) {
+      if (this.$isEmpty(value)) {
+        return ''
+      } else {
+        return {
+          'Number': () => value.toFixed(this.Precision).toString(),
+          'String': () => Number(value).toFixed(this.Precision).toString()
+        }[typeOf(value)]()
+      }
+    },
     confirm () {
-      this.$emit('update:lat', this.curSpot.lat)
-      this.$emit('update:lng', this.curSpot.lng)
+      this.$emit('update:lat', this.roundOff(this.curSpot.lat))
+      this.$emit('update:lng', this.roundOff(this.curSpot.lng))
       this.$emit('update:address', this.curSpot.address)
       this.$emit('update:zoom', this.Zoom)
       if (this.img) {
-        this.$emit('update:imgNorthEastLng', this.curImg.imgNorthEastLng)
-        this.$emit('update:imgNorthEastLat', this.curImg.imgNorthEastLat)
-        this.$emit('update:imgSouthWestLng', this.curImg.imgSouthWestLng)
-        this.$emit('update:imgSouthWestLat', this.curImg.imgSouthWestLat)
+        this.$emit('update:imgNorthEastLng', this.roundOff(this.curImg.imgNorthEastLng))
+        this.$emit('update:imgNorthEastLat', this.roundOff(this.curImg.imgNorthEastLat))
+        this.$emit('update:imgSouthWestLng', this.roundOff(this.curImg.imgSouthWestLng))
+        this.$emit('update:imgSouthWestLat', this.roundOff(this.curImg.imgSouthWestLat))
       }
       if (this.boundary) {
         this.syncPolygon()
@@ -764,14 +777,14 @@ export default {
       border-radius: 10px;
       background-color: skyblue;
       background-image: -webkit-linear-gradient(
-                      45deg,
-                      rgba(255, 255, 255, 0.2) 25%,
-                      transparent 25%,
-                      transparent 50%,
-                      rgba(255, 255, 255, 0.2) 50%,
-                      rgba(255, 255, 255, 0.2) 75%,
-                      transparent 75%,
-                      transparent
+          45deg,
+          rgba(255, 255, 255, 0.2) 25%,
+          transparent 25%,
+          transparent 50%,
+          rgba(255, 255, 255, 0.2) 50%,
+          rgba(255, 255, 255, 0.2) 75%,
+          transparent 75%,
+          transparent
       );
     }
 

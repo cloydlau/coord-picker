@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :visible.sync="showDialog" :close-on-click-modal="false" title="坐标拾取">
+  <el-dialog visible :close-on-click-modal="false" :show-close="false" title="coord-picker">
 
 
     <CoordPicker :show.sync="show"
@@ -24,24 +24,27 @@
 
 
     <el-form label-position="right"
-             label-width="113px"
+             label-width="148px"
     >
-      <el-form-item label="城市">
+      <el-form-item label="city">
         <el-input v-model="city" clearable/>
       </el-form-item>
-      <el-form-item label="地址">
+      <el-form-item label="address">
         <el-input v-model="address" clearable/>
       </el-form-item>
-      <el-form-item label="经度">
+      <el-form-item label="lng">
         <el-input v-model="lng" clearable/>
       </el-form-item>
-      <el-form-item label="纬度">
+      <el-form-item label="lat">
         <el-input v-model="lat" clearable/>
       </el-form-item>
-      <el-form-item label="缩放级别">
+      <el-form-item label="zoom">
         <el-input v-model="zoom" clearable/>
       </el-form-item>
-      <el-form-item label="地址成分">
+      <el-form-item label="precision">
+        <el-input-number v-model="precision" clearable :min="0"/>
+      </el-form-item>
+      <el-form-item label="addressComponent">
         <el-radio-group v-model="addressComponent__" @change="e => {
            addressComponent = e ? JSON.parse(e) : undefined
         }">
@@ -52,30 +55,27 @@
           </el-radio-button>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="图片地址">
+      <el-form-item label="img">
         <el-input v-model="img" clearable/>
       </el-form-item>
-      <el-form-item label="图片东北角经度">
+      <el-form-item label="imgNorthEastLng">
         <el-input v-model="imgNorthEastLng" clearable/>
       </el-form-item>
-      <el-form-item label="图片东北角纬度">
+      <el-form-item label="imgNorthEastLat">
         <el-input v-model="imgNorthEastLat" clearable/>
       </el-form-item>
-      <el-form-item label="图片西南角经度">
+      <el-form-item label="imgSouthWestLng">
         <el-input v-model="imgSouthWestLng" clearable/>
       </el-form-item>
-      <el-form-item label="图片西南角纬度">
+      <el-form-item label="imgSouthWestLat">
         <el-input v-model="imgSouthWestLat" clearable/>
       </el-form-item>
-      <el-form-item label="区域轮廓">
-        <el-input :value="boundary&&boundary.length>0?JSON.stringify(boundary):''"
-                  clearable
-                  @clear="boundary=null"
-        />
+      <el-form-item label="boundary">
+        <json-editor-vue v-model="boundary"/>
       </el-form-item>
     </el-form>
     <div slot="footer">
-      <el-button @click="show=true" type="primary">开启</el-button>
+      <el-button @click="show=true" type="primary">open</el-button>
     </div>
   </el-dialog>
 </template>
@@ -85,7 +85,10 @@
 //todo: import 'coord-picker/dist/coord-picker.css'
 //todo: import {CoordPicker} from 'coord-picker'
 
+import { JsonEditorVue } from 'json-editor-vue'
+
 export default {
+  components: { JsonEditorVue },
   data () {
     return {
       /**
@@ -145,8 +148,6 @@ export default {
       //地址成分
       addressComponent: undefined,
       addressComponent__: undefined,
-
-      showDialog: true,
     }
   },
   methods: {}
