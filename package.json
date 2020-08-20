@@ -1,6 +1,6 @@
 {
   "name": "coord-picker",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "author": "cloydlau",
   "license": "MIT",
   "description": "高德/腾讯地图坐标拾取器 / A coordinates picker for amap/tmap",
@@ -31,11 +31,11 @@
     "@amap/amap-jsapi-loader": "^0.0.4",
     "@tarekraafat/autocomplete.js": "^7.2.0",
     "core-js": "^3.6.0",
-    "lodash": "^4.17.20"
+    "lodash": "^4.17.20",
+    "plain-kit": "^0.3.0-alpha.0"
   },
   "peerDependencies": {
     "element-ui": "^2.13.2",
-    "plain-kit": "^0.3.0-alpha.0",
     "vue": "^2.6.11"
   },
   "devDependencies": {
@@ -43,7 +43,6 @@
     "@vue/cli-service": "~4.5.0",
     "element-ui": "^2.13.2",
     "json-editor-vue": "^0.0.3",
-    "plain-kit": "^0.3.0-alpha.0",
     "sass": "^1.26.0",
     "sass-loader": "^9.0.0",
     "svg-sprite-loader": "^5.0.0",

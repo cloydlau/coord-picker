@@ -6,7 +6,6 @@ function resolve (dir) {
 
 const externals = process.env.NODE_ENV === 'development' ? {} : {
   'element-ui': 'element-ui',
-  'plain-kit': 'plain-kit',
   'vue': 'vue'
 }
 

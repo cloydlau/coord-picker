@@ -17,7 +17,8 @@
 $ yarn add coord-picker
 ```
 
-**依赖项**：vue element-ui plain-kit
+**依赖**：vue element-ui
+___
 
 **全局引入**
 ```js
