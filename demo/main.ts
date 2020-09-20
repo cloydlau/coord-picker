@@ -7,9 +7,6 @@ import ElementUI from 'element-ui'
 Vue.use(ElementUI)
 
 import CoordPicker from '../src/main.ts'
-//import '../dist/coord-picker.css'
-//import CoordPicker from '../dist/coord-picker.umd.js'
-
 Vue.use(CoordPicker, {
     apiKey: process.env.VUE_APP_AMAP_JS_API_KEY,
     city: '',

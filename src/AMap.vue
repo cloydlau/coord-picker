@@ -472,9 +472,11 @@ export default {
       }
       //this.map.clearMap() 某些情况下未知报错
       Object.assign(this.$data, this.getInitData())
-      this.curImg.imgNorthEastLng = Math.max(this.imgNorthEastLng, this.imgSouthWestLng)
+      if (!this.$isEmpty(this.imgNorthEastLng) && !this.$isEmpty(this.imgSouthWestLng)) {
+        this.curImg.imgNorthEastLng = Math.max(this.imgNorthEastLng, this.imgSouthWestLng)
+        this.curImg.imgSouthWestLng = Math.min(this.imgNorthEastLng, this.imgSouthWestLng)
+      }
       this.curImg.imgNorthEastLat = this.imgNorthEastLat
-      this.curImg.imgSouthWestLng = Math.min(this.imgNorthEastLng, this.imgSouthWestLng)
       this.curImg.imgSouthWestLat = this.imgSouthWestLat
       this.curSpot.lng = this.$isEmpty(this.lng) ? '' : this.lng
       this.curSpot.lat = this.$isEmpty(this.lat) ? '' : this.lat

@@ -18,9 +18,15 @@ export default {
   computed: {
     curImg () {
       return Vue.observable({
-        imgNorthEastLng: Math.max(this.imgNorthEastLng, this.imgSouthWestLng), //1.x版本不兼容输入西北角
+        imgNorthEastLng:
+          (this.$isEmpty(this.imgNorthEastLng) || this.$isEmpty(this.imgSouthWestLng)) ?
+            '' :
+            Math.max(this.imgNorthEastLng, this.imgSouthWestLng), //1.x版本不兼容输入西北角
         imgNorthEastLat: this.imgNorthEastLat,
-        imgSouthWestLng: Math.min(this.imgNorthEastLng, this.imgSouthWestLng), //1.x版本不兼容输入东南角
+        imgSouthWestLng:
+          (this.$isEmpty(this.imgNorthEastLng) || this.$isEmpty(this.imgSouthWestLng)) ?
+            '' :
+            Math.min(this.imgNorthEastLng, this.imgSouthWestLng), //1.x版本不兼容输入东南角
         imgSouthWestLat: this.imgSouthWestLat,
       })
     }
