@@ -25,16 +25,16 @@ export default {
         }
       })
     },
-    drawPolygon (boundary) {
+    drawPolygon (boundary, draggable) {
       if (boundary) {
         for (let i = 0; i < boundary.length; i++) {
           this.polygonObj.push(new AMap.Polygon({
             ...this.polygonStyle,
             fillColor: '#00D3FC',
             map: this.map,
-            path: boundary[i]?.data?.map(v => [v.longitude, v.latitude]),
+            path: boundary[i]?.data?.map(v => [v.longitude || v.lng, v.latitude || v.lat]),
           }))
-          this.editPolygon()
+          this.editPolygon(draggable)
         }
       } else {
         this.mouseTool.polygon({
@@ -43,21 +43,19 @@ export default {
         })
       }
     },
-    editPolygon () {
+    editPolygon (draggable = true) {
       const i = this.polygonObj.length - 1
 
       const polygonContextMenu = new AMap.ContextMenu()
       polygonContextMenu.addItem('删除', e => {
-        this.polygonEditor[i].close()
-        this.polygonEditor[i] = null
+        if (draggable) {
+          this.polygonEditor[i].close()
+          this.polygonEditor[i] = null
+        }
         this.polygonObj[i].setMap(null)
         this.polygonObj[i] = null
       }, 0)
 
-      this.polygonObj[i].on('mousemove', e => {
-        this.text.setText('拖拽角可调整形状，右键可删除该区域')
-        this.setTextPosition(e)
-      })
       this.polygonObj[i].on('mouseout', e => {
         this.text.setText('点击获取坐标')
       })
@@ -68,11 +66,18 @@ export default {
         polygonContextMenu.open(this.map, e.lnglat)
       })
 
-      this.polygonEditor.push(AMap.PolygonEditor ?
-        new AMap.PolygonEditor(this.map, this.polygonObj[i]) :
-        new AMap.PolyEditor(this.map, this.polygonObj[i])
-      )
-      this.polygonEditor[i].open()
+      this.polygonObj[i].on('mousemove', e => {
+        this.text.setText((draggable ? '拖拽角可调整形状，' : '') + '右键可删除该区域')
+        this.setTextPosition(e)
+      })
+
+      if (draggable) {
+        this.polygonEditor.push(AMap.PolygonEditor ?
+          new AMap.PolygonEditor(this.map, this.polygonObj[i]) :
+          new AMap.PolyEditor(this.map, this.polygonObj[i])
+        )
+        this.polygonEditor[i].open()
+      }
       this.polygonObj[i].setMap(this.map)
     },
   }

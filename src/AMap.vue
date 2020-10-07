@@ -77,7 +77,7 @@
 
 <script>
 import Vue from 'vue'
-import { isEmpty, err, warn, typeOf, SvgIcon } from 'plain-kit'
+import { isEmpty, err, warn, confirmation, typeOf, SvgIcon } from 'plain-kit'
 import _ from 'lodash'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
@@ -154,6 +154,7 @@ export default {
       geocoder: null,
       autoComplete: null,
       placeSearch: null,
+      districtSearch: null,
       autoCompleting: false,
       autoCompleteList: [],
       autoCompleteInput: null,
@@ -225,6 +226,7 @@ export default {
               'AMap.MouseTool',
               'AMap.Polygon',
               'AMap.ContextMenu',
+              'AMap.DistrictSearch',
               ...this.version && this.version.startsWith('2.') ?
                 ['AMap.PolygonEditor',] :
                 ['AMap.PolyEditor',],
@@ -443,6 +445,13 @@ export default {
         new AMap.AutoComplete(param) :
         new AMap.Autocomplete(param)
       this.placeSearch = new AMap.PlaceSearch(param)
+      if (this.boundary) {
+        this.districtSearch = new AMap.DistrictSearch({
+          subdistrict: 0,   //获取边界不需要返回下级行政区
+          extensions: 'all',  //返回行政区边界坐标组等具体信息
+          level: 'district'  //行政级别
+        })
+      }
     },
     getInitData () {
       return this._.cloneDeep({
@@ -555,6 +564,19 @@ export default {
     locate (selectedLocation) {
       //选中搜索项
       if (selectedLocation) {
+        if (this.districtSearch) {
+          this.districtSearch.search(selectedLocation.name, (status, result) => {
+            if (status === 'complete' && result.info === 'OK') {
+              const bounds = result?.districtList[0]?.boundaries
+              if (bounds.length) {
+                confirmation(`是否绘制${selectedLocation.name}轮廓？`).then(() => {
+                  this.drawPolygon(Array.from(bounds, v => ({ data: v })), false)
+                })
+              }
+            }
+          })
+        }
+
         this.clearMarker()
         //this.meny.close()
         this.curSpot.lat = selectedLocation.location.lat
@@ -610,8 +632,7 @@ export default {
           //仅传了地址 定位至该地址 并将该地址所在的城市设置为baseCity
           if (!centerDesignated && this.address) {
             this.geocoder.getLocation(this.address, (status, result) => {
-              console.log('【getLocation】')
-              console.log(result)
+              console.log('[CoordPicker - getLocation]', result)
               if (status === 'complete' && result.info === 'OK') {
                 const { lng, lat } = result.geocodes[0]?.location
                 const addressCity = result.geocodes[0]?.addressComponent.city
@@ -639,8 +660,7 @@ export default {
       if (this.baseCity && isNaN(this.baseCity)) {
         if (!centerDesignated) {
           this.geocoder.getLocation(this.baseCity, (status, result) => {
-            console.log('【getLocation】')
-            console.log(result)
+            console.log('[CoordPicker - getLocation]', result)
             if (status === 'complete' && result.info === 'OK') {
               const { lng, lat } = result.geocodes[0]?.location
               if (!this.$isEmpty(lng) && !this.$isEmpty(lat)) {
@@ -654,8 +674,7 @@ export default {
       else {
         const citySearch = new AMap.CitySearch()
         citySearch.getLocalCity((status, result) => {
-          console.log('【getLocalCity】')
-          console.log(result)
+          console.log('[CoordPicker - getLocalCity]', result)
           if (status === 'complete' && result.info === 'OK') {
             this.baseCity = result.city
             this.initPlugins()
@@ -675,8 +694,7 @@ export default {
       this.searching = true
       this.throttle('search', () => {
         this.placeSearch.search(this.keyword, (status, result) => {
-          console.log('【search】')
-          console.log(result)
+          console.log('[CoordPicker - search]', result)
           if (status === 'complete') {
             if (result.info === 'OK' && result.poiList && result.poiList.pois) {
               this.searchResult = result.poiList.pois || []
