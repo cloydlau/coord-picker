@@ -39,13 +39,12 @@ import axios from 'axios'
 import qs from 'qs'
 import { apiKey, city } from './config.ts'
 import Vue from 'vue'
-import { isEmpty, err, Meny } from 'plain-kit'
+import { isEmpty } from 'plain-kit'
 import _ from 'lodash'
 
 Vue.mixin({
   methods: {
     $isEmpty: isEmpty,
-    $err: err,
   }
 })
 
@@ -102,7 +101,7 @@ export default {
         } else {
           this.locate()
         }
-        if (!this.meny) {
+        /*if (!this.meny) {
           this.$nextTick(() => {
             this.meny = Meny.create({
               // The element that will be animated in from off screen
@@ -124,7 +123,7 @@ export default {
               angle: 15.5
             })
           })
-        }
+        }*/
       } else {
         this.customClass = 'animate__animated animate__zoomOut'
       }
@@ -170,7 +169,7 @@ export default {
               resolve(res.data)
             }
           } else {
-            this.$err(res.data.message)
+            //this.$err(res.data.message)
           }
         }).catch(e => {
           reject()
@@ -206,7 +205,7 @@ export default {
       //选中搜索项
       if (selectedLocation) {
         this.clearSelection()
-        this.meny.close()
+        //this.meny.close()
         this.curSpot.lat = selectedLocation.location.lat
         this.curSpot.lng = selectedLocation.location.lng
         this.curSpot.address = (selectedLocation.address || '') + (selectedLocation.title || '')
