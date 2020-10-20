@@ -127,15 +127,17 @@ export default {
 
       boundary: [
         {
-          'data': [{ 'longitude': '106.44294', 'latitude': '26.644338' }, {
-            'longitude': '106.431267',
-            'latitude': '26.504937'
-          }, { 'longitude': '106.569282', 'latitude': '26.585405' }]
+          'data': [
+            { 'longitude': '106.44294', 'latitude': '26.644338' },
+            { 'longitude': '106.431267', 'latitude': '26.504937' },
+            { 'longitude': '106.569282', 'latitude': '26.585405' }
+          ]
         }, {
-          'data': [{ 'longitude': '106.623527', 'latitude': '26.52767' }, {
-            'longitude': '106.602241',
-            'latitude': '26.415188'
-          }, { 'longitude': '106.721031', 'latitude': '26.472979' }]
+          'data': [
+            { 'longitude': '106.623527', 'latitude': '26.52767' },
+            { 'longitude': '106.602241', 'latitude': '26.415188' },
+            { 'longitude': '106.721031', 'latitude': '26.472979' }
+          ]
         }
       ],
 
