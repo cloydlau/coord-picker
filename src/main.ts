@@ -1,4 +1,4 @@
-import CoordPicker from './index.vue'
+import CoordPicker from './AMap.vue'
 import { init } from './config'
 
 interface installInterface {

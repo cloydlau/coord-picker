@@ -79,7 +79,7 @@
 import Vue from 'vue'
 import { isEmpty, SweetAlert, typeOf, SvgIcon } from 'plain-kit'
 const { err, warn, confirmation } = SweetAlert
-import _ from 'lodash'
+import { throttle as throttling, cloneDeep } from 'lodash'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
 import autoComplete from '@tarekraafat/autocomplete.js/dist/js/autoComplete'
@@ -424,7 +424,6 @@ export default {
     $isEmpty: isEmpty,
     $err: err,
     $warn: warn,
-    _,
     /*convertLngLat () {
       new AMap.convertFrom(gps, 'gps', function (status, result) {
         if (result.info === 'ok') {
@@ -436,7 +435,7 @@ export default {
       //const functionName = /function\s*(\w*)/i.exec(fn.toString())[1]
       fnName += 'Throttle'
       if (!this[fnName]) {
-        this[fnName] = this._.throttle(fn, delay)
+        this[fnName] = throttling(fn, delay)
       }
       this[fnName](param)
     },
@@ -467,7 +466,7 @@ export default {
       }
     },
     getInitData () {
-      return this._.cloneDeep({
+      return cloneDeep({
         imageLayer: null,
         rectangleObj: null,
         rectangleEditor: null,

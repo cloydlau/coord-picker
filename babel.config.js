@@ -4,6 +4,11 @@ module.exports = {
   ],
   plugins: [
     ['import', {
+      'libraryName': 'lodash',
+      'libraryDirectory': '',
+      'camel2DashComponentName': false,
+    }, 'lodash'],
+    ['import', {
       libraryName: 'plain-kit',
       libraryDirectory: 'lib',
       style: false,
