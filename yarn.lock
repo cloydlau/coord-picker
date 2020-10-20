@@ -1604,6 +1604,16 @@ ajv@^6.12.4:
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
+ajv@^6.12.5:
+  version "6.12.6"
+  resolved "https://registry.npm.taobao.org/ajv/download/ajv-6.12.6.tgz?cache=0&sync_timestamp=1602353857510&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fajv%2Fdownload%2Fajv-6.12.6.tgz#baf5a62e802b07d977034586f8c3baf5adf26df4"
+  integrity sha1-uvWmLoArB9l3A0WG+MO69a3ybfQ=
+  dependencies:
+    fast-deep-equal "^3.1.1"
+    fast-json-stable-stringify "^2.0.0"
+    json-schema-traverse "^0.4.1"
+    uri-js "^4.2.2"
+
 alphanum-sort@^1.0.0:
   version "1.0.2"
   resolved "https://registry.npmjs.org/alphanum-sort/-/alphanum-sort-1.0.2.tgz#97a1119649b211ad33691d9f9f486a8ec9fbe0a3"
@@ -2972,10 +2982,10 @@ dashdash@^1.12.0:
   dependencies:
     assert-plus "^1.0.0"
 
-dayjs@^1.9.1:
-  version "1.9.1"
-  resolved "https://registry.npmjs.org/dayjs/-/dayjs-1.9.1.tgz#201a755f7db5103ed6de63ba93a984141c754541"
-  integrity sha512-01NCTBg8cuMJG1OQc6PR7T66+AFYiPwgDvdJmvJBn29NGzIG+DIFxPLNjHzwz3cpFIvG+NcwIjP9hSaPVoOaDg==
+dayjs@^1.9.3:
+  version "1.9.3"
+  resolved "https://registry.npm.taobao.org/dayjs/download/dayjs-1.9.3.tgz?cache=0&sync_timestamp=1602580786971&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fdayjs%2Fdownload%2Fdayjs-1.9.3.tgz#b7f94b22ad2a136a4ca02a01ab68ae893fe1a268"
+  integrity sha1-t/lLIq0qE2pMoCoBq2iuiT/homg=
 
 de-indent@^1.0.2:
   version "1.0.2"
@@ -4775,13 +4785,13 @@ jsesc@~0.5.0:
   resolved "https://registry.npmjs.org/jsesc/-/jsesc-0.5.0.tgz#e7dee66e35d6fc16f710fe91d5cf69f70f08911d"
   integrity sha1-597mbjXW/Bb3EP6R1c9p9w8IkR0=
 
-json-editor-vue@^0.0.3:
-  version "0.0.3"
-  resolved "https://registry.npmjs.org/json-editor-vue/-/json-editor-vue-0.0.3.tgz#a9a7608078b7f4e56e9391cbbca7f205d0464107"
-  integrity sha512-dcFhzv/HrwE/cXMhryIVaUmc7RSWT/vPvmOGIt2ygI6uHkfPyarxgAMj9DuXM04BEZjhqh4MzIgZXYEB2jDRzQ==
+json-editor-vue@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.npm.taobao.org/json-editor-vue/download/json-editor-vue-0.0.4.tgz#ff6e47e75ef9e193e41db0e4752f803b786122fa"
+  integrity sha1-/25H51754ZPkHbDkdS+AO3hhIvo=
   dependencies:
     core-js "^3.6.0"
-    jsoneditor "^9.0.4"
+    jsoneditor "^9.1.1"
 
 json-parse-better-errors@^1.0.1, json-parse-better-errors@^1.0.2:
   version "1.0.2"
@@ -4832,13 +4842,13 @@ json5@^2.1.2:
   dependencies:
     minimist "^1.2.5"
 
-jsoneditor@^9.0.4:
-  version "9.0.4"
-  resolved "https://registry.npmjs.org/jsoneditor/-/jsoneditor-9.0.4.tgz#7842d7ac29664ad249fef2d77694275e4c2a4f8b"
-  integrity sha512-GDllUoTi6OsZT2c1k23GlAyndDtdHp13oyXPWeKKBftzyk6wVsheEy+LZ5R1usTk4r4A5NCl/U4kdX0vP0h2AA==
+jsoneditor@^9.1.1:
+  version "9.1.1"
+  resolved "https://registry.npm.taobao.org/jsoneditor/download/jsoneditor-9.1.1.tgz#3f5654e6f8cdd8f239018f941fe6518b8ec3e68e"
+  integrity sha1-P1ZU5vjN2PI5AY+UH+ZRi47D5o4=
   dependencies:
     ace-builds "^1.4.12"
-    ajv "^6.12.3"
+    ajv "^6.12.5"
     javascript-natural-sort "^0.7.1"
     jmespath "^0.15.0"
     json-source-map "^0.6.1"
@@ -5956,18 +5966,18 @@ pkg-dir@^4.1.0:
   dependencies:
     find-up "^4.0.0"
 
-plain-kit@^0.4.1:
-  version "0.4.1"
-  resolved "https://registry.npmjs.org/plain-kit/-/plain-kit-0.4.1.tgz#ac8685ccf61a59390ff4eddac09594304dacb95f"
-  integrity sha512-aV20qx2s2XTgSlB1WWqqF2OrFeru8vyM103uMJYiqtuGSOa3pcnE0NcHiDlb9z4uzxxg+AelQN0p/Rx0IOFuFg==
+plain-kit@^0.4.2:
+  version "0.4.2"
+  resolved "https://registry.npm.taobao.org/plain-kit/download/plain-kit-0.4.2.tgz?cache=0&sync_timestamp=1603174522718&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fplain-kit%2Fdownload%2Fplain-kit-0.4.2.tgz#afbc7803dc0b2f47dafe85baab7a7001cbe5f339"
+  integrity sha1-r7x4A9wLL0fa/oW6q3pwAcvl8zk=
   dependencies:
     animate.css "^4.1.1"
     core-js "^3.6.0"
-    dayjs "^1.9.1"
+    dayjs "^1.9.3"
     lodash "^4.17.20"
     qrcode "^1.4.4"
     qs "^6.9.4"
-    sweetalert2 "^10.3.7"
+    sweetalert2 "^10.6.1"
 
 pngjs@^3.3.0:
   version "3.4.0"
@@ -7550,10 +7560,10 @@ svgo@^1.0.0, svgo@^1.3.2:
     unquote "~1.1.1"
     util.promisify "~1.0.0"
 
-sweetalert2@^10.3.7:
-  version "10.4.0"
-  resolved "https://registry.npmjs.org/sweetalert2/-/sweetalert2-10.4.0.tgz#65ff66110e720e52a6c1725ff339eec11b69b740"
-  integrity sha512-jr2htLkYR8ZaSEh7vUOs2sFyQrVABNLVu8U0tGlvqIJyXF/aW5SjLVYW23h+h518jlcT6Q3rWWexbYHlTgCxHQ==
+sweetalert2@^10.6.1:
+  version "10.6.1"
+  resolved "https://registry.npm.taobao.org/sweetalert2/download/sweetalert2-10.6.1.tgz?cache=0&sync_timestamp=1602838516494&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fsweetalert2%2Fdownload%2Fsweetalert2-10.6.1.tgz#343d980858494bd0073ac8de9be57bf2365df316"
+  integrity sha1-ND2YCFhJS9AHOsjem+V78jZd8xY=
 
 tapable@^1.0.0, tapable@^1.1.3:
   version "1.1.3"

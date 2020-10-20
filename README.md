@@ -63,3 +63,26 @@ components: { CoordPicker }
 > 高德JS-API版本：1.4.15（曾采用动态版本，但2.0存在诸多问题，性能也不如1.x，等待后续更新吧）
 
 > 坐标值类型：Number和String都能接收 但返回时 由于js的Number类型存在精度丢失问题 故返回String
+
+<br/>
+
+boundary格式：
+
+```
+[
+  // 轮廓1
+  {
+    data: [
+      { longitud: '', latitude: '' },
+      { longitud: '', latitude: '' }
+    ]
+  },
+  // 轮廓2
+  {
+    data: [
+      { longitud: '', latitude: '' },
+      { longitud: '', latitude: '' }
+    ]
+  }
+]
+```

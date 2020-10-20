@@ -88,26 +88,31 @@ import './styles/autocomplete.scss'
 import polygon from '@/mixins/polygon'
 import rectangle from '@/mixins/rectangle'
 import Toolbar from '@/components/Toolbar'
-import { apiKey, city, precision, addressComponent } from './config.ts'
+import { apiKey, city, precision, addressComponent, boundaryFormatter } from './config.ts'
 
 const requireAll = requireContext => requireContext.keys().map(requireContext)
 requireAll(require.context('@/assets/svg-sprite', false, /\.svg$/))
-Vue.component('SvgIcon', SvgIcon)
 
-Vue.mixin({
-  methods: {
-    $isEmpty: isEmpty,
-    $err: err,
-    $warn: warn,
-  }
-})
-
-Vue.prototype._ = _
+/**
+ * 参数有全局参数、实例参数和默认值之分 取哪个取决于用户传了哪个 此时有两个疑问：
+ *   1. 怎么判断用户传没传？ —— 以该参数是否全等于undefined作为标识
+ *   2. 如果传了多个，权重顺序是怎样的？ —— 全局＞实例＞默认
+ *
+ * @param {any} globalProp - 全局参数
+ * @param {any} prop - 实例参数
+ * @param {any} defaultValue - 默认值
+ * @return {any} 最终
+ */
+function getFinalProp (globalProp, prop, defaultValue) {
+  return prop !== undefined ? prop :
+    globalProp !== undefined ? globalProp :
+      defaultValue
+}
 
 export default {
   name: 'CoordPicker',
   mixins: [polygon, rectangle],
-  components: { Toolbar },
+  components: { Toolbar, SvgIcon },
   props: {
     show: {
       type: Boolean,
@@ -115,28 +120,29 @@ export default {
     },
     apiKey: String,
     lat: {
-      validator: value => ['String', 'Null', 'Number'].includes(typeOf(value)),
+      validator: value => ['string', 'null', 'number'].includes(typeOf(value)),
     },
     lng: {
-      validator: value => ['String', 'Null', 'Number'].includes(typeOf(value)),
+      validator: value => ['string', 'null', 'number'].includes(typeOf(value)),
     },
     address: {
-      validator: value => ['String', 'Null'].includes(typeOf(value)),
+      validator: value => ['string', 'null'].includes(typeOf(value)),
     },
     city: String,
     zoom: {
-      validator: value => ['String', 'Null', 'Number'].includes(typeOf(value)),
+      validator: value => ['string', 'null', 'number'].includes(typeOf(value)),
     },
     img: {
-      validator: value => ['String', 'Null'].includes(typeOf(value)),
+      validator: value => ['string', 'null'].includes(typeOf(value)),
     },
     imgNorthEastLng: [Number, String],
     imgNorthEastLat: [Number, String],
     imgSouthWestLng: [Number, String],
     imgSouthWestLat: [Number, String],
     boundary: {
-      validator: value => ['Array'].includes(typeOf(value)),
+      validator: value => ['null', 'array'].includes(typeOf(value)),
     },
+    boundaryFormatter: Function,
     precision: Number,
     addressComponent: Object
   },
@@ -162,6 +168,11 @@ export default {
     }
   },
   computed: {
+    BoundaryFormatter () {
+      /*return getFinalProp(boundaryFormatter, this.boundaryFormatter, ({ lng, lat }) => {
+
+      })*/
+    },
     version () {
       return ''
     },
@@ -179,10 +190,7 @@ export default {
       return this.apiKey || apiKey
     },
     Precision () {
-      return typeof this.precision === 'number' ?
-        this.precision :
-        typeof precision === 'number' ?
-          precision : 6
+      return getFinalProp(precision, this.precision, 6)
     },
     AddressComponent () {
       const defaultValue = {
@@ -413,6 +421,10 @@ export default {
     }
   },
   methods: {
+    $isEmpty: isEmpty,
+    $err: err,
+    $warn: warn,
+    _,
     /*convertLngLat () {
       new AMap.convertFrom(gps, 'gps', function (status, result) {
         if (result.info === 'ok') {
@@ -525,8 +537,8 @@ export default {
         return ''
       } else {
         return {
-          'Number': () => value.toFixed(this.Precision).toString(),
-          'String': () => Number(value).toFixed(this.Precision).toString()
+          'number': () => value.toFixed(this.Precision).toString(),
+          'string': () => Number(value).toFixed(this.Precision).toString()
         }[typeOf(value)]()
       }
     },
