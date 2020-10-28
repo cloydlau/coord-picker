@@ -20,7 +20,10 @@ if (typeof window !== 'undefined' && window.Vue) {
   install(window.Vue)
 }
 
-export default {
-  install,
+CoordPicker.install = install
+
+export default CoordPicker
+
+export {
   CoordPicker
 }

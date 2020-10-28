@@ -18,20 +18,14 @@ $ yarn add coord-picker
 ```
 
 **依赖**：vue element-ui
-___
 
-**全局引入**
 ```js
 import 'coord-picker/dist/coord-picker.css'
 import CoordPicker from 'coord-picker'
-Vue.use(CoordPicker)
-```
-
-**局部引入**
-```js
-import 'coord-picker/dist/coord-picker.css'
-import { CoordPicker } from 'coord-picker'
+// 组件内引入
 components: { CoordPicker }
+// 全局引入
+Vue.use(CoordPicker) 
 ```
 
 ### Quick Start
