@@ -22,8 +22,12 @@ $ yarn add coord-picker
 ```js
 import 'coord-picker/dist/coord-picker.css'
 import CoordPicker from 'coord-picker'
+
 // 组件内引入
 components: { CoordPicker }
+// ≤0.1.16
+components: { CoordPicker.CoordPicker }
+
 // 全局引入
 Vue.use(CoordPicker) 
 ```
