@@ -20,10 +20,12 @@ if (typeof window !== 'undefined' && window.Vue) {
   install(window.Vue)
 }
 
+// @ts-ignore
 CoordPicker.install = install
 
 export default CoordPicker
 
+// todo: deprecated
 export {
   CoordPicker
 }
