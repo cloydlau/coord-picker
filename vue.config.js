@@ -51,7 +51,7 @@ module.exports = {
       library: 'coord-picker',
       libraryTarget: 'umd',
       umdNamedDefine: true,
-      libraryExport: 'default'
+      //libraryExport: 'default'
     },
     externals,
     devtool: 'source-map',
