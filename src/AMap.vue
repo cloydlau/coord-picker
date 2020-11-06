@@ -77,8 +77,8 @@
 
 <script>
 import Vue from 'vue'
-import { isEmpty, SweetAlert, typeOf, SvgIcon } from 'plain-kit'
-const { err, warn, confirmation } = SweetAlert
+import { isEmpty, Swal, typeOf, SvgIcon } from 'plain-kit'
+const { err, warn, confirmation } = Swal
 import { throttle as throttling, cloneDeep } from 'lodash'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
