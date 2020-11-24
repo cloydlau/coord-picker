@@ -2,24 +2,25 @@
   <el-dialog visible :close-on-click-modal="false" :show-close="false" title="coord-picker">
 
 
-    <CoordPicker :show.sync="show"
-                 :api-key='apiKey'
+    <CoordPicker
+      :show.sync="show"
+      :api-key='apiKey'
 
-                 :city="city"
-                 :lng.sync="lng"
-                 :lat.sync="lat"
-                 :address.sync="address"
-                 :zoom.sync="zoom"
-                 :precision="precision"
-                 :addressComponent="addressComponent"
+      :city="city"
+      :lng.sync="lng"
+      :lat.sync="lat"
+      :address.sync="address"
+      :zoom.sync="zoom"
+      :precision="precision"
+      :addressComponent="addressComponent"
 
-                 :img="img"
-                 :imgNorthEastLng.sync="imgNorthEastLng"
-                 :imgNorthEastLat.sync="imgNorthEastLat"
-                 :imgSouthWestLng.sync="imgSouthWestLng"
-                 :imgSouthWestLat.sync="imgSouthWestLat"
+      :img="img"
+      :imgNorthEastLng.sync="imgNorthEastLng"
+      :imgNorthEastLat.sync="imgNorthEastLat"
+      :imgSouthWestLng.sync="imgSouthWestLng"
+      :imgSouthWestLat.sync="imgSouthWestLat"
 
-                 :boundary.sync="boundary"
+      :boundary.sync="boundary"
     />
 
 
@@ -81,10 +82,6 @@
 </template>
 
 <script>
-//import CoordPicker from '../src/AMap'
-//todo: import 'coord-picker/dist/coord-picker.css'
-//todo: import {CoordPicker} from 'coord-picker'
-
 import { JsonEditorVue } from 'json-editor-vue'
 
 export default {
