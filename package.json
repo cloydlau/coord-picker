@@ -30,7 +30,6 @@
   "dependencies": {
     "@amap/amap-jsapi-loader": "^0.0.7",
     "@tarekraafat/autocomplete.js": "^7.2.0",
-    "core-js": "^3.7.0",
     "lodash": "^4.17.20",
     "plain-kit": "^0.4.6"
   },

@@ -502,6 +502,8 @@ export default {
       this.curSpot.lng = this.$isEmpty(this.lng) ? '' : this.lng
       this.curSpot.lat = this.$isEmpty(this.lat) ? '' : this.lat
       this.curSpot.address = this.address || ((this.$isEmpty(this.lng) && this.$isEmpty(this.lat)) ? this.baseCity : '')
+      // 如果乾坤的子系统共享一个window对象 会导致报错——'禁止多种API加载方式混用'
+      AMapLoader.reset()
     },
     onMapClick (e) {
       this.clearMarker()
