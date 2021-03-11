@@ -1,11 +1,12 @@
 <template>
-  <el-dialog :visible.sync="show"
-             :fullscreen="true"
-             :append-to-body="true"
-             :show-close="false"
-             @close="$emit('update:show', false)"
-             destroy-on-close
-             v-if="show"
+  <el-dialog
+    :visible.sync="show"
+    :fullscreen="true"
+    :append-to-body="true"
+    :show-close="false"
+    @close="$emit('update:show', false)"
+    destroy-on-close
+    v-if="show"
   >
     <div slot="title" class="title">
       <span v-text="title||'坐标拾取'" class="title-text"/>
@@ -89,6 +90,8 @@ import polygon from '@/mixins/polygon'
 import rectangle from '@/mixins/rectangle'
 import Toolbar from '@/components/Toolbar'
 import { apiKey, city, precision, addressComponent, boundaryFormatter } from './config.ts'
+import { name } from '../package.json'
+const prefix = `[${name}] `
 
 const requireAll = requireContext => requireContext.keys().map(requireContext)
 requireAll(require.context('@/assets/svg-sprite', false, /\.svg$/))
@@ -244,7 +247,7 @@ export default {
         }).then(AMap => {
           this.map = new AMap.Map('map-container', {
             //viewMode: '3D',
-            zoom: this.Zoom,
+            ...!this.$isEmpty(this.Zoom) && { zoom: this.Zoom, }
           })
 
           // 在图面添加比例尺控件，展示地图在当前层级和纬度下的比例尺
@@ -343,7 +346,9 @@ export default {
 
           this.map.on('click', this.onMapClick)
 
-          this.Zoom = this.$isEmpty(this.zoom) ? 12 : Number(this.zoom)
+          if (!this.$isEmpty(this.zoom)) {
+            this.Zoom = Number(this.zoom)
+          }
           this.map.on('zoomchange', e => {
             this.Zoom = this.map.getZoom()
           })
@@ -431,6 +436,13 @@ export default {
         }
       })
     },*/
+    setCenter (args) {
+      if (this.$isEmpty(this.Zoom)) {
+        this.map.setCenter(args)
+      } else {
+        this.map.setZoomAndCenter(this.Zoom, args)
+      }
+    },
     throttle (fnName, fn, param, delay) {
       //const functionName = /function\s*(\w*)/i.exec(fn.toString())[1]
       fnName += 'Throttle'
@@ -603,7 +615,7 @@ export default {
           }
         })
         this.drawMarker()
-        this.map.setCenter([this.curSpot.lng, this.curSpot.lat])
+        this.setCenter([this.curSpot.lng, this.curSpot.lat])
       }
       //初始化
       else {
@@ -614,7 +626,7 @@ export default {
         }
 
         new Promise((resolve, reject) => {
-          let centerDesignated = false
+          let centerDesignated = false, hasOverlay = false
           //传了图片 绘制图层
           if (this.img &&
             !this.$isEmpty(this.curImg.imgSouthWestLng) &&
@@ -627,26 +639,35 @@ export default {
               new AMap.LngLat(this.curImg.imgNorthEastLng, this.curImg.imgNorthEastLat),
             ))
             centerDesignated = true
+            hasOverlay = true
           }
           //传了多边形 绘制多边形
-          if (this.boundary && this.boundary.length > 0) {
+          if (this.boundary?.length > 0) {
             this.drawPolygon(this.boundary)
             centerDesignated = true
+            hasOverlay = true
           }
+
+          // 如果没有传覆盖物且没有传zoom 给zoom赋默认值
+          if (!hasOverlay && this.$isEmpty(this.Zoom)) {
+            this.Zoom = 12
+          }
+
           //传了点位 定位至该点位
           if (!this.$isEmpty(this.curSpot.lat) && !this.$isEmpty(this.curSpot.lng)) {
             this.drawMarker()
-            this.map.setCenter([this.curSpot.lng, this.curSpot.lat])
+            this.setCenter([this.curSpot.lng, this.curSpot.lat])
             centerDesignated = true
           }
           //否则将视图适配覆盖物
-          else if (centerDesignated) {
+          else if (hasOverlay) {
             this.map.setFitView()
           }
+
           //仅传了地址 定位至该地址 并将该地址所在的城市设置为baseCity
           if (!centerDesignated && this.address) {
             this.geocoder.getLocation(this.address, (status, result) => {
-              console.log('[CoordPicker - getLocation]', result)
+              console.log(prefix + 'getLocation', result)
               if (status === 'complete' && result.info === 'OK') {
                 const { lng, lat } = result.geocodes[0]?.location
                 const addressCity = result.geocodes[0]?.addressComponent.city
@@ -655,7 +676,7 @@ export default {
                   this.initPlugins()
                 }
                 if (!this.$isEmpty(lng) && !this.$isEmpty(lat)) {
-                  this.map.setCenter([lng, lat])
+                  this.setCenter([lng, lat])
                   resolve(true)
                 }
               }
@@ -674,11 +695,11 @@ export default {
       if (this.baseCity && isNaN(this.baseCity)) {
         if (!centerDesignated) {
           this.geocoder.getLocation(this.baseCity, (status, result) => {
-            console.log('[CoordPicker - getLocation]', result)
+            console.log(prefix + 'getLocation', result)
             if (status === 'complete' && result.info === 'OK') {
               const { lng, lat } = result.geocodes[0]?.location
               if (!this.$isEmpty(lng) && !this.$isEmpty(lat)) {
-                this.map.setCenter([lng, lat])
+                this.setCenter([lng, lat])
               }
             }
           })
@@ -688,7 +709,7 @@ export default {
       else {
         const citySearch = new AMap.CitySearch()
         citySearch.getLocalCity((status, result) => {
-          console.log('[CoordPicker - getLocalCity]', result)
+          console.log(prefix + 'getLocalCity', result)
           if (status === 'complete' && result.info === 'OK') {
             this.baseCity = result.city
             this.initPlugins()
@@ -708,7 +729,7 @@ export default {
       this.searching = true
       this.throttle('search', () => {
         this.placeSearch.search(this.keyword, (status, result) => {
-          console.log('[CoordPicker - search]', result)
+          console.log(prefix + 'search', result)
           if (status === 'complete') {
             if (result.info === 'OK' && result.poiList && result.poiList.pois) {
               this.searchResult = result.poiList.pois || []
