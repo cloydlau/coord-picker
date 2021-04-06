@@ -9,6 +9,8 @@ const externals = process.env.NODE_ENV === 'development' ? {} : {
   'vue': 'vue'
 }
 
+const svgFilePath = path.resolve('./src/assets/icon')
+
 module.exports = {
   pages: {
     index: {
@@ -21,21 +23,31 @@ module.exports = {
     config.plugins.delete('preload')
     config.plugins.delete('prefetch')
 
+    /**
+     * vue-svgicon
+     */
     config.module
-      .rule('svg')
-      .exclude.add(resolve('src/assets/svg-sprite'))
-      .end()
+    .rule('vue-svgicon')
+    .include.add(svgFilePath)
+    .end()
+    .test(/\.svg$/)
+    .use('svgicon')
+    .loader('@yzfe/svgicon-loader')
+    .options({
+      svgFilePath
+    })
+    config.module.rule('svg').exclude.add(svgFilePath).end()
+    config.resolve.alias.set('@icon', svgFilePath) // recommended configuration alias
     config.module
-      .rule('svg-sprite')
-      .test(/\.svg$/)
-      .include.add(resolve('src/assets/svg-sprite'))
-      .end()
-      .use('svg-sprite-loader')
-      .loader('svg-sprite-loader')
-      .options({
-        symbolId: 'icon-[name]'
-      })
-      .end()
+    .rule('vue')
+    .use('vue-loader')
+    .loader('vue-loader')
+    .tap(opts => {
+      opts.transformAssetUrls = opts.transformAssetUrls || {} // vue-svgicon recommended configuration transformAssetUrls
+      opts.transformAssetUrls['icon'] = ['data'] // vue-svgicon recommended configuration transformAssetUrls
+      return opts
+    })
+    .end()
   },
   css: {
     extract: {

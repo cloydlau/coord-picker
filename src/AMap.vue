@@ -41,35 +41,35 @@
       <el-tooltip effect="dark" content="选取点位" placement="bottom">
         <a @click.stop="active='marker'"
            :class="{active:active==='marker'}">
-          <svg-icon icon-class="locate"/>
+          <SvgIcon :data="require(`@icon/locate.svg`)"/>
         </a>
       </el-tooltip>
       <el-tooltip effect="dark" content="绘制图层" placement="bottom" v-if="img">
         <a :class="{active:active==='rectangle'}"
            @click.stop="active='rectangle'"
         >
-          <svg-icon icon-class="draw-img"/>
+          <SvgIcon :data="require(`@icon/draw-img.svg`)"/>
         </a>
       </el-tooltip>
       <el-tooltip effect="dark" content="绘制轮廓" placement="bottom" v-if="boundary">
         <a @click.stop="active='polygon'"
            :class="{active:active==='polygon'}">
-          <svg-icon icon-class="draw-polygon"/>
+          <SvgIcon :data="require(`@icon/draw-polygon.svg`)"/>
         </a>
       </el-tooltip>
       <!--<el-tooltip effect="dark" content="重置" placement="bottom">
         <a @click.stop="()=>{reset();locate()}">
-          <svg-icon icon-class="reset"/>
+          <SvgIcon :data="require(`@icon/reset.svg`)"/>
         </a>
       </el-tooltip>-->
       <el-tooltip effect="dark" content="退出" placement="bottom">
         <a @click.stop="$emit('update:show', false)">
-          <svg-icon icon-class="close"/>
+          <SvgIcon :data="require(`@icon/close.svg`)"/>
         </a>
       </el-tooltip>
       <el-tooltip effect="dark" content="确定" placement="bottom">
         <a @click.stop="confirm">
-          <svg-icon icon-class="save"/>
+          <SvgIcon :data="require(`@icon/save.svg`)"/>
         </a>
       </el-tooltip>
     </Toolbar>
@@ -78,8 +78,10 @@
 
 <script>
 import Vue from 'vue'
-import { isEmpty, Swal, typeOf, SvgIcon } from 'plain-kit'
-const { err, warn, confirmation } = Swal
+import { isEmpty, typeOf } from 'kayran'
+import 'kikimore/dist/style.css'
+import { Swal } from 'kikimore'
+Vue.use(Swal)
 import { throttle as throttling, cloneDeep } from 'lodash'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
@@ -93,8 +95,8 @@ import { apiKey, city, precision, addressComponent, boundaryFormatter } from './
 import { name } from '../package.json'
 const prefix = `[${name}] `
 
-const requireAll = requireContext => requireContext.keys().map(requireContext)
-requireAll(require.context('@/assets/svg-sprite', false, /\.svg$/))
+import '@yzfe/svgicon/lib/svgicon.css'
+import { VueSvgIcon as SvgIcon } from '@yzfe/vue-svgicon'
 
 /**
  * 参数有全局参数、实例参数和默认值之分 取哪个取决于用户传了哪个：
@@ -180,13 +182,13 @@ export default {
       return ''
     },
     title () {
-      return this.curSpot.address + ((this.$isEmpty(this.curSpot.lng) || this.$isEmpty(this.curSpot.lat)) ? '' : `（${this.curSpot.lng}，${this.curSpot.lat}）`)
+      return this.curSpot.address + ((isEmpty(this.curSpot.lng) || isEmpty(this.curSpot.lat)) ? '' : `（${this.curSpot.lng}，${this.curSpot.lat}）`)
     },
     curSpot () {
       return Vue.observable({
-        lng: this.$isEmpty(this.lng) ? '' : this.lng,
-        lat: this.$isEmpty(this.lat) ? '' : this.lat,
-        address: this.address || ((this.$isEmpty(this.lng) || this.$isEmpty(this.lat)) ? this.baseCity : '')
+        lng: isEmpty(this.lng) ? '' : this.lng,
+        lat: isEmpty(this.lat) ? '' : this.lat,
+        address: this.address || ((isEmpty(this.lng) || isEmpty(this.lat)) ? this.baseCity : '')
       })
     },
     key () {
@@ -247,7 +249,7 @@ export default {
         }).then(AMap => {
           this.map = new AMap.Map('map-container', {
             //viewMode: '3D',
-            ...!this.$isEmpty(this.Zoom) && { zoom: this.Zoom, }
+            ...!isEmpty(this.Zoom) && { zoom: this.Zoom, }
           })
 
           // 在图面添加比例尺控件，展示地图在当前层级和纬度下的比例尺
@@ -296,7 +298,7 @@ export default {
                 this.autoCompleteInput = new autoComplete({
                   data: {                              // Data src [Array, Function, Async] | (REQUIRED)
                     src: async () => {
-                      if (this.$isEmpty(this.keyword)) {
+                      if (isEmpty(this.keyword)) {
                         this.searchResult = []
                         return []
                       } else {
@@ -346,7 +348,7 @@ export default {
 
           this.map.on('click', this.onMapClick)
 
-          if (!this.$isEmpty(this.zoom)) {
+          if (!isEmpty(this.zoom)) {
             this.Zoom = Number(this.zoom)
           }
           this.map.on('zoomchange', e => {
@@ -390,13 +392,17 @@ export default {
 
           this.locate()
         }).catch(e => {
-          this.$err(e)
+          this.$emit('update:show', false)
+          this.error__(`地图初始化失败：${e}`)
         })
         //}
       } else {
-        this.customClass = 'animate__animated animate__zoomOut'
-        this.reset()
-        this.map.destroy()
+        // 正常退出
+        if (this.map) {
+          this.customClass = 'animate__animated animate__zoomOut'
+          this.reset()
+          this.map.destroy()
+        }
       }
     },
     keyword () {
@@ -426,9 +432,6 @@ export default {
     }
   },
   methods: {
-    $isEmpty: isEmpty,
-    $err: err,
-    $warn: warn,
     /*convertLngLat () {
       new AMap.convertFrom(gps, 'gps', function (status, result) {
         if (result.info === 'ok') {
@@ -437,7 +440,7 @@ export default {
       })
     },*/
     setCenter (args) {
-      if (this.$isEmpty(this.Zoom)) {
+      if (isEmpty(this.Zoom)) {
         this.map.setCenter(args)
       } else {
         this.map.setZoomAndCenter(this.Zoom, args)
@@ -505,15 +508,15 @@ export default {
       }
       //this.map.clearMap() 某些情况下未知报错
       Object.assign(this.$data, this.getInitData())
-      if (!this.$isEmpty(this.imgNorthEastLng) && !this.$isEmpty(this.imgSouthWestLng)) {
+      if (!isEmpty(this.imgNorthEastLng) && !isEmpty(this.imgSouthWestLng)) {
         this.curImg.imgNorthEastLng = Math.max(this.imgNorthEastLng, this.imgSouthWestLng)
         this.curImg.imgSouthWestLng = Math.min(this.imgNorthEastLng, this.imgSouthWestLng)
       }
       this.curImg.imgNorthEastLat = this.imgNorthEastLat
       this.curImg.imgSouthWestLat = this.imgSouthWestLat
-      this.curSpot.lng = this.$isEmpty(this.lng) ? '' : this.lng
-      this.curSpot.lat = this.$isEmpty(this.lat) ? '' : this.lat
-      this.curSpot.address = this.address || ((this.$isEmpty(this.lng) && this.$isEmpty(this.lat)) ? this.baseCity : '')
+      this.curSpot.lng = isEmpty(this.lng) ? '' : this.lng
+      this.curSpot.lat = isEmpty(this.lat) ? '' : this.lat
+      this.curSpot.address = this.address || ((isEmpty(this.lng) && isEmpty(this.lat)) ? this.baseCity : '')
       // 如果乾坤的子系统共享一个window对象 会导致报错——'禁止多种API加载方式混用'
       AMapLoader.reset()
     },
@@ -539,14 +542,14 @@ export default {
           } else if (status === 'no_data') {
             resolve([])
           } else {
-            this.$err(result)
+            this.error__(result)
             reject()
           }
         })
       })
     },
     roundOff (value) {
-      if (this.$isEmpty(value)) {
+      if (isEmpty(value)) {
         return ''
       } else {
         return {
@@ -629,10 +632,10 @@ export default {
           let centerDesignated = false, hasOverlay = false
           //传了图片 绘制图层
           if (this.img &&
-            !this.$isEmpty(this.curImg.imgSouthWestLng) &&
-            !this.$isEmpty(this.curImg.imgSouthWestLat) &&
-            !this.$isEmpty(this.curImg.imgNorthEastLng) &&
-            !this.$isEmpty(this.curImg.imgNorthEastLat)
+            !isEmpty(this.curImg.imgSouthWestLng) &&
+            !isEmpty(this.curImg.imgSouthWestLat) &&
+            !isEmpty(this.curImg.imgNorthEastLng) &&
+            !isEmpty(this.curImg.imgNorthEastLat)
           ) {
             this.drawImg(new AMap.Bounds(
               new AMap.LngLat(this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat),
@@ -649,12 +652,12 @@ export default {
           }
 
           // 如果没有传覆盖物且没有传zoom 给zoom赋默认值
-          if (!hasOverlay && this.$isEmpty(this.Zoom)) {
+          if (!hasOverlay && isEmpty(this.Zoom)) {
             this.Zoom = 12
           }
 
           //传了点位 定位至该点位
-          if (!this.$isEmpty(this.curSpot.lat) && !this.$isEmpty(this.curSpot.lng)) {
+          if (!isEmpty(this.curSpot.lat) && !isEmpty(this.curSpot.lng)) {
             this.drawMarker()
             this.setCenter([this.curSpot.lng, this.curSpot.lat])
             centerDesignated = true
@@ -675,7 +678,7 @@ export default {
                   this.baseCity = addressCity
                   this.initPlugins()
                 }
-                if (!this.$isEmpty(lng) && !this.$isEmpty(lat)) {
+                if (!isEmpty(lng) && !isEmpty(lat)) {
                   this.setCenter([lng, lat])
                   resolve(true)
                 }
@@ -698,7 +701,7 @@ export default {
             console.log(prefix + 'getLocation', result)
             if (status === 'complete' && result.info === 'OK') {
               const { lng, lat } = result.geocodes[0]?.location
-              if (!this.$isEmpty(lng) && !this.$isEmpty(lat)) {
+              if (!isEmpty(lng) && !isEmpty(lat)) {
                 this.setCenter([lng, lat])
               }
             }
@@ -734,7 +737,7 @@ export default {
             if (result.info === 'OK' && result.poiList && result.poiList.pois) {
               this.searchResult = result.poiList.pois || []
             } else if (result.info === 'TIP_CITIES') {
-              this.$warn('尝试输入更加精确的关键字哦')
+              this.warning__('尝试输入更加精确的关键字哦')
             }
           }
           this.searching = false

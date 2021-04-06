@@ -74,7 +74,7 @@ Vue.use(CoordPicker)
       { 'longitude': '106.569282', 'latitude': '26.585405' }
     ]
   },
-  // 轮廓1 
+  // 轮廓2
   {
     data: [
       { 'longitude': '106.623527', 'latitude': '26.52767' },
