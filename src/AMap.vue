@@ -393,7 +393,7 @@ export default {
           this.locate()
         }).catch(e => {
           this.$emit('update:show', false)
-          this.error__(`地图初始化失败：${e}`)
+          this.$Swal.error(`地图初始化失败：${e}`)
         })
         //}
       } else {
@@ -542,7 +542,7 @@ export default {
           } else if (status === 'no_data') {
             resolve([])
           } else {
-            this.error__(result)
+            this.$Swal.error(result)
             reject()
           }
         })
@@ -737,7 +737,7 @@ export default {
             if (result.info === 'OK' && result.poiList && result.poiList.pois) {
               this.searchResult = result.poiList.pois || []
             } else if (result.info === 'TIP_CITIES') {
-              this.warning__('尝试输入更加精确的关键字哦')
+              this.$Swal.warning('尝试输入更加精确的关键字哦')
             }
           }
           this.searching = false

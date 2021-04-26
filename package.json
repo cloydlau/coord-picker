@@ -35,7 +35,7 @@
     "@yzfe/vue-svgicon": "^4.0.2",
     "core-js": "^3.10.0",
     "kayran": "^0.0.2",
-    "kikimore": "^0.0.11",
+    "kikimore": "^0.1.1",
     "lodash": "^4.17.21"
   },
   "peerDependencies": {
