@@ -41,20 +41,20 @@
       <el-tooltip effect="dark" content="选取点位" placement="bottom">
         <a @click.stop="active='marker'"
            :class="{active:active==='marker'}">
-          <SvgIcon :data="require(`@icon/locate.svg`)"/>
+          <!--          <SvgIcon :data="require(`@icon/locate.svg`)"/>-->
         </a>
       </el-tooltip>
-      <el-tooltip effect="dark" content="绘制图层" placement="bottom" v-if="img">
+      <el-tooltip effect="dark" content="绘制图层" placement="bottom" v-if="Img">
         <a :class="{active:active==='rectangle'}"
            @click.stop="active='rectangle'"
         >
-          <SvgIcon :data="require(`@icon/draw-img.svg`)"/>
+          <!--          <SvgIcon :data="require(`@icon/draw-img.svg`)"/>-->
         </a>
       </el-tooltip>
       <el-tooltip effect="dark" content="绘制轮廓" placement="bottom" v-if="boundary">
         <a @click.stop="active='polygon'"
            :class="{active:active==='polygon'}">
-          <SvgIcon :data="require(`@icon/draw-polygon.svg`)"/>
+          <!--          <SvgIcon :data="require(`@icon/draw-polygon.svg`)"/>-->
         </a>
       </el-tooltip>
       <!--<el-tooltip effect="dark" content="重置" placement="bottom">
@@ -64,12 +64,12 @@
       </el-tooltip>-->
       <el-tooltip effect="dark" content="退出" placement="bottom">
         <a @click.stop="$emit('update:show', false)">
-          <SvgIcon :data="require(`@icon/close.svg`)"/>
+          <!--          <SvgIcon :data="require(`@icon/close.svg`)"/>-->
         </a>
       </el-tooltip>
       <el-tooltip effect="dark" content="确定" placement="bottom">
         <a @click.stop="confirm">
-          <SvgIcon :data="require(`@icon/save.svg`)"/>
+          <!--          <SvgIcon :data="require(`@icon/save.svg`)"/>-->
         </a>
       </el-tooltip>
     </Toolbar>
@@ -81,8 +81,10 @@ import Vue from 'vue'
 import { isEmpty, typeOf } from 'kayran'
 import 'kikimore/dist/style.css'
 import { Swal } from 'kikimore'
-Vue.use(Swal)
-import { throttle as throttling, cloneDeep } from 'lodash'
+Object.defineProperty(Vue.prototype, '$Swal', {
+  value: Swal
+})
+import { throttle as throttling, cloneDeep } from 'lodash-es'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
 import autoComplete from '@tarekraafat/autocomplete.js/dist/js/autoComplete'
@@ -90,34 +92,16 @@ import autoComplete from '@tarekraafat/autocomplete.js/dist/js/autoComplete'
 import './styles/autocomplete.scss'
 import polygon from '@/mixins/polygon'
 import rectangle from '@/mixins/rectangle'
-import Toolbar from '@/components/Toolbar'
-import { apiKey, city, precision, addressComponent, boundaryFormatter } from './config.ts'
+import Toolbar from '@/components/Toolbar.vue'
+import { getFinalProp } from '@/utils'
+import globalProps from './config'
 import { name } from '../package.json'
 const prefix = `[${name}] `
-
-import '@yzfe/svgicon/lib/svgicon.css'
-import { VueSvgIcon as SvgIcon } from '@yzfe/vue-svgicon'
-
-/**
- * 参数有全局参数、实例参数和默认值之分 取哪个取决于用户传了哪个：
- *   1. 怎么判断用户传没传？ —— 以该参数是否全等于undefined作为标识
- *   2. 如果传了多个，权重顺序是怎样的？ —— 实例＞全局＞默认
- *
- * @param {any} globalProp - 全局参数
- * @param {any} prop - 实例参数
- * @param {any} defaultValue - 默认值
- * @return {any} 最终
- */
-function getFinalProp (globalProp, prop, defaultValue) {
-  return prop !== undefined ? prop :
-    globalProp !== undefined ? globalProp :
-      defaultValue
-}
 
 export default {
   name: 'CoordPicker',
   mixins: [polygon, rectangle],
-  components: { Toolbar, SvgIcon },
+  components: { Toolbar },
   props: {
     show: {
       type: Boolean,
@@ -147,9 +131,8 @@ export default {
     boundary: {
       validator: value => ['null', 'array'].includes(typeOf(value)),
     },
-    boundaryFormatter: Function,
     precision: Number,
-    addressComponent: Object
+    addressComponent: [Object, String]
   },
   data () {
     return {
@@ -173,10 +156,8 @@ export default {
     }
   },
   computed: {
-    BoundaryFormatter () {
-      /*return getFinalProp(boundaryFormatter, this.boundaryFormatter, ({ lng, lat }) => {
-
-      })*/
+    Img () {
+      return getFinalProp(this.img, globalProps.img)
     },
     version () {
       return ''
@@ -191,25 +172,18 @@ export default {
         address: this.address || ((isEmpty(this.lng) || isEmpty(this.lat)) ? this.baseCity : '')
       })
     },
-    key () {
-      return this.apiKey || apiKey
+    ApiKey () {
+      return getFinalProp(this.apiKey, globalProps.apiKey)
     },
     Precision () {
-      return getFinalProp(precision, this.precision, 6)
+      return getFinalProp(this.precision, globalProps.precision, 6)
     },
     AddressComponent () {
-      const defaultValue = {
+      return getFinalProp(this.addressComponent, globalProps.addressComponent, {
         province: true,
         city: true,
         district: true
-      }
-      return this.addressComponent ? {
-        ...defaultValue,
-        ...this.addressComponent,
-      } : addressComponent ? {
-        ...defaultValue,
-        ...addressComponent,
-      } : defaultValue
+      })
     },
   },
   watch: {
@@ -220,7 +194,7 @@ export default {
           this.reset()
         } else {*/
         AMapLoader.load({
-          'key': this.key,   // 申请好的Web端开发者Key，首次调用 load 时必填
+          'key': this.ApiKey,   // 申请好的Web端开发者Key，首次调用 load 时必填
           ...this.version ? { version: this.version, } : {}, // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
           'plugins': [
             'AMap.Scale',
@@ -232,7 +206,7 @@ export default {
             ...this.version && this.version.startsWith('2.') ?
               ['AMap.AutoComplete'] :
               ['AMap.Autocomplete'],
-            ...this.img ? [
+            ...this.Img ? [
               'AMap.MouseTool',
               'AMap.RectangleEditor',
             ] : [],
@@ -355,7 +329,7 @@ export default {
             this.Zoom = this.map.getZoom()
           })
 
-          if (this.img || this.boundary) {
+          if (this.Img || this.boundary) {
             this.mouseTool = new AMap.MouseTool(this.map)
             this.mouseTool.on('draw', e => {
               //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
@@ -527,9 +501,31 @@ export default {
       this.geocoder.getAddress([this.curSpot.lng, this.curSpot.lat], (status, result) => {
         if (status === 'complete' && result.info === 'OK' && result.regeocode?.formattedAddress) {
           const { province, city, district } = result.regeocode.addressComponent
-          const { province: provinceFlag, city: cityFlag, district: districtFlag } = this.AddressComponent
-          const regionReplacement = (provinceFlag ? '' : province) + (cityFlag ? '' : city) + (districtFlag ? '' : district)
-          this.curSpot.address = result.regeocode.formattedAddress.replace(regionReplacement, '')
+
+          if (typeof this.AddressComponent === 'string') {
+            const placeholders = this.AddressComponent.match(/\${[\dA-z_\$]*}/g)
+            if (placeholders) {
+              // 坑：ios不支持正则后顾 (?<=exp2)exp1 编译阶段就会报错 导致白屏
+              // const props = this.label.match(/(?<=\${)[\dA-z_\$]*(?=})/g)
+              const __labelTemplate = result.label
+              result.label = objOption => {
+                let res = __labelTemplate
+                placeholders.map((v, i) => {
+                  const prop = v?.slice(2, -1)
+                  if (prop) {
+                    res = res.replace(placeholders[i], objOption[prop])
+                  } else {
+
+                  }
+                })
+                return res
+              }
+            }
+          } else {
+            const { province: provinceFlag, city: cityFlag, district: districtFlag } = this.AddressComponent
+            const regionReplacement = (provinceFlag ? '' : province) + (cityFlag ? '' : city) + (districtFlag ? '' : district)
+            this.curSpot.address = result.regeocode.formattedAddress.replace(regionReplacement, '')
+          }
         }
       })
       this.drawMarker()
@@ -563,7 +559,7 @@ export default {
       this.$emit('update:lng', this.roundOff(this.curSpot.lng))
       this.$emit('update:address', this.curSpot.address)
       this.$emit('update:zoom', this.Zoom)
-      if (this.img) {
+      if (this.Img) {
         this.$emit('update:imgNorthEastLng', this.roundOff(this.curImg.imgNorthEastLng))
         this.$emit('update:imgNorthEastLat', this.roundOff(this.curImg.imgNorthEastLat))
         this.$emit('update:imgSouthWestLng', this.roundOff(this.curImg.imgSouthWestLng))
@@ -623,7 +619,7 @@ export default {
       //初始化
       else {
         //直辖市：['110100000000', '120100000000', '310100000000', '500100000000']
-        this.baseCity = this.city || city || ''
+        this.baseCity = getFinalProp(this.city, globalProps.city, '')
         if (this.baseCity) {
           this.initPlugins()
         }
@@ -631,7 +627,7 @@ export default {
         new Promise((resolve, reject) => {
           let centerDesignated = false, hasOverlay = false
           //传了图片 绘制图层
-          if (this.img &&
+          if (this.Img &&
             !isEmpty(this.curImg.imgSouthWestLng) &&
             !isEmpty(this.curImg.imgSouthWestLat) &&
             !isEmpty(this.curImg.imgNorthEastLng) &&

@@ -24,8 +24,3 @@ if (typeof window !== 'undefined' && window.Vue) {
 CoordPicker.install = install
 
 export default CoordPicker
-
-// todo: deprecated
-export {
-  CoordPicker
-}

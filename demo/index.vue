@@ -82,7 +82,8 @@
 </template>
 
 <script>
-import { JsonEditorVue } from 'json-editor-vue'
+import 'json-editor-vue/dist/style.css'
+import JsonEditorVue from 'json-editor-vue'
 
 export default {
   components: { JsonEditorVue },
@@ -94,7 +95,7 @@ export default {
       //开关
       show: false,
       //高德地图js api key（如果全局引入时已经传入 这里可以不传）
-      apiKey: '',
+      apiKey: import.meta.env.VITE_APP_AMAP_JS_API_KEY,
 
       /**
        * 点位相关
