@@ -13,6 +13,13 @@ export default {
     }
   },
   methods: {
+    onPolygonBtnClick () {
+      if (this.BoundaryMaxCount > 0 && this.polygonObj.length >= this.BoundaryMaxCount) {
+        this.$Swal.warning(`最多绘制${this.BoundaryMaxCount}个区域`)
+      } else {
+        this.active = 'polygon'
+      }
+    },
     syncPolygon () {
       //同步可能经过删除、节点变化的多边形
       this.curBoundary = []
@@ -48,12 +55,16 @@ export default {
 
       const polygonContextMenu = new AMap.ContextMenu()
       polygonContextMenu.addItem('删除', e => {
-        if (draggable) {
-          this.polygonEditor[i].close()
-          this.polygonEditor[i] = null
+        if (this.polygonObj.length <= this.BoundaryMinCount) {
+          this.$Swal.warning(`至少绘制${this.BoundaryMinCount}个区域`)
+        } else {
+          if (draggable) {
+            this.polygonEditor[i].close()
+            this.polygonEditor.splice(i, 1)
+          }
+          this.polygonObj[i].setMap(null)
+          this.polygonObj.splice(i, 1)
         }
-        this.polygonObj[i].setMap(null)
-        this.polygonObj[i] = null
       }, 0)
 
       this.polygonObj[i].on('mouseout', e => {

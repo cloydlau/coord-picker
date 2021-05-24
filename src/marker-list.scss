@@ -23,15 +23,11 @@ ul, li {
 
 #panel {
   position: absolute;
-  top: 0;
-  bottom: 0;
+  top: 75px;
   right: 0;
-  height: 100%;
   overflow: auto;
   width: 300px;
-  z-index: 999;
-  border-left: 1px solid #eaeaea;
-  background: #fff;
+  z-index: 0;
 }
 
 #btnList {
@@ -53,11 +49,28 @@ ul, li {
 }
 
 li.poibox {
-  border-bottom: 1px solid #eaeaea;
-  border-left: 2px solid rgba(0, 0, 0, 0);
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  backdrop-filter: blur(2px);
+  background-color: #f7f7f7ab;
+  border: 2px solid #e9f1f6;
   padding: 10px;
   cursor: pointer;
   min-height: 74px;
+  position: relative;
+
+  &:not(:first-child) {
+    margin-top: 5px;
+  }
+
+  .el-icon-circle-close {
+    position: absolute;
+    font-size: 20px;
+    right: 5px;
+    top: -10px;
+    cursor: pointer;
+    z-index: 1;
+  }
 }
 
 li.poibox.selected {

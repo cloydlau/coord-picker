@@ -73,7 +73,7 @@ export default {
 | lng.sync | 经度 | number, string, number[], string[] | | |
 | lat.sync | 纬度 | number, string, number[], string[] | | |
 | address.sync | 地址 | string, string[] | | |
-| addressComponent* | 地址成分 | object, string | | |
+| addressComponent* | 地址成分 | object, function | | |
 | markerCount* | 点位数量限制 | number, number[] | | 1 |
 
 ### 图层相关
@@ -130,23 +130,7 @@ adcode信息可参考[城市编码表](https://lbs.amap.com/api/webservice/downl
 }
 ```
 
-- string
-
-举个例子：
-
-`'${province}${district}'` 将等同于
-
-```
-{ 
-  province: false, // address中是否包含省
-  city: true,      // address中是否包含市
-  district: true   // address中是否包含区县
-}
-```
-
-string的方式可以实现在地址中加入自定义文字：
-
-`'省：${province}，市：${province}，区县：${district}'`
+- function
 
 ### boundary
 
@@ -184,6 +168,39 @@ string的方式可以实现在地址中加入自定义文字：
 
 - 局部配置高于全局配置
 - 对于对象类型的参数 局部配置会与全局配置进行合并 同名属性会被局部配置覆盖
+
+<br>
+
+## 绘制点位
+
+```vue
+<!-- 多点位示例 -->
+
+<template>
+  <CoordPicker
+    show
+    apiKey=""
+    :marker.sync="marker"
+    :markerCount="2"
+  />
+</template>
+
+<script>
+
+export default {
+  data () {
+    return {
+      marker: [{
+        lng: '',
+        lat: '',
+        address: '',
+        name: ''
+      }]
+    }
+  }
+}
+</script>
+```
 
 <br>
 

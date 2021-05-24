@@ -14,7 +14,7 @@ $btnSize: 35px;
   top: 15px;
   right: 0;
   height: 40px;
-  background: #ffffff96;
+  background: rgba(255, 255, 255, 0.9);
   border-color: #003371;
 
   & ::v-deep svg {
@@ -26,7 +26,7 @@ $btnSize: 35px;
   .panel {
     position: absolute;
     top: 0;
-    right: 20px;
+    right: 15px;
     height: 100%;
     border-radius: 25px;
     -webkit-backdrop-filter: blur(2px);

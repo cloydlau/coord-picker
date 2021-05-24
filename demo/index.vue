@@ -14,6 +14,9 @@
       :precision="precision"
       :addressComponent="addressComponent"
 
+      :marker.sync="marker"
+      :markerCount="[1,2]"
+
       :img="img"
       :imgNorthEastLng.sync="imgNorthEastLng"
       :imgNorthEastLat.sync="imgNorthEastLat"
@@ -21,6 +24,7 @@
       :imgSouthWestLat.sync="imgSouthWestLat"
 
       :boundary.sync="boundary"
+      :boundaryCount="[1,3]"
     />
 
 
@@ -52,7 +56,7 @@
             :key="i"
             :label="v.value"
             v-for="(v,i) of [
-              {value:'string',text:'string'},
+              {value:'function',text:'function'},
               {value:'object',text:'object'},
             ]"
           >
@@ -60,9 +64,8 @@
           </el-radio>
         </el-radio-group>
 
-        <el-input v-if="addressComponentType__==='string'" v-model="addressComponent" clearable/>
         <el-radio-group
-          v-else
+          v-if="addressComponentType__==='object'"
           v-model="addressComponentObject__"
         >
           <el-radio-button :label="undefined">完整地址</el-radio-button>
@@ -125,6 +128,27 @@ export default {
       //初始城市（也支持省份）
       city: '',
 
+      marker: [
+        {
+          address: '望京阜通东大街6号院3号楼',
+          lat: '39.989684',
+          lng: '116.480989',
+          name: '北京方恒假日酒店',
+          //pic: 'http://store.is.autonavi.com/showpic/1d84ec20efa80ceb6166abbd78c17e45?operate=merge&w=160&h=150&position=5',
+          //price: '<font color=\'#999999\'>起价:</font><font color=\'#f53623\'>￥</font><font color=\'#f53623\'>611</font>',
+          //rating: '4.6',
+        },
+        {
+          address: '望京阜通东大街8号',
+          lat: '39.988911',
+          lng: '116.479856',
+          name: '国际竹藤大厦',
+          pic: 'http://store.is.autonavi.com/showpic/18a7b09e5679767b4016d27bc2b85573?operate=merge&w=160&h=150&position=5',
+          //price: '<font color=\'#999999\'>起价:</font><font color=\'#f53623\'>￥</font><font color=\'#f53623\'>414</font>',
+          //rating: '4',
+        }
+      ],
+
       /**
        * 图片相关
        */
@@ -162,8 +186,11 @@ export default {
       precision: 6,
 
       //地址成分
-      addressComponent: '${city} - ${district}',
-      addressComponentType__: 'string',
+      addressComponent: undefined,
+      /*addressComponent ({ province, city, district }) {
+        return province + city + district
+      },*/
+      addressComponentType__: 'object',
       addressComponentObject__: undefined,
     }
   },
