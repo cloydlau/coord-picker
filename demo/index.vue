@@ -46,9 +46,25 @@
         <el-input-number v-model="precision" clearable :min="0"/>
       </el-form-item>
       <el-form-item label="addressComponent">
-        <el-radio-group v-model="addressComponent__" @change="e => {
-           addressComponent = e ? JSON.parse(e) : undefined
-        }">
+        <span style="margin-right: 30px">Type:</span>
+        <el-radio-group v-model="addressComponentType__">
+          <el-radio
+            :key="i"
+            :label="v.value"
+            v-for="(v,i) of [
+              {value:'string',text:'string'},
+              {value:'object',text:'object'},
+            ]"
+          >
+            {{ v.text }}
+          </el-radio>
+        </el-radio-group>
+
+        <el-input v-if="addressComponentType__==='string'" v-model="addressComponent" clearable/>
+        <el-radio-group
+          v-else
+          v-model="addressComponentObject__"
+        >
           <el-radio-button :label="undefined">完整地址</el-radio-button>
           <el-radio-button :label="JSON.stringify({province:false})">去掉省</el-radio-button>
           <el-radio-button :label="JSON.stringify({province:false,city:false})">去掉省市</el-radio-button>
@@ -146,8 +162,17 @@ export default {
       precision: 6,
 
       //地址成分
-      addressComponent: undefined,
-      addressComponent__: undefined,
+      addressComponent: '${city} - ${district}',
+      addressComponentType__: 'string',
+      addressComponentObject__: undefined,
+    }
+  },
+  watch: {
+    addressComponentType__ () {
+      this.addressComponent = undefined
+    },
+    addressComponentObject__ (n) {
+      this.addressComponent = n ? JSON.parse(n) : undefined
     }
   },
   methods: {}

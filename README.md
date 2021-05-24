@@ -58,29 +58,95 @@ export default {
 
 ## Props
 
-| Attribute | Description | Configuration Mode | Type | Accepted Values | Default |
-| --- | --- | --- | --- | --- | --- |
-| show.sync | 开关 | props | boolean | | false |
-| apiKey | 高德地图js api key | props, global | string | | |
-| city | 初始行政区 | props, global | string | 城市名称 / 省份名称 | |
-| address.sync | 地址 | props | string | | |
-| lng.sync | 经度 | props | number / string | | |
-| lat.sync | 纬度 | props | number / string | | |
-| zoom.sync | 缩放级别 | props | number | | |
-| precision | 坐标精度（保留几位小数） | props, global | number | | 6 |
-| addressComponent* | 地址成分 | props, global | object, string | | { province: true, city: true, district: true } |
-| img | 图片链接（用于图片图层） | props | string | | |
-| imgNorthEastLng.sync | 图片东北角经度（用于图片图层） | props | number / string | | |
-| imgNorthEastLat.sync | 图片东北角纬度（用于图片图层） | props | number / string | | |
-| imgSouthWestLng.sync | 图片西南角经度（用于图片图层） | props | number / string | | |
-| imgSouthWestLat.sync | 图片西南角纬度（用于图片图层） | props | number / string | | |
-| boundary.sync* | 区域轮廓（用于绘制区域） | props | array | | |
+| Attribute | Description | Type | Accepted Values | Default |
+| --- | --- | --- | --- | --- |
+| show.sync | 开关 | boolean | | false |
+| apiKey | 高德地图js api key | string | | |
+| city* | 初始行政区 | string | | |
+| zoom.sync | 缩放级别 | number | | |
+| precision | 坐标精度（保留几位小数） | number | | 6 |
+
+### 点位相关
+
+| Attribute | Description | Type | Accepted Values | Default |
+| --- | --- | --- | --- | --- |
+| lng.sync | 经度 | number, string, number[], string[] | | |
+| lat.sync | 纬度 | number, string, number[], string[] | | |
+| address.sync | 地址 | string, string[] | | |
+| addressComponent* | 地址成分 | object, string | | |
+| markerCount* | 点位数量限制 | number, number[] | | 1 |
+
+### 图层相关
+
+| Attribute | Description | Type | Accepted Values | Default |
+| --- | --- | --- | --- | --- |
+| img | 图片url | string | | |
+| imgNorthEastLng.sync | 图片东北角经度 | number, string | | |
+| imgNorthEastLat.sync | 图片东北角纬度 | number, string | | |
+| imgSouthWestLng.sync | 图片西南角经度 | number, string | | |
+| imgSouthWestLat.sync | 图片西南角纬度 | number, string | | |
+
+### 轮廓相关
+
+| Attribute | Description | Type | Accepted Values | Default |
+| --- | --- | --- | --- | --- |
+| boundary.sync* | 区域轮廓 | object, array | | |
+| boundaryCount* | 区域数量限制 | number, number[] | | 0 |
 
 ::: warning 坐标值类型  
 number和string都能接收 但返回时 由于js的number类型存在精度丢失问题 故返回string
 :::
 
+### city
+
+> 高德Web服务API的同名参数
+
+可选值：指定城市的中文（如北京）、指定城市的中文全拼（beijing）、citycode（010）、adcode（110000），不支持县级市。当指定城市查询内容为空时，会进行全国范围内的地址转换检索。
+
+adcode信息可参考[城市编码表](https://lbs.amap.com/api/webservice/download)获取
+
+### markerCount, imgCount, boundaryCount
+
+- number
+
+数量上限
+
+- number[]
+
+    0. 数量下限
+    1. 数量上限
+
 ### addressComponent
+
+默认情况下，点击地图获取到的address是包含省市区的完整地址，你可以用以下两种方式来自定义地址的成分：
+
+- object
+
+```
+{ 
+  province: true, // address中是否包含省
+  city: true,     // address中是否包含市
+  district: true  // address中是否包含区县
+}
+```
+
+- string
+
+举个例子：
+
+`'${province}${district}'` 将等同于
+
+```
+{ 
+  province: false, // address中是否包含省
+  city: true,      // address中是否包含市
+  district: true   // address中是否包含区县
+}
+```
+
+string的方式可以实现在地址中加入自定义文字：
+
+`'省：${province}，市：${province}，区县：${district}'`
 
 ### boundary
 
@@ -118,6 +184,20 @@ number和string都能接收 但返回时 由于js的number类型存在精度丢�
 
 - 局部配置高于全局配置
 - 对于对象类型的参数 局部配置会与全局配置进行合并 同名属性会被局部配置覆盖
+
+<br>
+
+## 绘制图层
+
+img参数不为空时 开启绘制图层功能
+
+图层数量目前仅支持一个，二次绘制会覆盖先前的图层
+
+<br>
+
+## 绘制轮廓
+
+boundaryCount参数值大于0时 开启绘制轮廓功能
 
 <br>
 

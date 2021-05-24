@@ -8,9 +8,9 @@
     destroy-on-close
     v-if="show"
   >
-    <div slot="title" class="title">
+    <!--<div slot="title" class="title">
       <span v-text="title||'坐标拾取'" class="title-text"/>
-    </div>
+    </div>-->
     <div style="height:100%">
       <div class="autoComplete-wrapper">
         <input id="autoComplete" tabindex="1" v-model="keyword" @keyup.enter="e=>{
@@ -34,7 +34,11 @@
         <i class="el-icon-search"/>
         <span>搜索</span>
       </div>-->
-      <div ref="map-container" id="map-container" v-loading="loading"/>
+      <div ref="map-container" id="map-container"/>
+
+      <div id="panel" class="scrollbar1">
+        <ul id="myList"/>
+      </div>
     </div>
 
     <Toolbar v-if="!loading">
@@ -51,7 +55,7 @@
           <!--          <SvgIcon :data="require(`@icon/draw-img.svg`)"/>-->
         </a>
       </el-tooltip>
-      <el-tooltip effect="dark" content="绘制轮廓" placement="bottom" v-if="boundary">
+      <el-tooltip effect="dark" content="绘制轮廓" placement="bottom" v-if="boundaryCount">
         <a @click.stop="active='polygon'"
            :class="{active:active==='polygon'}">
           <!--          <SvgIcon :data="require(`@icon/draw-polygon.svg`)"/>-->
@@ -97,6 +101,7 @@ import { getFinalProp } from '@/utils'
 import globalProps from './config'
 import { name } from '../package.json'
 const prefix = `[${name}] `
+import './amap-ui.scss'
 
 export default {
   name: 'CoordPicker',
@@ -132,7 +137,10 @@ export default {
       validator: value => ['null', 'array'].includes(typeOf(value)),
     },
     precision: Number,
-    addressComponent: [Object, String]
+    addressComponent: [Object, String],
+    markerCount: Number,
+    //imgCount: Number,
+    boundaryCount: Number,
   },
   data () {
     return {
@@ -143,7 +151,7 @@ export default {
       searchResult: [],
       map: null,
       loading: true,
-      marker: null,
+      marker: [],
       //meny: null,
       customClass: 'animate__animated animate__zoomIn',
       geocoder: null,
@@ -156,20 +164,29 @@ export default {
     }
   },
   computed: {
+    BoundaryCount () {
+      return getFinalProp(this.boundaryCount, globalProps.boundaryCount, 0)
+    },
+    /*ImgCount () {
+      return getFinalProp(this.imgCount, globalProps.imgCount, 1)
+    },*/
+    MarkerCount () {
+      return getFinalProp(this.markerCount, globalProps.markerCount, 1)
+    },
     Img () {
       return getFinalProp(this.img, globalProps.img)
     },
     version () {
       return ''
     },
-    title () {
+    /*title () {
       return this.curSpot.address + ((isEmpty(this.curSpot.lng) || isEmpty(this.curSpot.lat)) ? '' : `（${this.curSpot.lng}，${this.curSpot.lat}）`)
-    },
+    },*/
     curSpot () {
       return Vue.observable({
-        lng: isEmpty(this.lng) ? '' : this.lng,
-        lat: isEmpty(this.lat) ? '' : this.lat,
-        address: this.address || ((isEmpty(this.lng) || isEmpty(this.lat)) ? this.baseCity : '')
+        lng: isEmpty(this.lng) ? [] : Array.isArray(this.lng) ? this.lng : [this.lng],
+        lat: isEmpty(this.lat) ? [] : [this.lat],
+        address: this.address ? ((isEmpty(this.lng) || isEmpty(this.lat)) ? this.baseCity : []) : []
       })
     },
     ApiKey () {
@@ -194,7 +211,11 @@ export default {
           this.reset()
         } else {*/
         AMapLoader.load({
-          'key': this.ApiKey,   // 申请好的Web端开发者Key，首次调用 load 时必填
+          'key': this.ApiKey, // 申请好的Web端开发者Key，首次调用 load 时必填
+          AMapUI: {
+            version: '1.1',
+            plugins: ['misc/MarkerList', 'overlay/SimpleMarker', 'overlay/SimpleInfoWindow']
+          },
           ...this.version ? { version: this.version, } : {}, // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
           'plugins': [
             'AMap.Scale',
@@ -329,7 +350,7 @@ export default {
             this.Zoom = this.map.getZoom()
           })
 
-          if (this.Img || this.boundary) {
+          if (this.Img || this.boundaryCount) {
             this.mouseTool = new AMap.MouseTool(this.map)
             this.mouseTool.on('draw', e => {
               //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
@@ -409,7 +430,7 @@ export default {
     /*convertLngLat () {
       new AMap.convertFrom(gps, 'gps', function (status, result) {
         if (result.info === 'ok') {
-          var lnglats = result.locations // Array.<LngLat>
+          let lnglats = result.locations // Array.<LngLat>
         }
       })
     },*/
@@ -446,7 +467,7 @@ export default {
         new AMap.AutoComplete(param) :
         new AMap.Autocomplete(param)
       this.placeSearch = new AMap.PlaceSearch(param)
-      if (this.boundary) {
+      if (this.boundaryCount) {
         this.districtSearch = new AMap.DistrictSearch({
           subdistrict: 0,   //获取边界不需要返回下级行政区
           extensions: 'all',  //返回行政区边界坐标组等具体信息
@@ -488,47 +509,47 @@ export default {
       }
       this.curImg.imgNorthEastLat = this.imgNorthEastLat
       this.curImg.imgSouthWestLat = this.imgSouthWestLat
-      this.curSpot.lng = isEmpty(this.lng) ? '' : this.lng
-      this.curSpot.lat = isEmpty(this.lat) ? '' : this.lat
-      this.curSpot.address = this.address || ((isEmpty(this.lng) && isEmpty(this.lat)) ? this.baseCity : '')
+      this.curSpot.lng = isEmpty(this.lng) ? [] : Array.isArray(this.lng) ? this.lng : [this.lng]
+      this.curSpot.lat = isEmpty(this.lat) ? [] : Array.isArray(this.lat) ? this.lat : [this.lat]
+      this.curSpot.address = this.address ? Array.isArray(this.address) ? this.address : [this.address] : []
       // 如果乾坤的子系统共享一个window对象 会导致报错——'禁止多种API加载方式混用'
       AMapLoader.reset()
     },
-    onMapClick (e) {
-      this.clearMarker()
-      this.curSpot.lng = e.lnglat.lng
-      this.curSpot.lat = e.lnglat.lat
-      this.geocoder.getAddress([this.curSpot.lng, this.curSpot.lat], (status, result) => {
+    getAddress ([lng, lat]) {
+      this.geocoder.getAddress([lng, lat], (status, result) => {
         if (status === 'complete' && result.info === 'OK' && result.regeocode?.formattedAddress) {
-          const { province, city, district } = result.regeocode.addressComponent
-
           if (typeof this.AddressComponent === 'string') {
             const placeholders = this.AddressComponent.match(/\${[\dA-z_\$]*}/g)
             if (placeholders) {
               // 坑：ios不支持正则后顾 (?<=exp2)exp1 编译阶段就会报错 导致白屏
-              // const props = this.label.match(/(?<=\${)[\dA-z_\$]*(?=})/g)
-              const __labelTemplate = result.label
-              result.label = objOption => {
-                let res = __labelTemplate
+              const getAddress = addressComponent => {
+                let res = this.AddressComponent
                 placeholders.map((v, i) => {
                   const prop = v?.slice(2, -1)
                   if (prop) {
-                    res = res.replace(placeholders[i], objOption[prop])
+                    res = res.replace(placeholders[i], addressComponent[prop])
                   } else {
 
                   }
                 })
                 return res
               }
+              this.curSpot.address.push(getAddress(result.regeocode.addressComponent))
             }
           } else {
-            const { province: provinceFlag, city: cityFlag, district: districtFlag } = this.AddressComponent
-            const regionReplacement = (provinceFlag ? '' : province) + (cityFlag ? '' : city) + (districtFlag ? '' : district)
-            this.curSpot.address = result.regeocode.formattedAddress.replace(regionReplacement, '')
+            let address = result.regeocode.formattedAddress
+            for (let k in this.AddressComponent) {
+              if (this.AddressComponent[k] === false) {
+                address = address.replace(result.regeocode.addressComponent[k], '')
+              }
+            }
+            this.curSpot.address.push(address)
           }
         }
       })
-      this.drawMarker()
+    },
+    onMapClick (e) {
+      this.drawMarker([e.lnglat.lng, e.lnglat.lat])
     },
     fetchSuggestions (queryString, cb) {
       return new Promise((resolve, reject) => {
@@ -555,70 +576,364 @@ export default {
       }
     },
     confirm () {
-      this.$emit('update:lat', this.roundOff(this.curSpot.lat))
-      this.$emit('update:lng', this.roundOff(this.curSpot.lng))
-      this.$emit('update:address', this.curSpot.address)
+      this.$emit('update:lng',
+        this.MarkerCount > 1 ?
+          this.curSpot.lng.map(v => this.roundOff(v)) :
+          this.roundOff(this.curSpot.lng[0])
+      )
+      this.$emit('update:lat',
+        this.MarkerCount > 1 ?
+          this.curSpot.lat.map(v => this.roundOff(v)) :
+          this.roundOff(this.curSpot.lat[0])
+      )
+      this.$emit('update:address', this.MarkerCount > 1 ? this.curSpot.address : this.curSpot.address[0])
       this.$emit('update:zoom', this.Zoom)
       if (this.Img) {
+        //this.address || ((isEmpty(this.lng) || isEmpty(this.lat)) ? this.baseCity : '')
         this.$emit('update:imgNorthEastLng', this.roundOff(this.curImg.imgNorthEastLng))
         this.$emit('update:imgNorthEastLat', this.roundOff(this.curImg.imgNorthEastLat))
         this.$emit('update:imgSouthWestLng', this.roundOff(this.curImg.imgSouthWestLng))
         this.$emit('update:imgSouthWestLat', this.roundOff(this.curImg.imgSouthWestLat))
       }
-      if (this.boundary) {
+      if (this.boundaryCount) {
         this.syncPolygon()
         this.$emit('update:boundary', this.curBoundary)
       }
       this.$emit('update:show', false)
     },
     clearMarker () {
-      if (this.marker) {
-        this.curSpot.lng = ''
-        this.curSpot.lat = ''
-        this.curSpot.address = ''
-        this.map.remove(this.marker)
+      this.marker.map(v => {
+        if (v) {
+          this.map.remove(v)
+        }
+      })
+      this.curSpot.lng = []
+      this.curSpot.lat = []
+      this.curSpot.address = []
+      this.marker.length = 0
+    },
+    drawMarker ([lng, lat]) {
+      if (this.markerCount > 1 && this.marker.length >= this.markerCount) {
+        this.$Swal.warning(`最多标记${this.markerCount}个点位`)
+      } else {
+        this.getAddress([lng, lat])
+        this.curSpot.lng.push(lng)
+        this.curSpot.lat.push(lat)
+        const position = [lng, lat]
+        /*const marker = new AMap.Marker({
+          position,
+        })*/
+        //this.map.add(marker)
+        const marker = new AMapUI.SimpleMarker({
+          containerClassNames: 'my-marker',
+          // 背景图标样式
+          iconStyle: 'red',
+          // 前景文字
+          iconLabel: {
+            // A,B,C.....
+            innerHTML: String.fromCharCode('A'.charCodeAt(0) + this.marker.length),
+          },
+          map: this.map,
+          position: [lng, lat],
+        })
+
+        marker.on('mouseover', e => {
+          console.log('mouseover', e)
+          e.target.setIconStyle('blue')
+        })
+
+        marker.on('mouseout', e => {
+          console.log('mouseout', e)
+          e.target.setIconStyle('red')
+        })
+
+        marker.on('click', e => {
+          console.log('click', e)
+        })
+
+        this.marker.push(marker)
       }
     },
-    drawMarker () {
-      const position = [this.curSpot.lng, this.curSpot.lat]
-      this.marker = new AMap.Marker({
-        position,
+    initMarkerList () {
+      const { MarkerList, SimpleMarker, SimpleInfoWindow } = AMapUI
+      //即jQuery/Zepto
+      let $ = MarkerList.utils.$
+
+      let defaultIconStyle = 'red', //默认的图标样式
+        hoverIconStyle = 'blue', //鼠标hover时的样式
+        selectedIconStyle = 'darkblue' //选中时的图标样式
+
+      let markerList = new MarkerList({
+        map: this.map,
+        //ListElement对应的父节点或者ID
+        listContainer: 'myList', //document.getElementById("myList"),
+        //选中后显示
+
+        //从数据中读取位置, 返回lngLat
+        getPosition: function (item) {
+          return [item.longitude, item.latitude]
+        },
+        //数据ID，如果不提供，默认使用数组索引，即index
+        getDataId: function (item, index) {
+
+          return item.id
+        },
+        getInfoWindow: function (data, context, recycledInfoWindow) {
+
+          if (recycledInfoWindow) {
+
+            recycledInfoWindow.setInfoTitle(data.name)
+            recycledInfoWindow.setInfoBody(data.address)
+
+            return recycledInfoWindow
+          }
+
+          return new SimpleInfoWindow({
+            infoTitle: data.name,
+            infoBody: data.address,
+            offset: new AMap.Pixel(0, -37)
+          })
+        },
+        //构造marker用的options对象, content和title支持模板，也可以是函数，返回marker实例，或者返回options对象
+        getMarker: function (data, context, recycledMarker) {
+
+          let label = String.fromCharCode('A'.charCodeAt(0) + context.index)
+
+          if (recycledMarker) {
+            recycledMarker.setIconLabel(label)
+            return
+          }
+
+          return new SimpleMarker({
+            containerClassNames: 'my-marker',
+            iconStyle: defaultIconStyle,
+            iconLabel: label
+          })
+        },
+        //构造列表元素，与getMarker类似，可以是函数，返回一个dom元素，或者模板 html string
+        getListElement: function (data, context, recycledListElement) {
+          let label = String.fromCharCode('A'.charCodeAt(0) + context.index)
+          //使用模板创建
+          const innerHTML = MarkerList.utils.template(
+            '<div class="poi-imgbox" <%- !data.pic&&`style="display:"none"` %>' +
+            '  <span class="poi-img" style="background-image:url(<%- data.pic %>)"></span>' +
+            '</div>' +
+            '<div class="poi-info-left">' +
+            '    <h3 class="poi-title">' +
+            '        <%- label %>. <%- data.name %>' +
+            '    </h3>' +
+            '    <div class="poi-info">' +
+            '        <span class="poi-price">' +
+            '            <%= data.price %>' +
+            '        </span>' +
+            '        <p class="poi-addr"><%- data.address %></p>' +
+            '    </div>' +
+            '</div>', {
+              data: data,
+              label: label
+            })
+
+          if (recycledListElement) {
+            recycledListElement.innerHTML = innerHTML
+            return recycledListElement
+          }
+
+          return '<li class="poibox">' +
+            innerHTML +
+            '</li>'
+        },
+        //列表节点上监听的事件
+        listElementEvents: ['click', 'mouseenter', 'mouseleave'],
+        //marker上监听的事件
+        markerEvents: ['click', 'mouseover', 'mouseout'],
+        //makeSelectedEvents:false,
+        selectedClassNames: 'selected',
+        autoSetFitView: true
       })
-      this.map.add(this.marker)
+
+      //window.markerList = markerList
+
+      markerList.on('selectedChanged', function (event, info) {
+        checkBtnStats()
+        if (info.selected) {
+          console.log(info)
+          if (info.selected.marker) {
+            //更新为选中样式
+            info.selected.marker.setIconStyle(selectedIconStyle)
+          }
+          //选中并非由列表节点上的事件触发，将关联的列表节点移动到视野内
+          if (!info.sourceEventInfo.isListElementEvent) {
+            if (info.selected.listElement) {
+              scrollListElementIntoView($(info.selected.listElement))
+            }
+          }
+        }
+        if (info.unSelected && info.unSelected.marker) {
+          //更新为默认样式
+          info.unSelected.marker.setIconStyle(defaultIconStyle)
+        }
+      })
+
+      markerList.on('listElementMouseenter markerMouseover', function (event, record) {
+        if (record && record.marker) {
+          forcusMarker(record.marker)
+          //this.openInfoWindowOnRecord(record);
+          //非选中的id
+          if (!this.isSelectedDataId(record.id)) {
+            //设置为hover样式
+            record.marker.setIconStyle(hoverIconStyle)
+            //this.closeInfoWindow();
+          }
+        }
+      })
+
+      markerList.on('listElementMouseleave markerMouseout', function (event, record) {
+        if (record && record.marker) {
+          if (!this.isSelectedDataId(record.id)) {
+            //恢复默认样式
+            record.marker.setIconStyle(defaultIconStyle)
+          }
+        }
+      })
+
+      //数据输出完成
+      markerList.on('renderComplete', function (event, records) {
+        checkBtnStats()
+      })
+
+      // markerList.on('*', function(type, event, res) {
+      //     console.log(type, event, res);
+      // });
+
+      //加载数据
+      function loadData (src, callback) {
+
+        //$.getJSON(src, function (data) {
+
+        //markerList._dataSrc = src
+
+        const data = [
+          {
+            address: '望京阜通东大街6号院3号楼',
+            id: 'B000A8URXB',
+            latitude: '39.989684',
+            longitude: '116.480989',
+            name: '北京方恒假日酒店',
+            //pic: 'http://store.is.autonavi.com/showpic/1d84ec20efa80ceb6166abbd78c17e45?operate=merge&w=160&h=150&position=5',
+            //price: '<font color=\'#999999\'>起价:</font><font color=\'#f53623\'>￥</font><font color=\'#f53623\'>611</font>',
+            //rating: '4.6',
+          },
+          {
+            address: '望京阜通东大街8号',
+            id: 'B000A1853E',
+            latitude: '39.988911',
+            longitude: '116.479856',
+            name: '国际竹藤大厦',
+            pic: 'http://store.is.autonavi.com/showpic/18a7b09e5679767b4016d27bc2b85573?operate=merge&w=160&h=150&position=5',
+            //price: '<font color=\'#999999\'>起价:</font><font color=\'#f53623\'>￥</font><font color=\'#f53623\'>414</font>',
+            //rating: '4',
+          }
+        ]
+
+        //渲染数据
+        markerList.render(data)
+
+        if (callback) {
+          callback(null, data)
+        }
+        //})
+      }
+
+      let $btns = $('#btnList input[data-path]')
+
+      /**
+       * 检测各个button的状态
+       */
+      function checkBtnStats () {
+        $('#btnList input[data-enable]').each(function () {
+
+          let $input = $(this),
+            codeEval = $input.attr('data-enable')
+
+          $input.prop({
+            disabled: !eval(codeEval)
+          })
+        })
+      }
+
+      $('#btnList').on('click', 'input', function () {
+
+        let $input = $(this),
+          dataPath = $input.attr('data-path'),
+          codeEval = $input.attr('data-eval')
+
+        if (dataPath) {
+          loadData(dataPath)
+        } else if (codeEval) {
+          eval(codeEval)
+        }
+
+        checkBtnStats()
+      })
+
+      loadData($btns.attr('data-path'))
+
+      const forcusMarker = marker => {
+        marker.setTop(true)
+
+        //不在地图视野内
+        if (!(this.map.getBounds().contains(marker.getPosition()))) {
+
+          //移动到中心
+          this.map.setCenter(marker.getPosition())
+        }
+      }
+
+      const isElementInViewport = el => {
+        let rect = el.getBoundingClientRect()
+
+        return (
+          rect.top >= 0 &&
+          rect.left >= 0 &&
+          rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
+          rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
+        )
+      }
+
+      function scrollListElementIntoView ($listEle) {
+        if (!isElementInViewport($listEle.get(0))) {
+          $('#panel').scrollTop($listEle.offset().top - $listEle.parent().offset().top)
+        }
+        //闪动一下
+        $listEle
+        .one('webkitAnimationEnd oanimationend msAnimationEnd animationend',
+          function (e) {
+            $(this).removeClass('flash animated')
+          }).addClass('flash animated')
+      }
     },
     locate (selectedLocation) {
-      //选中搜索项
+      // 选中搜索项
       if (selectedLocation) {
         if (this.districtSearch) {
           this.districtSearch.search(selectedLocation.name, (status, result) => {
             if (status === 'complete' && result.info === 'OK') {
               const bounds = result?.districtList[0]?.boundaries
               if (bounds.length) {
-                confirmation(`是否绘制${selectedLocation.name}轮廓？`).then(() => {
+                this.$Swal.confirm(`是否绘制${selectedLocation.name}轮廓？`).then(() => {
                   this.drawPolygon(Array.from(bounds, v => ({ data: v })), false)
                 })
               }
             }
           })
         }
-
-        this.clearMarker()
         //this.meny.close()
-        this.curSpot.lat = selectedLocation.location.lat
-        this.curSpot.lng = selectedLocation.location.lng
-        this.geocoder.getAddress([this.curSpot.lng, this.curSpot.lat], (status, result) => {
-          if (status === 'complete' && result.info === 'OK' && result.regeocode?.addressComponent) {
-            const { province, city, district } = result.regeocode.addressComponent
-            const { province: provinceFlag, city: cityFlag, district: districtFlag } = this.AddressComponent
-            this.curSpot.address = (provinceFlag ? province : '') + (cityFlag ? city : '') + (districtFlag ? district : '') + (selectedLocation.address || '') + (selectedLocation.name || '')
-          }
-        })
-        this.drawMarker()
+        this.drawMarker([selectedLocation.location.lng, selectedLocation.location.lat])
         this.setCenter([this.curSpot.lng, this.curSpot.lat])
       }
-      //初始化
+      // 初始化
       else {
-        //直辖市：['110100000000', '120100000000', '310100000000', '500100000000']
+        // 直辖市：['110100000000', '120100000000', '310100000000', '500100000000']
         this.baseCity = getFinalProp(this.city, globalProps.city, '')
         if (this.baseCity) {
           this.initPlugins()
@@ -626,7 +941,7 @@ export default {
 
         new Promise((resolve, reject) => {
           let centerDesignated = false, hasOverlay = false
-          //传了图片 绘制图层
+          // 传了图片 绘制图层
           if (this.Img &&
             !isEmpty(this.curImg.imgSouthWestLng) &&
             !isEmpty(this.curImg.imgSouthWestLat) &&
@@ -640,7 +955,7 @@ export default {
             centerDesignated = true
             hasOverlay = true
           }
-          //传了多边形 绘制多边形
+          // 传了多边形 绘制多边形
           if (this.boundary?.length > 0) {
             this.drawPolygon(this.boundary)
             centerDesignated = true
@@ -652,18 +967,31 @@ export default {
             this.Zoom = 12
           }
 
-          //传了点位 定位至该点位
-          if (!isEmpty(this.curSpot.lat) && !isEmpty(this.curSpot.lng)) {
-            this.drawMarker()
-            this.setCenter([this.curSpot.lng, this.curSpot.lat])
-            centerDesignated = true
+          // 传了点位 定位至该点位
+          this.initMarkerList()
+          if (!isEmpty(this.curSpot.lng) && !isEmpty(this.curSpot.lat)) {
+            /*if (Array.isArray(this.curSpot.lng) && Array.isArray(this.curSpot.lat)) {
+              if (this.curSpot.lng.length !== this.curSpot.lat.length) {
+                throw Error(`${prefix}lng与lat数量不一致`)
+              } else {
+                this.curSpot.lng.map((v, i) => {
+                  this.drawMarker([this.curSpot.lng[i], this.curSpot.lat[i]])
+                })
+                this.map.setFitView()
+              }
+            } else {
+              this.drawMarker([this.curSpot.lng, this.curSpot.lat])
+              this.setCenter([this.curSpot.lng, this.curSpot.lat])
+            }
+            centerDesignated = true*/
           }
           //否则将视图适配覆盖物
           else if (hasOverlay) {
             this.map.setFitView()
+            centerDesignated = true
           }
 
-          //仅传了地址 定位至该地址 并将该地址所在的城市设置为baseCity
+          // 仅传了地址 定位至该地址 并将该地址所在的城市设置为baseCity
           if (!centerDesignated && this.address) {
             this.geocoder.getLocation(this.address, (status, result) => {
               console.log(prefix + 'getLocation', result)
@@ -756,12 +1084,12 @@ export default {
 }
 
 ::v-deep .el-dialog__header {
+  display: none; // flex
   box-sizing: border-box;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   border-radius: 0 0 10px 10px;
-  height: 70px;
+  min-height: 70px;
   padding: 0 20px;
-  display: flex;
   position: fixed;
   top: 0;
   left: 400px;
@@ -786,10 +1114,11 @@ export default {
       //-webkit-box-orient: vertical;
       -webkit-line-clamp: 1;
       overflow: hidden;
-      line-height: 22px;
+      line-height: 25px;
       font-size: 22px;
       flex: 1;
       color: #003371;
+      padding: 15px 0;
     }
   }
 }
@@ -851,7 +1180,7 @@ export default {
 }
 
 ::v-deep .amap-maptypecontrol {
-  top: 70px;
-  right: 20px;
+  top: unset;
+  bottom: 95px;
 }
 </style>
