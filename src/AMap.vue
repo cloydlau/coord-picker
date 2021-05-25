@@ -521,6 +521,7 @@ export default {
       })
     },
     reset () {
+      this.markerList?.clearData()
       this.searchResult = []
       this.keyword = ''
       if (this.imageLayer) {
@@ -704,6 +705,11 @@ export default {
     },
     drawMarkerList (marker) {
       this.markerList?.clearData()
+
+      if (isEmpty(marker)) {
+        return
+      }
+
       const { MarkerList, SimpleMarker, SimpleInfoWindow } = AMapUI
       // 即jQuery/Zepto
       const $ = MarkerList.utils.$
@@ -936,14 +942,6 @@ export default {
         new Promise((resolve, reject) => {
           let centerDesignated = false, hasOverlay = false
 
-          // 没传点位 但是传了中心点 将中心点当作一个点位
-          if (!isEmpty(this.lng) && !isEmpty(this.lat) && isEmpty(this.marker)) {
-            this.markers = [{
-              longitude: this.lng,
-              latitude: this.lat,
-            }]
-          }
-
           // 传了点位 绘制点位
           if (this.marker?.length > 0) {
             this.markers = cloneDeep(this.marker).map(v => {
@@ -953,12 +951,21 @@ export default {
               delete v.lat
               return v
             })
-            this.drawMarkerList(this.markers)
+
             // 如果点位有多个 视为覆盖物 便于setFitView
             if (this.marker.length > 1) {
               hasOverlay = true
             }
           }
+          // 没传点位 但是传了中心点 将中心点当作一个点位
+          else if (!isEmpty(this.lng) && !isEmpty(this.lat)) {
+            this.markers = [{
+              longitude: this.lng,
+              latitude: this.lat,
+              address: this.address
+            }]
+          }
+          this.drawMarkerList(this.markers)
 
           // 传了图片 绘制图层
           if (this.Img &&
