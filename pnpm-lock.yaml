@@ -476,7 +476,7 @@ packages:
       jiti: 1.9.2
       magic-string: 0.25.7
       micromatch: 4.0.4
-      windicss: 3.0.10
+      windicss: 3.0.12
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -2118,7 +2118,7 @@ packages:
       chalk: 4.1.1
       debug: 4.3.2
       vite: 2.2.4
-      windicss: 3.0.10
+      windicss: 3.0.12
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -2161,8 +2161,8 @@ packages:
     resolution: {integrity: sha1-2e8H3Od7mQK4o6j6SzHD4/fm6Ho=}
     dev: false
 
-  /windicss/3.0.10:
-    resolution: {integrity: sha512-ihcGCdgjKloqRr9l072J+eWOddgdUdoEXl89W1wdnaDScz2AT6S6H9znoKf5y3g4Zu1JRTYTqCdYultRxezYpw==}
+  /windicss/3.0.12:
+    resolution: {integrity: sha512-pDxtFLN0xmL7bnGtnEfu9z7B5279UM2EP8wWlPH+FYb5gjHyONxRtyWtR5QIn1FRx6h1UXpm+I19GgTx5Y4TyA==}
     engines: {node: '>= 12'}
     hasBin: true
     dev: true

@@ -5,8 +5,8 @@
 ## Features
 
 - √ 坐标拾取（双向绑定）
-- √ 拖拉拽绘制/编辑图片图层（双向绑定角坐标）
-- √ 拖拉拽绘制/编辑多边形（双向绑定轮廓坐标）
+- √ 拖拉拽绘制、编辑图片图层（双向绑定角坐标）
+- √ 拖拉拽绘制、编辑多边形（双向绑定轮廓坐标）
 - √ POI搜索、搜索关键字自动补全
 - √ 根据传参情况智能初始化至合适的位置
 - √ 全局或局部引入 参数支持全局或局部配置
@@ -58,22 +58,30 @@ export default {
 
 ## Props
 
+### 基础参数
+
 | Attribute | Description | Type | Accepted Values | Default |
 | --- | --- | --- | --- | --- |
 | show.sync | 开关 | boolean | | false |
-| apiKey | 高德地图js api key | string | | |
+| apiKey | 高德地图 js api key | string | | |
 | city* | 初始行政区 | string | | |
 | zoom.sync | 缩放级别 | number | | |
 | precision | 坐标精度（保留几位小数） | number | | 6 |
+| addressComponent* | 地址成分 | object, function | | |
+
+### 中心点相关
+
+| Attribute | Description | Type | Accepted Values | Default |
+| --- | --- | --- | --- | --- |
+| lng.sync | 经度 | number, string | | |
+| lat.sync | 纬度 | number, string | | |
+| address.sync | 地址 | string | | |
 
 ### 点位相关
 
 | Attribute | Description | Type | Accepted Values | Default |
 | --- | --- | --- | --- | --- |
-| lng.sync | 经度 | number, string, number[], string[] | | |
-| lat.sync | 纬度 | number, string, number[], string[] | | |
-| address.sync | 地址 | string, string[] | | |
-| addressComponent* | 地址成分 | object, function | | |
+| marker.sync* | 点位列表 | object[] | | |
 | markerCount* | 点位数量限制 | number, number[] | | 1 |
 
 ### 图层相关
@@ -90,7 +98,7 @@ export default {
 
 | Attribute | Description | Type | Accepted Values | Default |
 | --- | --- | --- | --- | --- |
-| boundary.sync* | 区域轮廓 | object, array | | |
+| boundary.sync* | 区域轮廓列表 | object[] | | |
 | boundaryCount* | 区域数量限制 | number, number[] | | 0 |
 
 ::: warning 坐标值类型  
@@ -105,7 +113,7 @@ number和string都能接收 但返回时 由于js的number类型存在精度丢�
 
 adcode信息可参考[城市编码表](https://lbs.amap.com/api/webservice/download)获取
 
-### markerCount, imgCount, boundaryCount
+### markerCount, boundaryCount
 
 - number
 
@@ -113,8 +121,8 @@ adcode信息可参考[城市编码表](https://lbs.amap.com/api/webservice/downl
 
 - number[]
 
-    0. 数量下限
-    1. 数量上限
+  0. 数量下限
+  1. 数量上限
 
 ### addressComponent
 

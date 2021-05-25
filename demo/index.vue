@@ -15,7 +15,7 @@
       :addressComponent="addressComponent"
 
       :marker.sync="marker"
-      :markerCount="[1,2]"
+      :markerCount="1"
 
       :img="img"
       :imgNorthEastLng.sync="imgNorthEastLng"
@@ -129,7 +129,7 @@ export default {
       city: '',
 
       marker: [
-        {
+        /*{
           address: '望京阜通东大街6号院3号楼',
           lat: '39.989684',
           lng: '116.480989',
@@ -146,7 +146,7 @@ export default {
           pic: 'http://store.is.autonavi.com/showpic/18a7b09e5679767b4016d27bc2b85573?operate=merge&w=160&h=150&position=5',
           //price: '<font color=\'#999999\'>起价:</font><font color=\'#f53623\'>￥</font><font color=\'#f53623\'>414</font>',
           //rating: '4',
-        }
+        }*/
       ],
 
       /**

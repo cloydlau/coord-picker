@@ -512,6 +512,7 @@ export default {
         imageLayer: null,
         rectangleObj: null,
         rectangleEditor: null,
+        markers: [],
         polygonObj: [],
         polygonEditor: [],
         curBoundary: [],
@@ -611,12 +612,12 @@ export default {
         this.$emit('update:lng', this.roundOff(lng))
         this.$emit('update:lat', this.roundOff(lat))
       } else {
-        const { longitude, latiude, address } = this.markers[0]
+        const { longitude, latitude, address } = this.markers[0] || {}
         this.$emit('update:lng', this.roundOff(longitude))
-        this.$emit('update:lat', this.roundOff(latiude))
+        this.$emit('update:lat', this.roundOff(latitude))
         this.$emit('update:address', address)
       }
-      this.$emit('update:marker', this.markers.map(v => {
+      this.$emit('update:marker', cloneDeep(this.markers).map(v => {
         v.lng = this.roundOff(v.longitude)
         v.lat = this.roundOff(v.latitude)
         delete v.longitude
@@ -645,7 +646,7 @@ export default {
       })
       this.markers.length = 0
     },
-    async drawMarker (markerOptions, isInit = false) {
+    drawMarker (markerOptions, isInit = false) {
       if (this.MarkerMaxCount > 1 && this.markers.length >= this.MarkerMaxCount && !isInit) {
         this.$Swal.warning(`最多标记${this.MarkerMaxCount}个点位`)
       } else {
@@ -680,20 +681,22 @@ export default {
         marker.on('click', e => {
           console.log('click', e)
         })*/
-        if (markerOptions) {
-          const { lng, lat, longitude, latitude } = markerOptions
-          if (lng && !longitude) {
-            markerOptions.longitude = lng
-            delete markerOptions.lng
-          }
-          if (lat && !latitude) {
-            markerOptions.latitude = lng
-            delete markerOptions.lat
-          }
+        const { lng, lat, longitude, latitude } = markerOptions
+        if (lng && !longitude) {
+          markerOptions.longitude = lng
+          delete markerOptions.lng
+        }
+        if (lat && !latitude) {
+          markerOptions.latitude = lng
+          delete markerOptions.lat
+        }
+        if (this.MarkerMaxCount > 1) {
           this.markers.push({
             ...markerOptions,
             //address: isInit ? this.address || await this.getAddress([lng, lat]),
           })
+        } else {
+          this.markers[0] = markerOptions
         }
 
         this.drawMarkerList(this.markers)
@@ -791,7 +794,7 @@ export default {
         markerEvents: ['click', 'mouseover', 'mouseout', 'rightclick'],
         // makeSelectedEvents:false,
         selectedClassNames: 'selected',
-        autoSetFitView: true
+        autoSetFitView: false
       })
 
       const markerContextMenu = new AMap.ContextMenu()
@@ -933,11 +936,28 @@ export default {
         new Promise((resolve, reject) => {
           let centerDesignated = false, hasOverlay = false
 
+          // 没传点位 但是传了中心点 将中心点当作一个点位
+          if (!isEmpty(this.lng) && !isEmpty(this.lat) && isEmpty(this.marker)) {
+            this.markers = [{
+              longitude: this.lng,
+              latitude: this.lat,
+            }]
+          }
+
           // 传了点位 绘制点位
           if (this.marker?.length > 0) {
-            //this.drawMarkerList(this.marker)
-            this.drawMarker()
-            hasOverlay = true
+            this.markers = cloneDeep(this.marker).map(v => {
+              v.longitude = v.lng
+              v.latitude = v.lat
+              delete v.lng
+              delete v.lat
+              return v
+            })
+            this.drawMarkerList(this.markers)
+            // 如果点位有多个 视为覆盖物 便于setFitView
+            if (this.marker.length > 1) {
+              hasOverlay = true
+            }
           }
 
           // 传了图片 绘制图层
@@ -967,16 +987,18 @@ export default {
             this.Zoom = 12
           }
 
-          // 传了点位 定位至该点位
+          // 传了中心点 定位至该中心点
           if (!isEmpty(this.lng) && !isEmpty(this.lat)) {
-            this.drawMarker({
-              longitude: this.lng,
-              latitude: this.lat,
-            }, true)
             this.setCenter([this.lng, this.lat])
             centerDesignated = true
           }
-          //否则将视图适配覆盖物
+          // 传了点位且点位数量为1 定位至该点位
+          else if (this.marker?.length === 1 && this.marker[0]?.lng && this.marker[0].lat) {
+            const { lng, lat } = this.marker[0]
+            this.setCenter([lng, lat])
+            centerDesignated = true
+          }
+          // 否则将视图适配覆盖物
           else if (hasOverlay) {
             this.map.setFitView()
             centerDesignated = true

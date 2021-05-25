@@ -1,6 +1,6 @@
 {
   "name": "coord-picker",
-  "version": "0.1.20",
+  "version": "0.2.0",
   "author": "cloydlau",
   "license": "MIT",
   "description": "高德/腾讯地图坐标拾取器 / A coordinates picker for amap/tmap",
