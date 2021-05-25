@@ -97,9 +97,9 @@
       </el-tooltip>
     </Toolbar>
 
-    <div class="absolute left-3px bottom-50px" id="zoom">
-      <span class="text-45px">{{ Zoom }}</span>
-      <span class="text-10px">缩放级别</span>
+    <div class="absolute left-3px bottom-50px" style="position:absolute;left:3px;bottom:50px;" id="zoom">
+      <span class="text-45px" style="font-size:45px;">{{ Zoom }}</span>
+      <span class="text-10px" style="font-size:10px;">缩放级别</span>
     </div>
   </el-dialog>
 </template>
