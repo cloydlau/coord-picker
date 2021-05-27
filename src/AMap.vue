@@ -1,12 +1,12 @@
 <template>
   <el-dialog
-    :visible.sync="show"
-    :fullscreen="true"
-    :append-to-body="true"
-    :show-close="false"
-    @close="$emit('update:show', false)"
-    destroy-on-close
-    v-if="show"
+      :visible.sync="show"
+      :fullscreen="true"
+      :append-to-body="true"
+      :show-close="false"
+      @close="$emit('update:show', false)"
+      destroy-on-close
+      v-if="show"
   >
     <!--<div slot="title" class="title">
       <span v-text="title||'坐标拾取'" class="title-text"/>
@@ -19,12 +19,12 @@
         }">
         <br>
         <RegionSelect
-          :label.sync='baseCity'
-          class="region-select"
-          placeholder="当前城市"
-          :level='2'
-          :show-all-levels="false"
-          @change="initPlugins"
+            :label.sync='baseCity'
+            class="region-select"
+            placeholder="当前城市"
+            :level='2'
+            :show-all-levels="false"
+            @change="initPlugins"
         />
       </div>
       <transition enter-active-class="animate__animated animate__backInLeft"
@@ -56,8 +56,8 @@
            :class="{active:active==='marker'}">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
-              d="M15 17h3v-3h2v3h3v2h-3v3h-2v-3h-3v-2M9 6.5c1.4 0 2.5 1.1 2.5 2.5s-1.1 2.5-2.5 2.5S6.5 10.4 6.5 9S7.6 6.5 9 6.5M9 2c3.9 0 7 3.1 7 7c0 5.2-7 13-7 13S2 14.2 2 9c0-3.9 3.1-7 7-7m0 2C6.2 4 4 6.2 4 9c0 1 0 3 5 9.7C14 12 14 10 14 9c0-2.8-2.2-5-5-5z"
-              fill="currentColor"></path>
+                d="M15 17h3v-3h2v3h3v2h-3v3h-2v-3h-3v-2M9 6.5c1.4 0 2.5 1.1 2.5 2.5s-1.1 2.5-2.5 2.5S6.5 10.4 6.5 9S7.6 6.5 9 6.5M9 2c3.9 0 7 3.1 7 7c0 5.2-7 13-7 13S2 14.2 2 9c0-3.9 3.1-7 7-7m0 2C6.2 4 4 6.2 4 9c0 1 0 3 5 9.7C14 12 14 10 14 9c0-2.8-2.2-5-5-5z"
+                fill="currentColor"></path>
           </svg>
         </a>
       </el-tooltip>
@@ -67,8 +67,8 @@
         >
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
-              d="M21 15v3h3v2h-3v3h-2v-3h-3v-2h3v-3h2zm.008-12c.548 0 .992.445.992.993V13h-2V5H4v13.999L14 9l3 3v2.829l-3-3L6.827 19H14v2H2.992A.993.993 0 0 1 2 20.007V3.993A1 1 0 0 1 2.992 3h18.016zM8 7a2 2 0 1 1 0 4a2 2 0 0 1 0-4z"
-              fill="currentColor"></path>
+                d="M21 15v3h3v2h-3v3h-2v-3h-3v-2h3v-3h2zm.008-12c.548 0 .992.445.992.993V13h-2V5H4v13.999L14 9l3 3v2.829l-3-3L6.827 19H14v2H2.992A.993.993 0 0 1 2 20.007V3.993A1 1 0 0 1 2.992 3h18.016zM8 7a2 2 0 1 1 0 4a2 2 0 0 1 0-4z"
+                fill="currentColor"></path>
           </svg>
         </a>
       </el-tooltip>
@@ -90,8 +90,8 @@
         <a @click.stop="$emit('update:show', false)">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
-              d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10zm0-2a8 8 0 1 0 0-16a8 8 0 0 0 0 16zm0-9.414l2.828-2.829l1.415 1.415L13.414 12l2.829 2.828l-1.415 1.415L12 13.414l-2.828 2.829l-1.415-1.415L10.586 12L7.757 9.172l1.415-1.415L12 10.586z"
-              fill="currentColor"></path>
+                d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10zm0-2a8 8 0 1 0 0-16a8 8 0 0 0 0 16zm0-9.414l2.828-2.829l1.415 1.415L13.414 12l2.829 2.828l-1.415 1.415L12 13.414l-2.828 2.829l-1.415-1.415L10.586 12L7.757 9.172l1.415-1.415L12 10.586z"
+                fill="currentColor"></path>
           </svg>
         </a>
       </el-tooltip>
@@ -99,8 +99,8 @@
         <a @click.stop="confirm">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
-              d="M7 19v-6h10v6h2V7.828L16.172 5H5v14h2zM4 3h13l4 4v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm5 12v4h6v-4H9z"
-              fill="currentColor"></path>
+                d="M7 19v-6h10v6h2V7.828L16.172 5H5v14h2zM4 3h13l4 4v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm5 12v4h6v-4H9z"
+                fill="currentColor"></path>
           </svg>
         </a>
       </el-tooltip>
@@ -265,8 +265,8 @@ export default {
             'AMap.CitySearch',
             'AMap.PlaceSearch',
             ...this.Version?.startsWith('2.') ?
-              ['AMap.AutoComplete'] :
-              ['AMap.Autocomplete'],
+                ['AMap.AutoComplete'] :
+                ['AMap.Autocomplete'],
             ...this.Img ? [
               'AMap.MouseTool',
               'AMap.RectangleEditor',
@@ -277,8 +277,8 @@ export default {
               'AMap.ContextMenu',
               'AMap.DistrictSearch',
               ...this.Version?.startsWith('2.') ?
-                ['AMap.PolygonEditor',] :
-                ['AMap.PolyEditor',],
+                  ['AMap.PolygonEditor',] :
+                  ['AMap.PolyEditor',],
             ] : [],
           ]
         }).then(async AMap => {
@@ -408,7 +408,7 @@ export default {
                 e.obj.setMap(null) //1.x改为销毁绘制出来的矩形并新建一个矩形对象
                 this.drawImg(this.rectangleObj.getBounds())
               }
-                //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
+                  //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
               //2.x：e.obj.className==='Overlay.Polygon'
               else if (this.active === 'polygon') {
                 this.active = 'marker'
@@ -506,8 +506,8 @@ export default {
       this.geocoder = new AMap.Geocoder(param)
       //兼容1.x
       this.autoComplete = AMap.AutoComplete ?
-        new AMap.AutoComplete(param) :
-        new AMap.Autocomplete(param)
+          new AMap.AutoComplete(param) :
+          new AMap.Autocomplete(param)
       this.placeSearch = new AMap.PlaceSearch(param)
       if (this.boundaryCount > 0) {
         this.districtSearch = new AMap.DistrictSearch({
@@ -732,8 +732,8 @@ export default {
       const $ = MarkerList.utils.$
 
       const defaultIconStyle = 'red', //默认的图标样式
-        hoverIconStyle = 'blue', //鼠标hover时的样式
-        selectedIconStyle = 'darkblue' //选中时的图标样式
+          hoverIconStyle = 'blue', //鼠标hover时的样式
+          selectedIconStyle = 'darkblue' //选中时的图标样式
 
       this.markerList = new MarkerList({
         map: this.map,
@@ -808,8 +808,8 @@ export default {
           }
 
           return '<li class="poibox">' +
-            innerHTML +
-            '</li>'
+              innerHTML +
+              '</li>'
         },
         // 列表节点上监听的事件
         listElementEvents: ['click', 'mouseenter', 'mouseleave'],
@@ -918,10 +918,10 @@ export default {
         let rect = el.getBoundingClientRect()
 
         return (
-          rect.top >= 0 &&
-          rect.left >= 0 &&
-          rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
-          rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
         )
       }
 
@@ -932,9 +932,9 @@ export default {
         //闪动一下
         $listEle
         .one('webkitAnimationEnd oanimationend msAnimationEnd animationend',
-          function (e) {
-            $(this).removeClass('flash animated')
-          }).addClass('flash animated')
+            function (e) {
+              $(this).removeClass('flash animated')
+            }).addClass('flash animated')
       }
     },
     async locate (selectedLocation) {
@@ -968,14 +968,14 @@ export default {
          */
         // 传了图片 绘制图层
         if (this.Img &&
-          !isEmpty(this.curImg.imgSouthWestLng) &&
-          !isEmpty(this.curImg.imgSouthWestLat) &&
-          !isEmpty(this.curImg.imgNorthEastLng) &&
-          !isEmpty(this.curImg.imgNorthEastLat)
+            !isEmpty(this.curImg.imgSouthWestLng) &&
+            !isEmpty(this.curImg.imgSouthWestLat) &&
+            !isEmpty(this.curImg.imgNorthEastLng) &&
+            !isEmpty(this.curImg.imgNorthEastLat)
         ) {
           this.drawImg(new AMap.Bounds(
-            new AMap.LngLat(this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat),
-            new AMap.LngLat(this.curImg.imgNorthEastLng, this.curImg.imgNorthEastLat),
+              new AMap.LngLat(this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat),
+              new AMap.LngLat(this.curImg.imgNorthEastLng, this.curImg.imgNorthEastLat),
           ))
           hasOverlay = true
         }
@@ -1095,14 +1095,12 @@ export default {
       }, null, 500)
     },
     amapAPI () {
-      return new Promise(function (resolve, reject) {
-        console.log('\n-------------------------\n')
-        console.log(arguments)
-        console.log('-------------------------\n\n')
-        console.log(...arguments[1] || [])
-        console.log(...(arguments[1] || []))
-        arguments[0](...(arguments[1] || []), (status, result) => {
-          debugger
+      const api = arguments[0]
+      const args = arguments[1] || []
+      console.log(api)
+      console.log(args)
+      return new Promise((resolve, reject) => {
+        api(...args, (status, result) => {
           console.log(prefix, result, status)
           if (status === 'complete' && result.info === 'OK') {
             resolve(result, status)
@@ -1214,14 +1212,14 @@ export default {
       border-radius: 10px;
       background-color: skyblue;
       background-image: -webkit-linear-gradient(
-          45deg,
-          rgba(255, 255, 255, 0.2) 25%,
-          transparent 25%,
-          transparent 50%,
-          rgba(255, 255, 255, 0.2) 50%,
-          rgba(255, 255, 255, 0.2) 75%,
-          transparent 75%,
-          transparent
+              45deg,
+              rgba(255, 255, 255, 0.2) 25%,
+              transparent 25%,
+              transparent 50%,
+              rgba(255, 255, 255, 0.2) 50%,
+              rgba(255, 255, 255, 0.2) 75%,
+              transparent 75%,
+              transparent
       );
     }
 
