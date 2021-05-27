@@ -17,6 +17,15 @@
           search()
           e.currentTarget.blur()
         }">
+        <br>
+        <RegionSelect
+          :label.sync='baseCity'
+          class="region-select"
+          placeholder="当前城市"
+          :level='2'
+          :show-all-levels="false"
+          @change="initPlugins"
+        />
       </div>
       <transition enter-active-class="animate__animated animate__backInLeft"
                   leave-active-class="animate__animated animate__backOutLeft">
@@ -98,8 +107,8 @@
     </Toolbar>
 
     <div class="absolute left-3px bottom-50px" style="position:absolute;left:3px;bottom:50px;" id="zoom">
-      <span class="text-45px" style="font-size:45px;">{{ Zoom }}</span>
-      <span class="text-10px" style="font-size:10px;">缩放级别</span>
+      <span class="text-45px" style="color:#3297FD;font-size:45px;">{{ Zoom }}</span>
+      <span class="text-10px" style="font-size:10px;"> 缩放级别</span>
     </div>
   </el-dialog>
 </template>
@@ -126,11 +135,12 @@ import globalProps from './config'
 import { name } from '../package.json'
 const prefix = `[${name}] `
 import './marker-list.scss'
+import RegionSelect from 'region-select'
 
 export default {
   name: 'CoordPicker',
   mixins: [polygon, rectangle],
-  components: { Toolbar },
+  components: { Toolbar, RegionSelect },
   props: {
     show: {
       type: Boolean,
@@ -271,7 +281,7 @@ export default {
                 ['AMap.PolyEditor',],
             ] : [],
           ]
-        }).then(AMap => {
+        }).then(async AMap => {
           this.map = new AMap.Map('map-container', {
             //viewMode: '3D',
             ...!isEmpty(this.Zoom) && { zoom: this.Zoom, }
@@ -333,7 +343,7 @@ export default {
                     key: ['name'],
                     cache: false
                   },
-                  placeHolder: '搜索地点',              // Place Holder text                 | (Optional)
+                  placeHolder: '搜索位置',              // Place Holder text                 | (Optional)
                   selector: '#autoComplete',           // Input field selector              | (Optional)
                   threshold: 1,                        // Min. Chars length to start Engine | (Optional)
                   debounce: 300,                       // Post duration for engine to start | (Optional)
@@ -549,9 +559,9 @@ export default {
     getAddress ([lng, lat]) {
       return new Promise((resolve, reject) => {
         if (this.geocoder) {
-          this.geocoder.getAddress([lng, lat], (status, result) => {
-            console.log(prefix + 'getAddress', status, result)
-            if (status === 'complete' && result.info === 'OK' && result.regeocode?.formattedAddress) {
+          this.amapAPI(this.geocoder.getAddress, [[lng, lat]])
+          .then(result => {
+            if (result.regeocode?.formattedAddress) {
               const { province, city, district, township } = result.regeocode.addressComponent
               const name = result.regeocode.formattedAddress.replace(province + city + district + township, '')
               if (typeof this.AddressComponent === 'function') {
@@ -563,32 +573,39 @@ export default {
                     address = address.replace(result.regeocode.addressComponent[k], '')
                   }
                 }
-                resolve({ address, name })
+                resolve({ city, address, name })
               }
             } else {
               reject()
             }
           })
+          .catch(result => {
+            reject()
+          })
         } else {
+          // baseCity为空时
           resolve()
         }
       })
     },
     async onMapClick (e) {
       const { address, name } = await this.getAddress([e.lnglat.lng, e.lnglat.lat])
+      const { lng: longitude, lat: latitude } = e.lnglat
       this.drawMarker({
-        longitude: e.lnglat.lng,
-        latitude: e.lnglat.lat,
+        longitude,
+        latitude,
         address,
         name
       })
     },
     fetchSuggestions (queryString, cb) {
       return new Promise((resolve, reject) => {
-        this.autoComplete.search(this.keyword, (status, result) => {
-          if (status === 'complete' && result.info === 'OK') {
-            resolve(result.tips || [])
-          } else if (status === 'no_data') {
+        this.amapAPI(this.autoComplete.search, [this.keyword])
+        .then(result => {
+          resolve(result.tips || [])
+        })
+        .catch((result, status) => {
+          if (status === 'no_data') {
             resolve([])
           } else {
             this.$Swal.error(result)
@@ -807,16 +824,16 @@ export default {
       markerContextMenu.addItem('删除', e => {
         console.log(e)
         if (this.polygonObj.length <= this.MarkerMinCount) {
-          this.$Swal.warning(`至少绘制${this.MarkerMinCount}个区域`)
+          this.$Swal.warning(`至少绘制${this.MarkerMinCount}个点位`)
         } else {
         }
       }, 0)
 
       this.markerList.on('markerRightclick', (event, info) => {
         //console.log(event, info)
-        //markerContextMenu.open(this.map, event.originalEvent.lnglat)
-        this.markers.splice(info.index, 1)
-        this.drawMarkerList(this.markers)
+        markerContextMenu.open(this.map, event.originalEvent.lnglat)
+        //this.markers.splice(info.index, 1)
+        //this.drawMarkerList(this.markers)
       })
 
       this.markerList.on('selectedChanged', function (event, info) {
@@ -840,7 +857,19 @@ export default {
         }
       })
 
-      this.markerList.on('listElementMouseenter markerMouseover', function (event, record) {
+      this.markerList.on('listElementMouseenter', function (event, record) {
+        if (record && record.marker) {
+          //this.openInfoWindowOnRecord(record);
+          //非选中的id
+          if (!this.isSelectedDataId(record.id)) {
+            //设置为hover样式
+            record.marker.setIconStyle(hoverIconStyle)
+            //this.closeInfoWindow();
+          }
+        }
+      })
+
+      this.markerList.on('markerMouseover', function (event, record) {
         if (record && record.marker) {
           forcusMarker(record.marker)
           //this.openInfoWindowOnRecord(record);
@@ -908,21 +937,18 @@ export default {
           }).addClass('flash animated')
       }
     },
-    locate (selectedLocation) {
+    async locate (selectedLocation) {
       // 选中搜索项
       if (selectedLocation) {
-        if (this.districtSearch) {
-          this.districtSearch.search(selectedLocation.name, (status, result) => {
-            if (status === 'complete' && result.info === 'OK') {
-              const bounds = result?.districtList[0]?.boundaries
-              if (bounds.length) {
-                this.$Swal.confirm(`是否绘制${selectedLocation.name}轮廓？`).then(() => {
-                  this.drawPolygon(Array.from(bounds, v => ({ data: v })), false)
-                })
-              }
-            }
-          })
-        }
+        this.amapAPI(this.districtSearch.search, [selectedLocation.name])
+        .then(result => {
+          const bounds = result?.districtList[0]?.boundaries
+          if (bounds.length) {
+            this.$Swal.confirm(`是否绘制${selectedLocation.name}轮廓？`).then(() => {
+              this.drawPolygon(Array.from(bounds, v => ({ data: v })), false)
+            })
+          }
+        })
         //this.meny.close()
         this.drawMarker({
           ...selectedLocation,
@@ -933,140 +959,119 @@ export default {
       }
       // 初始化
       else {
-        // 直辖市：['110100000000', '120100000000', '310100000000', '500100000000']
-        this.baseCity = getFinalProp(this.city, globalProps.city, '')
-        if (this.baseCity) {
-          this.initPlugins()
+        this.baseCity = await this.getBaseCity()
+        this.initPlugins()
+        let centerDesignated = false, hasOverlay = false
+
+        /**
+         * 绘制覆盖物
+         */
+        // 传了图片 绘制图层
+        if (this.Img &&
+          !isEmpty(this.curImg.imgSouthWestLng) &&
+          !isEmpty(this.curImg.imgSouthWestLat) &&
+          !isEmpty(this.curImg.imgNorthEastLng) &&
+          !isEmpty(this.curImg.imgNorthEastLat)
+        ) {
+          this.drawImg(new AMap.Bounds(
+            new AMap.LngLat(this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat),
+            new AMap.LngLat(this.curImg.imgNorthEastLng, this.curImg.imgNorthEastLat),
+          ))
+          hasOverlay = true
+        }
+        // 传了多边形 绘制多边形
+        if (this.boundary?.length > 0) {
+          this.drawPolygon(this.boundary)
+          hasOverlay = true
         }
 
-        new Promise((resolve, reject) => {
-          let centerDesignated = false, hasOverlay = false
-
-          // 传了点位 绘制点位
-          if (this.marker?.length > 0) {
-            this.markers = cloneDeep(this.marker).map(v => {
-              v.longitude = v.lng
-              v.latitude = v.lat
-              delete v.lng
-              delete v.lat
-              return v
-            })
-
-            // 如果点位有多个 视为覆盖物 便于setFitView
-            if (this.marker.length > 1) {
-              hasOverlay = true
-            }
-          }
-          // 没传点位 但是传了中心点 将中心点当作一个点位
-          else if (!isEmpty(this.lng) && !isEmpty(this.lat)) {
-            this.markers = [{
-              longitude: this.lng,
-              latitude: this.lat,
-              address: this.address
-            }]
-          }
-          this.drawMarkerList(this.markers)
-
-          // 传了图片 绘制图层
-          if (this.Img &&
-            !isEmpty(this.curImg.imgSouthWestLng) &&
-            !isEmpty(this.curImg.imgSouthWestLat) &&
-            !isEmpty(this.curImg.imgNorthEastLng) &&
-            !isEmpty(this.curImg.imgNorthEastLat)
-          ) {
-            this.drawImg(new AMap.Bounds(
-              new AMap.LngLat(this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat),
-              new AMap.LngLat(this.curImg.imgNorthEastLng, this.curImg.imgNorthEastLat),
-            ))
+        /**
+         * 中心点定位
+         */
+        // 传了点位 绘制点位
+        if (this.marker?.length > 0) {
+          this.markers = cloneDeep(this.marker).map(v => {
+            v.longitude = v.lng
+            v.latitude = v.lat
+            delete v.lng
+            delete v.lat
+            return v
+          })
+          // 如果点位只有一个 将其视为中心点
+          if (this.marker.length === 1) {
             centerDesignated = true
+          } else if (this.marker.length > 1) {
             hasOverlay = true
           }
-
-          // 传了多边形 绘制多边形
-          if (this.boundary?.length > 0) {
-            this.drawPolygon(this.boundary)
-            centerDesignated = true
-            hasOverlay = true
-          }
-
-          // 如果没有传覆盖物且没有传zoom 给zoom赋默认值
-          if (!hasOverlay && isEmpty(this.Zoom)) {
-            this.Zoom = 12
-          }
-
-          // 传了中心点 定位至该中心点
-          if (!isEmpty(this.lng) && !isEmpty(this.lat)) {
-            this.setCenter([this.lng, this.lat])
-            centerDesignated = true
-          }
-          // 传了点位且点位数量为1 定位至该点位
-          else if (this.marker?.length === 1 && this.marker[0]?.lng && this.marker[0].lat) {
-            const { lng, lat } = this.marker[0]
-            this.setCenter([lng, lat])
-            centerDesignated = true
-          }
-          // 否则将视图适配覆盖物
-          else if (hasOverlay) {
-            this.map.setFitView()
-            centerDesignated = true
-          }
-
-          // 仅传了地址 定位至该地址 并将该地址所在的城市设置为baseCity
-          if (!centerDesignated && this.address) {
-            this.geocoder.getLocation(this.address, (status, result) => {
-              console.log(prefix + 'getLocation', result)
-              if (status === 'complete' && result.info === 'OK') {
-                const { lng, lat } = result.geocodes[0]?.location
-                const addressCity = result.geocodes[0]?.addressComponent.city
-                if (addressCity) {
-                  this.baseCity = addressCity
-                  this.initPlugins()
-                }
-                if (!isEmpty(lng) && !isEmpty(lat)) {
-                  this.setCenter([lng, lat])
-                  resolve(true)
-                }
-              }
-              resolve(false)
-            })
+        }
+        // 没传点位 但是传了中心点 将中心点当作一个点位
+        else if (!isEmpty(this.lng) && !isEmpty(this.lat)) {
+          let address, name
+          if (this.address) {
+            address = this.address
           } else {
-            resolve(centerDesignated)
+            const result = await this.getAddress([this.lng, this.lat])
+            address = result.address
+            name = result.name
           }
-        }).then(centerDesignated => {
-          this.getBaseCity(centerDesignated)
-        })
+
+          this.markers = [{
+            longitude: this.lng,
+            latitude: this.lat,
+            address,
+            name,
+          }]
+
+          centerDesignated = true
+        }
+        this.drawMarkerList(this.markers)
+        // 如果没有传覆盖物且没有传zoom 给zoom赋默认值
+        if (centerDesignated && isEmpty(this.Zoom)) {
+          this.Zoom = 12
+        }
+        // 传了中心点 定位至该中心点
+        if (!isEmpty(this.lng) && !isEmpty(this.lat)) {
+          this.setCenter([this.lng, this.lat])
+        }
+        // 传了点位且点位数量为1 定位至该点位
+        else if (this.marker?.length === 1 && this.marker[0]?.lng && this.marker[0].lat) {
+          const { lng, lat } = this.marker[0]
+          this.setCenter([lng, lat])
+        }
+        // 定位至address
+        else if (this.address) {
+          const result = await this.amapAPI(this.geocoder.getLocation, [this.address])
+          const { lng, lat } = result.geocodes[0]?.location
+          if (!isEmpty(lng) && !isEmpty(lat)) {
+            this.setCenter([lng, lat])
+          }
+        }
+        // 存在覆盖物 将视图适配覆盖物
+        else if (hasOverlay) {
+          this.map.setFitView()
+        }
+        // 定位至baseCity
+        else if (this.baseCity) {
+          this.map.setCity(this.baseCity)
+        }
       }
     },
-    getBaseCity (centerDesignated) {
-      //传了城市（非城市编码）且未指定地图中心 定位至该城市
-      if (this.baseCity && isNaN(this.baseCity)) {
-        if (!centerDesignated) {
-          this.geocoder.getLocation(this.baseCity, (status, result) => {
-            console.log(prefix + 'getLocation', result)
-            if (status === 'complete' && result.info === 'OK') {
-              const { lng, lat } = result.geocodes[0]?.location
-              if (!isEmpty(lng) && !isEmpty(lat)) {
-                this.setCenter([lng, lat])
-              }
-            }
+    getBaseCity () {
+      // 直辖市：['110100000000', '120100000000', '310100000000', '500100000000']
+      const result = getFinalProp(this.city, globalProps.city, '')
+      return new Promise((resolve, reject) => {
+        if (result) {
+          resolve(result)
+        } else {
+          this.amapAPI(new AMap.CitySearch().getLocalCity)
+          .then(result => {
+            resolve(result.city)
+          })
+          .catch(result => {
+            reject()
           })
         }
-      }
-      //没有传城市 ip定位城市
-      else {
-        const citySearch = new AMap.CitySearch()
-        citySearch.getLocalCity((status, result) => {
-          console.log(prefix + 'getLocalCity', result)
-          if (status === 'complete' && result.info === 'OK') {
-            this.baseCity = result.city
-            this.initPlugins()
-            //未指定地图中心 定位至该城市
-            if (!centerDesignated) {
-              this.map.setCity(this.baseCity)
-            }
-          }
-        })
-      }
+      })
     },
     search () {
       if (!this.keyword) {
@@ -1075,17 +1080,36 @@ export default {
       }
       this.searching = true
       this.throttle('search', () => {
-        this.placeSearch.search(this.keyword, (status, result) => {
-          console.log(prefix + 'search', result)
-          if (status === 'complete') {
-            if (result.info === 'OK' && result.poiList && result.poiList.pois) {
-              this.searchResult = result.poiList.pois || []
-            } else if (result.info === 'TIP_CITIES') {
-              this.$Swal.warning('尝试输入更加精确的关键字哦')
-            }
+        this.amapAPI(this.placeSearch.search, [this.keyword])
+        .then(result => {
+          this.searchResult = result.poiList?.pois || []
+        })
+        .catch(result => {
+          if (result.info === 'TIP_CITIES') {
+            this.$Swal.warning('尝试输入更加精确的关键字哦')
           }
+        })
+        .finally(() => {
           this.searching = false
-        }, null, 500)
+        })
+      }, null, 500)
+    },
+    amapAPI () {
+      return new Promise(function (resolve, reject) {
+        console.log('\n-------------------------\n')
+        console.log(arguments)
+        console.log('-------------------------\n\n')
+        console.log(...arguments[1] || [])
+        console.log(...(arguments[1] || []))
+        arguments[0](...(arguments[1] || []), (status, result) => {
+          debugger
+          console.log(prefix, result, status)
+          if (status === 'complete' && result.info === 'OK') {
+            resolve(result, status)
+          } else {
+            reject(result, status)
+          }
+        })
       })
     }
   }
@@ -1147,6 +1171,16 @@ export default {
   background-color: aliceblue;
   height: 100%;
   padding: 0;
+
+  .region-select {
+    display: inline-block;
+    margin-top: 2px;
+    width: 185px;
+
+    input {
+      border-radius: 20px;
+    }
+  }
 
   .drawer {
     box-sizing: border-box;

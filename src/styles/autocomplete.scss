@@ -1,7 +1,3 @@
-#autoComplete::-webkit-input-placeholder {
-  color: lightgrey !important;
-}
-
 .autoComplete-wrapper {
   position: fixed;
   top: 15px;
@@ -14,41 +10,40 @@
 }
 
 #autoComplete {
-  color: #1296db;
-  border-color: #003371;
-  caret-color: #1296db;
-  background-image: url(../assets/magnifier.svg);
-}
-
-#autoComplete:hover {
   color: #003371;
-  width: 250px;
-  background-image: url(../assets/magnifier.svg);
+  border: 2px solid #0033714a;
+  caret-color: #003371;
+  background-image: url(../assets/magnifier.svg) !important;
+
+  &::-webkit-input-placeholder {
+    color: rgba(123, 123, 123, 0.5) !important;
+  }
+
+  &:hover {
+    color: #003371;
+    width: 250px;
+    background-image: url(../assets/magnifier.svg) !important;
+  }
+
+  &:focus {
+    color: #003371;
+    width: 250px;
+    border-color: #003371;
+    box-shadow: rgba(0, 51, 113, 0.1) 0 0 20px 5px;
+    background-image: url(../assets/magnifier.svg) !important;
+  }
+
+  &:hover::placeholder, &:focus::placeholder {
+    color: #003371;
+  }
+
+  &::selection, &:focus::selection {
+    background-color: #3297FD;
+    color: white;
+  }
 }
 
-#autoComplete:focus {
-  color: #003371;
-  width: 250px;
-  border-color: #003371;
-  box-shadow: rgba(0, 51, 113, 0.1) 0 0 20px 5px;
-  background-image: url(../assets/magnifier.svg);
-}
-
-#autoComplete:hover::placeholder, #autoComplete:focus::placeholder {
-  color: #003371;
-}
-
-#autoComplete:focus::selection {
-  background-color: #1296db;
-}
-
-.autoComplete_result:hover {
-  background-color: rgba(194, 233, 251, 0.8);
-  border-left: 2px solid #a1c4fd;
-  border-right: 2px solid #a1c4fd;
-}
-
-.autoComplete_result:focus {
+.autoComplete_result:hover, .autoComplete_result:focus {
   background-color: rgba(194, 233, 251, 0.8);
   border-left: 2px solid #a1c4fd;
   border-right: 2px solid #a1c4fd;
@@ -61,5 +56,5 @@
 }
 
 .autoComplete_highlighted {
-  color: #1296db;
+  color: #003371;
 }
