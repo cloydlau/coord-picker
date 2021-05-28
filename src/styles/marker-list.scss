@@ -25,9 +25,14 @@ ul, li {
   position: absolute;
   top: 75px;
   right: 0;
-  overflow: auto;
+  overflow-y: auto;
   width: 300px;
-  z-index: 0;
+  z-index: 999;
+  height: 100%;
+
+  & > #myList {
+    padding-bottom: 200px;
+  }
 }
 
 #btnList {
@@ -52,11 +57,10 @@ li.poibox {
   border-top-left-radius: 8px;
   border-bottom-left-radius: 8px;
   backdrop-filter: blur(2px);
-  background-color: rgba(247, 247, 247, 0.9);
+  background-color: rgba(247, 247, 247, 0.95);
   border: 2px solid #e9f1f6;
   padding: 10px;
   cursor: pointer;
-  min-height: 74px;
   position: relative;
 
   &:not(:first-child) {
@@ -74,20 +78,16 @@ li.poibox {
 }
 
 li.poibox.selected {
-  border-left-color: #f00;
-  background: #f6f6f6;
+  border-left-color: #3297FD;
+  background: white;
 }
 
 li.poibox:hover {
-  background: #f6f6f6;
-}
-
-li.poibox:last-child {
-  border-bottom: none;
+  background: white;
 }
 
 h3.poi-title {
-  margin: 3px 0;
+  margin: 0;
   font-size: 13px;
 }
 
@@ -97,8 +97,7 @@ h3.poi-title {
   }
 
   .poi-addr {
-    margin: 7px 0 0;
-    @include ellipsis(2)
+    margin: 5px 0 0;
   }
 }
 

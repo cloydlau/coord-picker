@@ -1,3 +1,7 @@
+import 'kikimore/dist/style.css'
+import { Swal } from 'kikimore'
+const { error, warning, confirm, } = Swal
+
 export default {
   data () {
     return {
@@ -15,7 +19,7 @@ export default {
   methods: {
     onPolygonBtnClick () {
       if (this.BoundaryMaxCount > 0 && this.polygonObj.length >= this.BoundaryMaxCount) {
-        this.$Swal.warning(`最多绘制${this.BoundaryMaxCount}个区域`)
+        warning(`最多绘制${this.BoundaryMaxCount}个区域`)
       } else {
         this.active = 'polygon'
       }
@@ -56,7 +60,7 @@ export default {
       const polygonContextMenu = new AMap.ContextMenu()
       polygonContextMenu.addItem('删除', e => {
         if (this.polygonObj.length <= this.BoundaryMinCount) {
-          this.$Swal.warning(`至少绘制${this.BoundaryMinCount}个区域`)
+          warning(`至少绘制${this.BoundaryMinCount}个区域`)
         } else {
           if (draggable) {
             this.polygonEditor[i].close()

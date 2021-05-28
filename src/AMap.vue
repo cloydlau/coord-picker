@@ -1,30 +1,30 @@
 <template>
   <el-dialog
-      :visible.sync="show"
-      :fullscreen="true"
-      :append-to-body="true"
-      :show-close="false"
-      @close="$emit('update:show', false)"
-      destroy-on-close
-      v-if="show"
+    :visible.sync="show"
+    :fullscreen="true"
+    :append-to-body="true"
+    :show-close="false"
+    @close="$emit('update:show', false)"
+    destroy-on-close
+    v-if="show"
   >
     <!--<div slot="title" class="title">
       <span v-text="title||'坐标拾取'" class="title-text"/>
     </div>-->
     <div style="height:100%">
       <div class="autoComplete-wrapper">
+        <span class="magnifier"/>
         <input id="autoComplete" tabindex="1" v-model="keyword" @keyup.enter="e=>{
           search()
           e.currentTarget.blur()
         }">
-        <br>
         <RegionSelect
-            :label.sync='baseCity'
-            class="region-select"
-            placeholder="当前城市"
-            :level='2'
-            :show-all-levels="false"
-            @change="initPlugins"
+          :label.sync='baseCity'
+          class="region-select"
+          placeholder="当前城市"
+          :level='2'
+          :show-all-levels="false"
+          @change="initPlugins"
         />
       </div>
       <transition enter-active-class="animate__animated animate__backInLeft"
@@ -43,7 +43,12 @@
         <i class="el-icon-search"/>
         <span>搜索</span>
       </div>-->
-      <div ref="map-container" id="map-container" v-loading="loading"/>
+      <div
+        ref="map-container"
+        id="map-container"
+        v-loading="loading"
+        element-loading-custom-class="coord-picker-loading"
+      />
 
       <div id="panel" class="scrollbar1">
         <ul id="myList"/>
@@ -56,8 +61,8 @@
            :class="{active:active==='marker'}">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
-                d="M15 17h3v-3h2v3h3v2h-3v3h-2v-3h-3v-2M9 6.5c1.4 0 2.5 1.1 2.5 2.5s-1.1 2.5-2.5 2.5S6.5 10.4 6.5 9S7.6 6.5 9 6.5M9 2c3.9 0 7 3.1 7 7c0 5.2-7 13-7 13S2 14.2 2 9c0-3.9 3.1-7 7-7m0 2C6.2 4 4 6.2 4 9c0 1 0 3 5 9.7C14 12 14 10 14 9c0-2.8-2.2-5-5-5z"
-                fill="currentColor"></path>
+              d="M15 17h3v-3h2v3h3v2h-3v3h-2v-3h-3v-2M9 6.5c1.4 0 2.5 1.1 2.5 2.5s-1.1 2.5-2.5 2.5S6.5 10.4 6.5 9S7.6 6.5 9 6.5M9 2c3.9 0 7 3.1 7 7c0 5.2-7 13-7 13S2 14.2 2 9c0-3.9 3.1-7 7-7m0 2C6.2 4 4 6.2 4 9c0 1 0 3 5 9.7C14 12 14 10 14 9c0-2.8-2.2-5-5-5z"
+              fill="currentColor"></path>
           </svg>
         </a>
       </el-tooltip>
@@ -67,12 +72,12 @@
         >
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
-                d="M21 15v3h3v2h-3v3h-2v-3h-3v-2h3v-3h2zm.008-12c.548 0 .992.445.992.993V13h-2V5H4v13.999L14 9l3 3v2.829l-3-3L6.827 19H14v2H2.992A.993.993 0 0 1 2 20.007V3.993A1 1 0 0 1 2.992 3h18.016zM8 7a2 2 0 1 1 0 4a2 2 0 0 1 0-4z"
-                fill="currentColor"></path>
+              d="M21 15v3h3v2h-3v3h-2v-3h-3v-2h3v-3h2zm.008-12c.548 0 .992.445.992.993V13h-2V5H4v13.999L14 9l3 3v2.829l-3-3L6.827 19H14v2H2.992A.993.993 0 0 1 2 20.007V3.993A1 1 0 0 1 2.992 3h18.016zM8 7a2 2 0 1 1 0 4a2 2 0 0 1 0-4z"
+              fill="currentColor"></path>
           </svg>
         </a>
       </el-tooltip>
-      <el-tooltip effect="dark" content="绘制轮廓" placement="bottom" v-if="boundaryCount">
+      <el-tooltip effect="dark" content="绘制轮廓" placement="bottom" v-if="BoundaryMaxCount>0">
         <a @click.stop="onPolygonBtnClick"
            :class="{active:active==='polygon'}">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
@@ -90,8 +95,8 @@
         <a @click.stop="$emit('update:show', false)">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
-                d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10zm0-2a8 8 0 1 0 0-16a8 8 0 0 0 0 16zm0-9.414l2.828-2.829l1.415 1.415L13.414 12l2.829 2.828l-1.415 1.415L12 13.414l-2.828 2.829l-1.415-1.415L10.586 12L7.757 9.172l1.415-1.415L12 10.586z"
-                fill="currentColor"></path>
+              d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10zm0-2a8 8 0 1 0 0-16a8 8 0 0 0 0 16zm0-9.414l2.828-2.829l1.415 1.415L13.414 12l2.829 2.828l-1.415 1.415L12 13.414l-2.828 2.829l-1.415-1.415L10.586 12L7.757 9.172l1.415-1.415L12 10.586z"
+              fill="currentColor"></path>
           </svg>
         </a>
       </el-tooltip>
@@ -99,34 +104,32 @@
         <a @click.stop="confirm">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
-                d="M7 19v-6h10v6h2V7.828L16.172 5H5v14h2zM4 3h13l4 4v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm5 12v4h6v-4H9z"
-                fill="currentColor"></path>
+              d="M7 19v-6h10v6h2V7.828L16.172 5H5v14h2zM4 3h13l4 4v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm5 12v4h6v-4H9z"
+              fill="currentColor"></path>
           </svg>
         </a>
       </el-tooltip>
     </Toolbar>
 
     <div class="absolute left-3px bottom-50px" style="position:absolute;left:3px;bottom:50px;" id="zoom">
-      <span class="text-45px" style="color:#3297FD;font-size:45px;">{{ Zoom }}</span>
+      <span class="text-45px" style="color:#3297FD;font-size:35px;">{{ Zoom }}</span>
       <span class="text-10px" style="font-size:10px;"> 缩放级别</span>
     </div>
   </el-dialog>
 </template>
 
 <script>
-import Vue from 'vue'
 import { isEmpty, typeOf } from 'kayran'
 import 'kikimore/dist/style.css'
 import { Swal } from 'kikimore'
-Object.defineProperty(Vue.prototype, '$Swal', {
-  value: Swal
-})
+const { error, warning, confirm, } = Swal
 import { throttle as throttling, cloneDeep } from 'lodash-es'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
 import autoComplete from '@tarekraafat/autocomplete.js/dist/js/autoComplete'
 //import './styles/meny-arrow.scss'
 import './styles/autocomplete.scss'
+import './styles/marker-list.scss'
 import polygon from '@/mixins/polygon'
 import rectangle from '@/mixins/rectangle'
 import Toolbar from '@/components/Toolbar.vue'
@@ -134,7 +137,6 @@ import { getFinalProp } from '@/utils'
 import globalProps from './config'
 import { name } from '../package.json'
 const prefix = `[${name}] `
-import './marker-list.scss'
 import RegionSelect from 'region-select'
 
 export default {
@@ -176,7 +178,6 @@ export default {
     },
     precision: Number,
     addressComponent: [Object, Function],
-    //imgCount: Number,
     boundaryCount: [Number, Array],
   },
   data () {
@@ -191,14 +192,17 @@ export default {
       markers: [],
       //meny: null,
       customClass: 'animate__animated animate__zoomIn',
-      geocoder: null,
-      autoComplete: null,
-      placeSearch: null,
-      markerList: null,
-      districtSearch: null,
       autoCompleting: false,
       autoCompleteList: [],
       autoCompleteInput: null,
+      plugins: {
+        Geocoder: null,
+        AutoComplete: null,
+        PlaceSearch: null,
+        MarkerList: null,
+        DistrictSearch: null,
+        CitySearch: null,
+      }
     }
   },
   computed: {
@@ -265,8 +269,8 @@ export default {
             'AMap.CitySearch',
             'AMap.PlaceSearch',
             ...this.Version?.startsWith('2.') ?
-                ['AMap.AutoComplete'] :
-                ['AMap.Autocomplete'],
+              ['AMap.AutoComplete'] :
+              ['AMap.Autocomplete'],
             ...this.Img ? [
               'AMap.MouseTool',
               'AMap.RectangleEditor',
@@ -277,8 +281,8 @@ export default {
               'AMap.ContextMenu',
               'AMap.DistrictSearch',
               ...this.Version?.startsWith('2.') ?
-                  ['AMap.PolygonEditor',] :
-                  ['AMap.PolyEditor',],
+                ['AMap.PolygonEditor',] :
+                ['AMap.PolyEditor',],
             ] : [],
           ]
         }).then(async AMap => {
@@ -361,7 +365,7 @@ export default {
                 })
               }
 
-              //this.loading = false
+              this.loading = false
             })
           })
 
@@ -390,7 +394,7 @@ export default {
             this.Zoom = this.map.getZoom()
           })
 
-          if (this.Img || this.boundaryCount > 0) {
+          if (this.Img || this.BoundaryMaxCount > 0) {
             this.mouseTool = new AMap.MouseTool(this.map)
             this.mouseTool.on('draw', e => {
               //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
@@ -408,7 +412,7 @@ export default {
                 e.obj.setMap(null) //1.x改为销毁绘制出来的矩形并新建一个矩形对象
                 this.drawImg(this.rectangleObj.getBounds())
               }
-                  //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
+                //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
               //2.x：e.obj.className==='Overlay.Polygon'
               else if (this.active === 'polygon') {
                 this.active = 'marker'
@@ -425,12 +429,11 @@ export default {
 
           //this.map.addControl(new AMap.ControlBar())
 
-          this.locate()
+          await this.locate()
         }).catch(e => {
           this.$emit('update:show', false)
-          this.$Swal.error(`地图初始化失败：${e}`)
+          error(`地图初始化失败：${e}`)
         }).finally(e => {
-          this.loading = false
         })
         //}
       } else {
@@ -503,14 +506,14 @@ export default {
       const param = {
         city: this.baseCity
       }
-      this.geocoder = new AMap.Geocoder(param)
+      this.plugins.Geocoder = new AMap.Geocoder(param)
       //兼容1.x
-      this.autoComplete = AMap.AutoComplete ?
-          new AMap.AutoComplete(param) :
-          new AMap.Autocomplete(param)
-      this.placeSearch = new AMap.PlaceSearch(param)
-      if (this.boundaryCount > 0) {
-        this.districtSearch = new AMap.DistrictSearch({
+      this.plugins.AutoComplete = AMap.AutoComplete ?
+        new AMap.AutoComplete(param) :
+        new AMap.Autocomplete(param)
+      this.plugins.PlaceSearch = new AMap.PlaceSearch(param)
+      if (this.BoundaryMaxCount > 0) {
+        this.plugins.DistrictSearch = new AMap.DistrictSearch({
           subdistrict: 0,   //获取边界不需要返回下级行政区
           extensions: 'all',  //返回行政区边界坐标组等具体信息
           level: 'district'  //行政级别
@@ -531,7 +534,7 @@ export default {
       })
     },
     reset () {
-      this.markerList?.clearData()
+      this.plugins.MarkerList?.clearData()
       this.searchResult = []
       this.keyword = ''
       if (this.imageLayer) {
@@ -558,8 +561,8 @@ export default {
     },
     getAddress ([lng, lat]) {
       return new Promise((resolve, reject) => {
-        if (this.geocoder) {
-          this.amapAPI(this.geocoder.getAddress, [[lng, lat]])
+        if (this.plugins.Geocoder) {
+          this.useAmapApi('Geocoder.getAddress', [lng, lat])
           .then(result => {
             if (result.regeocode?.formattedAddress) {
               const { province, city, district, township } = result.regeocode.addressComponent
@@ -578,6 +581,8 @@ export default {
             } else {
               reject()
             }
+          }).catch(e => {
+            console.error(e)
           })
           .catch(result => {
             reject()
@@ -589,8 +594,8 @@ export default {
       })
     },
     async onMapClick (e) {
-      const { address, name } = await this.getAddress([e.lnglat.lng, e.lnglat.lat])
       const { lng: longitude, lat: latitude } = e.lnglat
+      const { address, name } = await this.getAddress([e.lnglat.lng, e.lnglat.lat])
       this.drawMarker({
         longitude,
         latitude,
@@ -600,15 +605,16 @@ export default {
     },
     fetchSuggestions (queryString, cb) {
       return new Promise((resolve, reject) => {
-        this.amapAPI(this.autoComplete.search, [this.keyword])
+        this.useAmapApi('AutoComplete.search', this.keyword)
         .then(result => {
           resolve(result.tips || [])
         })
         .catch((result, status) => {
+          debugger
           if (status === 'no_data') {
             resolve([])
           } else {
-            this.$Swal.error(result)
+            error(result)
             reject()
           }
         })
@@ -650,7 +656,7 @@ export default {
         this.$emit('update:imgSouthWestLng', this.roundOff(this.curImg.imgSouthWestLng))
         this.$emit('update:imgSouthWestLat', this.roundOff(this.curImg.imgSouthWestLat))
       }
-      if (this.boundaryCount > 0) {
+      if (this.BoundaryMaxCount > 0) {
         this.syncPolygon()
         this.$emit('update:boundary', this.curBoundary)
       }
@@ -666,7 +672,7 @@ export default {
     },
     drawMarker (markerOptions, isInit = false) {
       if (this.MarkerMaxCount > 1 && this.markers.length >= this.MarkerMaxCount && !isInit) {
-        this.$Swal.warning(`最多标记${this.MarkerMaxCount}个点位`)
+        warning(`最多标记${this.MarkerMaxCount}个点位`)
       } else {
         /*const position = [lng, lat]
         const marker = new AMap.Marker({
@@ -721,7 +727,7 @@ export default {
       }
     },
     drawMarkerList (marker) {
-      this.markerList?.clearData()
+      this.plugins.MarkerList?.clearData()
 
       if (isEmpty(marker)) {
         return
@@ -732,10 +738,10 @@ export default {
       const $ = MarkerList.utils.$
 
       const defaultIconStyle = 'red', //默认的图标样式
-          hoverIconStyle = 'blue', //鼠标hover时的样式
-          selectedIconStyle = 'darkblue' //选中时的图标样式
+        hoverIconStyle = 'blue', //鼠标hover时的样式
+        selectedIconStyle = 'darkblue' //选中时的图标样式
 
-      this.markerList = new MarkerList({
+      this.plugins.MarkerList = new MarkerList({
         map: this.map,
         // ListElement对应的父节点或者ID
         listContainer: 'myList', //document.getElementById("myList"),
@@ -766,27 +772,39 @@ export default {
           })
         },
         // 构造marker用的options对象, content和title支持模板，也可以是函数，返回marker实例，或者返回options对象
-        getMarker: function (data, context, recycledMarker) {
+        getMarker: (data, context, recycledMarker) => {
           let label = String.fromCharCode('A'.charCodeAt(0) + context.index)
           if (recycledMarker) {
             recycledMarker.setIconLabel(label)
             return
           }
-          return new SimpleMarker({
+          const simpleMarker = new SimpleMarker({
             containerClassNames: 'my-marker',
             iconStyle: defaultIconStyle,
             iconLabel: label
           })
+
+          const markerContextMenu = new AMap.ContextMenu()
+          markerContextMenu.addItem('删除', e => {
+            if (this.markers.length <= this.MarkerMinCount) {
+              warning(`至少绘制${this.MarkerMinCount}个点位`)
+            } else {
+              this.markers.splice(context.index, 1)
+              this.drawMarkerList(this.markers)
+            }
+          }, 0)
+
+          simpleMarker.on('rightclick', e => {
+            markerContextMenu.open(this.map, e.lnglat)
+          })
+
+          return simpleMarker
         },
         // 构造列表元素，与getMarker类似，可以是函数，返回一个dom元素，或者模板 html string
         getListElement: function (data, context, recycledListElement) {
           let label = String.fromCharCode('A'.charCodeAt(0) + context.index)
           // 使用模板创建
           const innerHTML = MarkerList.utils.template(`
-
-            <div class="poi-imgbox" <%- !data.pic&&'style="display:"none"' %> >
-              <span class="poi-img" style="background-image:url(<%- data.pic %>)"></span>
-            </div>
             <div class="poi-info-left">
               <h3 class="poi-title" <%- !data.name&&'style="display:"none"' %>>
                   <%- label %>. <%- data.name %>
@@ -808,8 +826,8 @@ export default {
           }
 
           return '<li class="poibox">' +
-              innerHTML +
-              '</li>'
+            innerHTML +
+            '</li>'
         },
         // 列表节点上监听的事件
         listElementEvents: ['click', 'mouseenter', 'mouseleave'],
@@ -820,23 +838,11 @@ export default {
         autoSetFitView: false
       })
 
-      const markerContextMenu = new AMap.ContextMenu()
-      markerContextMenu.addItem('删除', e => {
-        console.log(e)
-        if (this.polygonObj.length <= this.MarkerMinCount) {
-          this.$Swal.warning(`至少绘制${this.MarkerMinCount}个点位`)
-        } else {
-        }
-      }, 0)
-
-      this.markerList.on('markerRightclick', (event, info) => {
+      /*this.plugins.MarkerList.on('markerRightclick', (event, info) => {
         //console.log(event, info)
-        markerContextMenu.open(this.map, event.originalEvent.lnglat)
-        //this.markers.splice(info.index, 1)
-        //this.drawMarkerList(this.markers)
-      })
+      })*/
 
-      this.markerList.on('selectedChanged', function (event, info) {
+      this.plugins.MarkerList.on('selectedChanged', function (event, info) {
         //checkBtnStats()
         if (info.selected) {
           console.log(info)
@@ -857,7 +863,7 @@ export default {
         }
       })
 
-      this.markerList.on('listElementMouseenter', function (event, record) {
+      this.plugins.MarkerList.on('listElementMouseenter', function (event, record) {
         if (record && record.marker) {
           //this.openInfoWindowOnRecord(record);
           //非选中的id
@@ -869,7 +875,7 @@ export default {
         }
       })
 
-      this.markerList.on('markerMouseover', function (event, record) {
+      this.plugins.MarkerList.on('markerMouseover', function (event, record) {
         if (record && record.marker) {
           forcusMarker(record.marker)
           //this.openInfoWindowOnRecord(record);
@@ -882,7 +888,7 @@ export default {
         }
       })
 
-      this.markerList.on('listElementMouseleave markerMouseout', function (event, record) {
+      this.plugins.MarkerList.on('listElementMouseleave markerMouseout', function (event, record) {
         if (record && record.marker) {
           if (!this.isSelectedDataId(record.id)) {
             //恢复默认样式
@@ -892,7 +898,7 @@ export default {
       })
 
       // 数据输出完成
-      /*this.markerList.on('renderComplete', function (event, records) {
+      /*this.plugins.MarkerList.on('renderComplete', function (event, records) {
         checkBtnStats()
       })*/
 
@@ -901,7 +907,7 @@ export default {
       // });
 
       //渲染数据
-      this.markerList.render(marker)
+      this.plugins.MarkerList.render(marker)
 
       const forcusMarker = marker => {
         marker.setTop(true)
@@ -918,10 +924,10 @@ export default {
         let rect = el.getBoundingClientRect()
 
         return (
-            rect.top >= 0 &&
-            rect.left >= 0 &&
-            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
-            rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
+          rect.top >= 0 &&
+          rect.left >= 0 &&
+          rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
+          rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
         )
       }
 
@@ -932,23 +938,28 @@ export default {
         //闪动一下
         $listEle
         .one('webkitAnimationEnd oanimationend msAnimationEnd animationend',
-            function (e) {
-              $(this).removeClass('flash animated')
-            }).addClass('flash animated')
+          function (e) {
+            $(this).removeClass('flash animated')
+          }).addClass('flash animated')
       }
     },
     async locate (selectedLocation) {
       // 选中搜索项
       if (selectedLocation) {
-        this.amapAPI(this.districtSearch.search, [selectedLocation.name])
-        .then(result => {
-          const bounds = result?.districtList[0]?.boundaries
-          if (bounds.length) {
-            this.$Swal.confirm(`是否绘制${selectedLocation.name}轮廓？`).then(() => {
-              this.drawPolygon(Array.from(bounds, v => ({ data: v })), false)
-            })
-          }
-        })
+        if (this.BoundaryMaxCount > 0) {
+          this.useAmapApi('DistrictSearch.search', selectedLocation.name)
+          .then(result => {
+            const bounds = result.districtList?.[0]?.boundaries
+            if (bounds?.length) {
+              confirm(`是否绘制${selectedLocation.name}轮廓？`)
+              .then(() => {
+                this.drawPolygon(Array.from(bounds, v => ({ data: v })), false)
+              })
+            }
+          })
+          .catch((result, status) => {
+          })
+        }
         //this.meny.close()
         this.drawMarker({
           ...selectedLocation,
@@ -968,14 +979,14 @@ export default {
          */
         // 传了图片 绘制图层
         if (this.Img &&
-            !isEmpty(this.curImg.imgSouthWestLng) &&
-            !isEmpty(this.curImg.imgSouthWestLat) &&
-            !isEmpty(this.curImg.imgNorthEastLng) &&
-            !isEmpty(this.curImg.imgNorthEastLat)
+          !isEmpty(this.curImg.imgSouthWestLng) &&
+          !isEmpty(this.curImg.imgSouthWestLat) &&
+          !isEmpty(this.curImg.imgNorthEastLng) &&
+          !isEmpty(this.curImg.imgNorthEastLat)
         ) {
           this.drawImg(new AMap.Bounds(
-              new AMap.LngLat(this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat),
-              new AMap.LngLat(this.curImg.imgNorthEastLng, this.curImg.imgNorthEastLat),
+            new AMap.LngLat(this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat),
+            new AMap.LngLat(this.curImg.imgNorthEastLng, this.curImg.imgNorthEastLat),
           ))
           hasOverlay = true
         }
@@ -1040,7 +1051,7 @@ export default {
         }
         // 定位至address
         else if (this.address) {
-          const result = await this.amapAPI(this.geocoder.getLocation, [this.address])
+          const result = await this.useAmapApi('Geocoder.getLocation', this.address)
           const { lng, lat } = result.geocodes[0]?.location
           if (!isEmpty(lng) && !isEmpty(lat)) {
             this.setCenter([lng, lat])
@@ -1063,7 +1074,8 @@ export default {
         if (result) {
           resolve(result)
         } else {
-          this.amapAPI(new AMap.CitySearch().getLocalCity)
+          this.plugins.CitySearch = new AMap.CitySearch()
+          this.useAmapApi('CitySearch.getLocalCity')
           .then(result => {
             resolve(result.city)
           })
@@ -1080,13 +1092,14 @@ export default {
       }
       this.searching = true
       this.throttle('search', () => {
-        this.amapAPI(this.placeSearch.search, [this.keyword])
+
+        this.useAmapApi('PlaceSearch.search', this.keyword)
         .then(result => {
           this.searchResult = result.poiList?.pois || []
         })
         .catch(result => {
           if (result.info === 'TIP_CITIES') {
-            this.$Swal.warning('尝试输入更加精确的关键字哦')
+            warning('尝试输入更精确的关键字哦')
           }
         })
         .finally(() => {
@@ -1094,19 +1107,25 @@ export default {
         })
       }, null, 500)
     },
-    amapAPI () {
-      const api = arguments[0]
-      const args = arguments[1] || []
-      console.log(api)
-      console.log(args)
+    useAmapApi () {
+      const loading = this.$loading({
+        lock: false,
+        background: 'transparent',
+        customClass: 'coord-picker-loading'
+      })
+      const apiName = arguments[0]
+      const [plugin, fn] = apiName.split('.')
+      let args = Array.from(arguments)
+      args.shift()
       return new Promise((resolve, reject) => {
-        api(...args, (status, result) => {
-          console.log(prefix, result, status)
+        this.plugins[plugin][fn](...args, (status, result) => {
+          console.log(prefix, `高德Web服务API ${apiName} 参数：`, args, '，返回值：\n', result, status)
           if (status === 'complete' && result.info === 'OK') {
             resolve(result, status)
           } else {
             reject(result, status)
           }
+          loading.close()
         })
       })
     }
@@ -1172,8 +1191,8 @@ export default {
 
   .region-select {
     display: inline-block;
-    margin-top: 2px;
-    width: 185px;
+    margin-left: 15px;
+    width: 105px;
 
     input {
       border-radius: 20px;
@@ -1183,12 +1202,12 @@ export default {
   .drawer {
     box-sizing: border-box;
     //box-shadow: 50px 0 100px rgba(0, 0, 0, 0.5);
-    width: 384px;
+    width: 275px;
     height: 100%;
     overflow-y: auto;
-    padding: 75px 16px;
+    padding: 78px 16px 0 16px;
     position: absolute;
-    z-index: 1;
+    z-index: 999;
     //background-image: linear-gradient(to left, #e6e9f0 0%, #eef1f5 100%);
     backdrop-filter: blur(2px);
     background-color: #f7f7f7ab;
@@ -1198,13 +1217,13 @@ export default {
       cursor: pointer;
 
       &:hover {
-        background-color: #add8e69e;
+        background-color: rgba(173, 216, 230, 0.4);
         border-radius: 25px;
       }
     }
 
     &::-webkit-scrollbar {
-      width: 10px;
+      width: 6px;
       height: 1px;
     }
 
@@ -1212,14 +1231,14 @@ export default {
       border-radius: 10px;
       background-color: skyblue;
       background-image: -webkit-linear-gradient(
-              45deg,
-              rgba(255, 255, 255, 0.2) 25%,
-              transparent 25%,
-              transparent 50%,
-              rgba(255, 255, 255, 0.2) 50%,
-              rgba(255, 255, 255, 0.2) 75%,
-              transparent 75%,
-              transparent
+          45deg,
+          rgba(255, 255, 255, 0.2) 25%,
+          transparent 25%,
+          transparent 50%,
+          rgba(255, 255, 255, 0.2) 50%,
+          rgba(255, 255, 255, 0.2) 75%,
+          transparent 75%,
+          transparent
       );
     }
 
@@ -1234,5 +1253,15 @@ export default {
 ::v-deep .amap-maptypecontrol {
   top: unset;
   bottom: 95px;
+}
+</style>
+
+<style lang="scss">
+.el-loading-mask.coord-picker-loading {
+  left: 50%;
+  top: 50%;
+  bottom: unset;
+  right: unset;
+  transform: translate(-50%, -50%);
 }
 </style>

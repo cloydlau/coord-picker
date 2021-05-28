@@ -2,45 +2,59 @@
   position: fixed;
   top: 15px;
   left: 15px;
-  z-index: 10;
+  z-index: 9999;
+
+  // fix: Chrome在自动完成时隐藏input图标
+  & > .magnifier {
+    position: absolute;
+    background-image: url(../assets/magnifier.svg);
+    background-size: 1.4rem;
+    background-position: left 1.05rem top 0.8rem;
+    background-repeat: no-repeat;
+    background-origin: border-box;
+    width: 48px;
+    height: 48px;
+  }
+
+  #autoComplete {
+    width: 250px !important;
+    color: #003371;
+    border: 2px solid #0033714a;
+    caret-color: #003371;
+    background-image: none;
+
+    // fix: Chrome在自动完成时改变input背景
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:focus,
+    &:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 30px white inset !important;
+    }
+
+    &::-webkit-input-placeholder {
+      color: rgba(123, 123, 123, 0.5) !important;
+    }
+
+    &:hover, &:focus {
+      color: #003371;
+      width: 250px;
+      box-shadow: rgba(0, 51, 113, 0.1) 0 0 20px 5px;
+    }
+
+    &:hover::placeholder, &:focus::placeholder {
+      color: #003371;
+    }
+
+    &::selection, &:focus::selection {
+      background-color: #3297FD;
+      color: white;
+    }
+  }
 }
 
 #autoComplete_list {
   position: absolute;
-}
-
-#autoComplete {
-  color: #003371;
-  border: 2px solid #0033714a;
-  caret-color: #003371;
-  background-image: url(../assets/magnifier.svg) !important;
-
-  &::-webkit-input-placeholder {
-    color: rgba(123, 123, 123, 0.5) !important;
-  }
-
-  &:hover {
-    color: #003371;
-    width: 250px;
-    background-image: url(../assets/magnifier.svg) !important;
-  }
-
-  &:focus {
-    color: #003371;
-    width: 250px;
-    border-color: #003371;
-    box-shadow: rgba(0, 51, 113, 0.1) 0 0 20px 5px;
-    background-image: url(../assets/magnifier.svg) !important;
-  }
-
-  &:hover::placeholder, &:focus::placeholder {
-    color: #003371;
-  }
-
-  &::selection, &:focus::selection {
-    background-color: #3297FD;
-    color: white;
-  }
+  width: 248px;
 }
 
 .autoComplete_result:hover, .autoComplete_result:focus {

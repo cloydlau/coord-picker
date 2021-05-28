@@ -58,7 +58,7 @@
     "vite": "2.2.4",
     "vite-plugin-icons": "^0.5.1",
     "vite-plugin-vue2": "^1.5.1",
-    "vite-plugin-windicss": "^0.16.2",
+    "vite-plugin-windicss": "^0.16.5",
     "vue": "^2.6.12",
     "vue-template-compiler": "^2.6.12",
     "windicss": "^3.0.12"
