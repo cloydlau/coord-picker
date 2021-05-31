@@ -121,8 +121,8 @@ adcode信息可参考[城市编码表](https://lbs.amap.com/api/webservice/downl
 
 - number[]
 
-  0. 数量下限
-  1. 数量上限
+    0. 数量下限
+    1. 数量上限
 
 ### addressComponent
 
@@ -209,7 +209,7 @@ adcode信息可参考[城市编码表](https://lbs.amap.com/api/webservice/downl
 
 ### 如何启用
 
-`img` 参数不为空时
+`img` 参数不为空
 
 ### 图层数量
 
@@ -221,7 +221,7 @@ adcode信息可参考[城市编码表](https://lbs.amap.com/api/webservice/downl
 
 ### 如何启用
 
-`boundaryCount` 参数的值大于0时
+`boundaryCount` 参数的值大于0
 
 ### 数据格式
 
