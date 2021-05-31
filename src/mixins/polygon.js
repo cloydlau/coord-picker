@@ -1,6 +1,7 @@
 import 'kikimore/dist/style.css'
 import { Swal } from 'kikimore'
 const { error, warning, confirm, } = Swal
+import { notEmpty } from 'kayran'
 
 export default {
   data () {
@@ -25,13 +26,13 @@ export default {
       }
     },
     syncPolygon () {
-      //同步可能经过删除、节点变化的多边形
+      // 同步可能经过删除、节点变化的多边形
       this.curBoundary = []
       this.polygonObj.map(v => {
         if (v) {
-          //新创建的polygon getPath()获取的lng和lat默认只保留6位小数 而R和Q是完整的
+          // 新创建的polygon getPath()获取的lng和lat默认只保留6位小数 而R和Q是完整的
           this.curBoundary.push({
-            data: Array.from(v.getPath(), v => ({ longitude: this.roundOff(v.R), latitude: this.roundOff(v.Q) }))
+            path: Array.from(v.getPath(), v => ({ lng: this.roundOff(v.R), lat: this.roundOff(v.Q) }))
           })
         }
       })
@@ -39,13 +40,21 @@ export default {
     drawPolygon (boundary, draggable) {
       if (boundary) {
         for (let i = 0; i < boundary.length; i++) {
-          this.polygonObj.push(new AMap.Polygon({
-            ...this.polygonStyle,
-            fillColor: '#00D3FC',
-            map: this.map,
-            path: boundary[i]?.data?.map(v => [v.longitude || v.lng, v.latitude || v.lat]),
-          }))
-          this.editPolygon(draggable)
+          const path = []
+          for (let v of boundary[i]?.path || []) {
+            if (notEmpty(v.lng) && notEmpty(v.lat)) {
+              path.push([v.lng, v.lat])
+            }
+          }
+          if (path.length > 0) {
+            this.polygonObj.push(new AMap.Polygon({
+              ...this.polygonStyle,
+              fillColor: '#00D3FC',
+              map: this.map,
+              path
+            }))
+            this.editPolygon(draggable)
+          }
         }
       } else {
         this.mouseTool.polygon({
@@ -72,7 +81,7 @@ export default {
       }, 0)
 
       this.polygonObj[i].on('mouseout', e => {
-        this.text.setText('点击获取坐标')
+        this.text.setText('单击绘制点位')
       })
 
       this.polygonObj[i].on('click', this.onMapClick)
@@ -82,7 +91,7 @@ export default {
       })
 
       this.polygonObj[i].on('mousemove', e => {
-        this.text.setText((draggable ? '拖拽角可调整形状，' : '') + '右键可删除该区域')
+        this.text.setText((draggable ? '拖拽角调整形状，' : '') + '右键删除')
         this.setTextPosition(e)
       })
 

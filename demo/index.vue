@@ -2,7 +2,7 @@
   <el-dialog visible :close-on-click-modal="false" :show-close="false" title="coord-picker">
 
 
-    <CoordPicker v-bind="props"/>
+    <CoordPicker v-bind.sync="props"/>
 
 
     <el-form
@@ -122,16 +122,16 @@ export default {
         imgSouthWestLat: 26.506218,
         boundary: [
           {
-            'data': [
-              { 'longitude': '106.44294', 'latitude': '26.644338' },
-              { 'longitude': '106.431267', 'latitude': '26.504937' },
-              { 'longitude': '106.569282', 'latitude': '26.585405' }
+            'path': [
+              { 'lng': '106.44294', 'lat': '26.644338' },
+              { 'lng': '106.431267', 'lat': '26.504937' },
+              { 'lng': '106.569282', 'lat': '26.585405' }
             ]
           }, {
-            'data': [
-              { 'longitude': '106.623527', 'latitude': '26.52767' },
-              { 'longitude': '106.602241', 'latitude': '26.415188' },
-              { 'longitude': '106.721031', 'latitude': '26.472979' }
+            'path': [
+              { 'lng': '106.623527', 'lat': '26.52767' },
+              { 'lng': '106.602241', 'lat': '26.415188' },
+              { 'lng': '106.721031', 'lat': '26.472979' }
             ]
           }
         ],

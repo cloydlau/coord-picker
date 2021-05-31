@@ -4,7 +4,7 @@
 
 ## Features
 
-- √ 坐标拾取（双向绑定）
+- √ 坐标拾取、绘制点位（双向绑定）
 - √ 拖拉拽绘制、编辑图片图层（双向绑定角坐标）
 - √ 拖拉拽绘制、编辑多边形（双向绑定轮廓坐标）
 - √ POI搜索、搜索关键字自动补全
@@ -126,7 +126,7 @@ adcode信息可参考[城市编码表](https://lbs.amap.com/api/webservice/downl
 
 ### addressComponent
 
-默认情况下，点击地图获取到的address是包含省市区的完整地址，你可以用以下两种方式来自定义地址的成分：
+获取的address默认是包含省市区的完整地址，你可以用以下两种方式来自定义地址成分：
 
 - object
 
@@ -140,29 +140,10 @@ adcode信息可参考[城市编码表](https://lbs.amap.com/api/webservice/downl
 
 - function
 
-### boundary
-
-返回格式：
+自由组合
 
 ```
-[
-  // 轮廓1
-  {
-    data: [
-      { 'longitude': '106.44294', 'latitude': '26.644338' },
-      { 'longitude': '106.431267', 'latitude': '26.504937' },
-      { 'longitude': '106.569282', 'latitude': '26.585405' }
-    ]
-  },
-  // 轮廓2
-  {
-    data: [
-      { 'longitude': '106.623527', 'latitude': '26.52767' },
-      { 'longitude': '106.602241', 'latitude': '26.415188' },
-      { 'longitude': '106.721031', 'latitude': '26.472979' }
-    ]
-  }
-]
+({ province, city, district ... }) => `${province} - ${city} - ${district}`
 ```
 
 <br>
@@ -179,50 +160,100 @@ adcode信息可参考[城市编码表](https://lbs.amap.com/api/webservice/downl
 
 <br>
 
+## 定位优先级
+
+`“根据传参情况智能初始化至合适的位置”`，具体参数权重排序如下：
+
+1. 中心点
+
+2. 点位（单个）
+
+3. 详细地址
+
+4. 覆盖物、点位（多个）
+
+5. 参数指定的行政区
+
+6. IP所在行政区（调用高德 `CitySearch` 接口）
+
+> 1、2、3以 `setCenter` 方式定位，4以 `setFitView` 方式定位，5、6以 `setCity` 方式定位
+
+<br>
+
 ## 绘制点位
 
-```vue
-<!-- 多点位示例 -->
+### 数据格式
 
-<template>
-  <CoordPicker
-    show
-    apiKey=""
-    :marker.sync="marker"
-    :markerCount="2"
-  />
-</template>
-
-<script>
-
-export default {
-  data () {
-    return {
-      marker: [{
-        lng: '',
-        lat: '',
-        address: '',
-        name: ''
-      }]
-    }
+```
+[
+  // 点位1
+  {
+    lng: '',
+    lat: '',
+    address: '',
+    name: ''
+  },
+  // 点位2
+  {
+    lng: '',
+    lat: '',
+    address: '',
+    name: ''
   }
-}
-</script>
+]
 ```
 
 <br>
 
 ## 绘制图层
 
-img参数不为空时 开启绘制图层功能
+### 如何启用
 
-图层数量目前仅支持一个，二次绘制会覆盖先前的图层
+`img` 参数不为空时
+
+### 图层数量
+
+目前仅支持一个，二次绘制会覆盖先前的图层
 
 <br>
 
 ## 绘制轮廓
 
-boundaryCount参数值大于0时 开启绘制轮廓功能
+### 如何启用
+
+`boundaryCount` 参数的值大于0时
+
+### 数据格式
+
+```
+[
+  // 轮廓1
+  {
+    path: [
+      { 'lng': '106.44294', 'lat': '26.644338' },
+      { 'lng': '106.431267', 'lat': '26.504937' },
+      { 'lng': '106.569282', 'lat': '26.585405' }
+    ]
+  },
+  // 轮廓2
+  {
+    path: [
+      { 'lng': '106.623527', 'lat': '26.52767' },
+      { 'lng': '106.602241', 'lat': '26.415188' },
+      { 'lng': '106.721031', 'lat': '26.472979' }
+    ]
+  }
+]
+```
+
+<br>
+
+## 命名规则
+
+为什么不使用全称 `longitude` 和 `latitude` ？
+
+- 高德自己的API也没有完全统一，有的用简称有的用全称，coord-picker为方便起见统一使用简称 `lng` 和 `lat`
+- 如果命名/格式与你所需不一致，可考虑二次封装
 
 <br>
 
@@ -232,8 +263,8 @@ boundaryCount参数值大于0时 开启绘制轮廓功能
 
 <br>
 
-## 高德JS-API版本
+## 高德 JS-API 版本
 
-1.4.15（2.0存在诸多问题，性能也不如1.x，等待后续更新）
+`1.4.15`（2.0存在诸多问题，性能也不如1.x，等待后续更新）
 
 <br>

@@ -62,11 +62,11 @@ export default {
       this.rectangleObj.on('click', this.onMapClick)
 
       this.rectangleObj.on('mousemove', e => {
-        this.text.setText('拖拽角可改变形状')
+        this.text.setText('拖拽角调整大小')
         this.setTextPosition(e)
       })
       this.rectangleObj.on('mouseout', e => {
-        this.text.setText('点击获取坐标')
+        this.text.setText('单击绘制点位')
       })
 
       this.rectangleEditor = new AMap.RectangleEditor(this.map, this.rectangleObj)

@@ -56,7 +56,7 @@
     </div>
 
     <Toolbar v-if="!loading">
-      <el-tooltip effect="dark" content="添加点位" placement="bottom">
+      <el-tooltip effect="dark" content="绘制点位" placement="bottom">
         <a @click.stop="active='marker'"
            :class="{active:active==='marker'}">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
@@ -100,7 +100,7 @@
           </svg>
         </a>
       </el-tooltip>
-      <el-tooltip effect="dark" content="确定" placement="bottom">
+      <el-tooltip effect="dark" content="保存并关闭" placement="bottom">
         <a @click.stop="confirm">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
@@ -111,7 +111,7 @@
       </el-tooltip>
     </Toolbar>
 
-    <div class="absolute left-3px bottom-50px" style="position:absolute;left:3px;bottom:50px;" id="zoom">
+    <div class="absolute left-3px bottom-40px" style="position:absolute;left:3px;bottom:40px;" id="zoom">
       <span class="text-45px" style="color:#3297FD;font-size:35px;">{{ Zoom }}</span>
       <span class="text-10px" style="font-size:10px;"> 缩放级别</span>
     </div>
@@ -119,7 +119,7 @@
 </template>
 
 <script>
-import { isEmpty, typeOf } from 'kayran'
+import { isEmpty, notEmpty, typeOf } from 'kayran'
 import 'kikimore/dist/style.css'
 import { Swal } from 'kikimore'
 const { error, warning, confirm, } = Swal
@@ -288,7 +288,7 @@ export default {
         }).then(async AMap => {
           this.map = new AMap.Map('map-container', {
             //viewMode: '3D',
-            ...!isEmpty(this.Zoom) && { zoom: this.Zoom, }
+            ...notEmpty(this.Zoom) && { zoom: this.Zoom, }
           })
 
           // 在图面添加比例尺控件，展示地图在当前层级和纬度下的比例尺
@@ -381,13 +381,14 @@ export default {
               'box-shadow': '0 2px 6px 0 rgba(114, 124, 245, .5)',
               'text-align': 'center',
             },
+            //zIndex: 9999 // MarkerList始终比它高10
           })
           this.text.setMap(this.map)
           this.map.on('mousemove', this.setTextPosition)
 
           this.map.on('click', this.onMapClick)
 
-          if (!isEmpty(this.zoom)) {
+          if (notEmpty(this.zoom)) {
             this.Zoom = Number(this.zoom)
           }
           this.map.on('zoomchange', e => {
@@ -452,7 +453,7 @@ export default {
       ({
         'marker': () => {
           this.mouseTool?.close()
-          this.text.setText('点击获取坐标')
+          this.text.setText('单击绘制点位')
           this.text.on('click', this.onMapClick)
           this.map.on('click', this.onMapClick)
         },
@@ -463,7 +464,7 @@ export default {
           this.mouseTool.rectangle(this.rectangleStyle)
         },
         'polygon': () => {
-          this.text.setText('单击确定起点，双击结束绘制')
+          this.text.setText('单击确定区域起点，双击结束绘制')
           this.text.off('click', this.onMapClick)
           this.map.off('click', this.onMapClick)
           this.drawPolygon()
@@ -535,6 +536,7 @@ export default {
     },
     reset () {
       this.plugins.MarkerList?.clearData()
+      window.__CoordPicker__deleteMarker = undefined
       this.searchResult = []
       this.keyword = ''
       if (this.imageLayer) {
@@ -550,7 +552,7 @@ export default {
       }
       //this.map.clearMap() 某些情况下未知报错
       Object.assign(this.$data, this.getInitData())
-      if (!isEmpty(this.imgNorthEastLng) && !isEmpty(this.imgSouthWestLng)) {
+      if (notEmpty(this.imgNorthEastLng) && notEmpty(this.imgSouthWestLng)) {
         this.curImg.imgNorthEastLng = Math.max(this.imgNorthEastLng, this.imgSouthWestLng)
         this.curImg.imgSouthWestLng = Math.min(this.imgNorthEastLng, this.imgSouthWestLng)
       }
@@ -741,6 +743,11 @@ export default {
         hoverIconStyle = 'blue', //鼠标hover时的样式
         selectedIconStyle = 'darkblue' //选中时的图标样式
 
+      window.__CoordPicker__deleteMarker = index => {
+        this.markers.splice(index, 1)
+        this.drawMarkerList(this.markers)
+      }
+
       this.plugins.MarkerList = new MarkerList({
         map: this.map,
         // ListElement对应的父节点或者ID
@@ -801,11 +808,13 @@ export default {
           return simpleMarker
         },
         // 构造列表元素，与getMarker类似，可以是函数，返回一个dom元素，或者模板 html string
-        getListElement: function (data, context, recycledListElement) {
+        getListElement: (data, context, recycledListElement) => {
           let label = String.fromCharCode('A'.charCodeAt(0) + context.index)
           // 使用模板创建
+
           const innerHTML = MarkerList.utils.template(`
             <div class="poi-info-left">
+              <i class="el-icon-close" style="right:0;top:0;position:absolute;font-size:18px;" onclick="__CoordPicker__deleteMarker(${context.index})"></i>
               <h3 class="poi-title" <%- !data.name&&'style="display:"none"' %>>
                   <%- label %>. <%- data.name %>
               </h3>
@@ -863,8 +872,12 @@ export default {
         }
       })
 
+      const that = this
       this.plugins.MarkerList.on('listElementMouseenter', function (event, record) {
         if (record && record.marker) {
+
+          that.text.setText('右键删除')
+
           //this.openInfoWindowOnRecord(record);
           //非选中的id
           if (!this.isSelectedDataId(record.id)) {
@@ -880,6 +893,9 @@ export default {
           forcusMarker(record.marker)
           //this.openInfoWindowOnRecord(record);
           //非选中的id
+
+          that.text.setText('右键删除')
+
           if (!this.isSelectedDataId(record.id)) {
             //设置为hover样式
             record.marker.setIconStyle(hoverIconStyle)
@@ -889,6 +905,9 @@ export default {
       })
 
       this.plugins.MarkerList.on('listElementMouseleave markerMouseout', function (event, record) {
+
+        that.text.setText('单击绘制点位')
+
         if (record && record.marker) {
           if (!this.isSelectedDataId(record.id)) {
             //恢复默认样式
@@ -953,7 +972,7 @@ export default {
             if (bounds?.length) {
               confirm(`是否绘制${selectedLocation.name}轮廓？`)
               .then(() => {
-                this.drawPolygon(Array.from(bounds, v => ({ data: v })), false)
+                this.drawPolygon(Array.from(bounds, v => ({ path: v })), false)
               })
             }
           })
@@ -979,10 +998,10 @@ export default {
          */
         // 传了图片 绘制图层
         if (this.Img &&
-          !isEmpty(this.curImg.imgSouthWestLng) &&
-          !isEmpty(this.curImg.imgSouthWestLat) &&
-          !isEmpty(this.curImg.imgNorthEastLng) &&
-          !isEmpty(this.curImg.imgNorthEastLat)
+          notEmpty(this.curImg.imgSouthWestLng) &&
+          notEmpty(this.curImg.imgSouthWestLat) &&
+          notEmpty(this.curImg.imgNorthEastLng) &&
+          notEmpty(this.curImg.imgNorthEastLat)
         ) {
           this.drawImg(new AMap.Bounds(
             new AMap.LngLat(this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat),
@@ -999,24 +1018,8 @@ export default {
         /**
          * 中心点定位
          */
-        // 传了点位 绘制点位
-        if (this.marker?.length > 0) {
-          this.markers = cloneDeep(this.marker).map(v => {
-            v.longitude = v.lng
-            v.latitude = v.lat
-            delete v.lng
-            delete v.lat
-            return v
-          })
-          // 如果点位只有一个 将其视为中心点
-          if (this.marker.length === 1) {
-            centerDesignated = true
-          } else if (this.marker.length > 1) {
-            hasOverlay = true
-          }
-        }
-        // 没传点位 但是传了中心点 将中心点当作一个点位
-        else if (!isEmpty(this.lng) && !isEmpty(this.lat)) {
+        // 传了中心点 将中心点当作一个点位
+        if (notEmpty(this.lng) && notEmpty(this.lat)) {
           let address, name
           if (this.address) {
             address = this.address
@@ -1035,25 +1038,41 @@ export default {
 
           centerDesignated = true
         }
+        // 传了点位 绘制点位
+        if (this.marker?.length > 0) {
+          cloneDeep(this.marker).map(v => {
+            v.longitude = v.lng
+            v.latitude = v.lat
+            delete v.lng
+            delete v.lat
+            this.markers.push(v)
+          })
+        }
+        // 如果点位只有一个 将其视为中心点
+        if (this.markers.length === 1) {
+          centerDesignated = true
+        } else if (this.markers.length > 1) {
+          hasOverlay = true
+        }
         this.drawMarkerList(this.markers)
         // 如果没有传覆盖物且没有传zoom 给zoom赋默认值
         if (centerDesignated && isEmpty(this.Zoom)) {
           this.Zoom = 12
         }
         // 传了中心点 定位至该中心点
-        if (!isEmpty(this.lng) && !isEmpty(this.lat)) {
+        if (notEmpty(this.lng) && notEmpty(this.lat)) {
           this.setCenter([this.lng, this.lat])
         }
-        // 传了点位且点位数量为1 定位至该点位
-        else if (this.marker?.length === 1 && this.marker[0]?.lng && this.marker[0].lat) {
-          const { lng, lat } = this.marker[0]
-          this.setCenter([lng, lat])
+        // 点位数量为1 定位至该点位
+        else if (this.markers.length === 1 && notEmpty(this.markers[0].longitude) && notEmpty(this.markers[0].latitude)) {
+          const { longitude, latitude } = this.markers[0]
+          this.setCenter([longitude, latitude])
         }
         // 定位至address
         else if (this.address) {
           const result = await this.useAmapApi('Geocoder.getLocation', this.address)
           const { lng, lat } = result.geocodes[0]?.location
-          if (!isEmpty(lng) && !isEmpty(lat)) {
+          if (notEmpty(lng) && notEmpty(lat)) {
             this.setCenter([lng, lat])
           }
         }
