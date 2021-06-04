@@ -19,7 +19,7 @@ export default {
   },
   methods: {
     onPolygonBtnClick () {
-      if (this.BoundaryMaxCount > 0 && this.polygonObj.length >= this.BoundaryMaxCount) {
+      if (this.BoundaryMaxCount > 0 && this.overlay.polygon.length >= this.BoundaryMaxCount) {
         warning(`最多绘制${this.BoundaryMaxCount}个区域`)
       } else {
         this.active = 'polygon'
@@ -28,7 +28,7 @@ export default {
     syncPolygon () {
       // 同步可能经过删除、节点变化的多边形
       this.curBoundary = []
-      this.polygonObj.map(v => {
+      this.overlay.polygon.map(v => {
         if (v) {
           // 新创建的polygon getPath()获取的lng和lat默认只保留6位小数 而R和Q是完整的
           this.curBoundary.push({
@@ -47,7 +47,7 @@ export default {
             }
           }
           if (path.length > 0) {
-            this.polygonObj.push(new AMap.Polygon({
+            this.overlay.polygon.push(new AMap.Polygon({
               ...this.polygonStyle,
               fillColor: '#00D3FC',
               map: this.map,
@@ -64,45 +64,45 @@ export default {
       }
     },
     editPolygon (draggable = true) {
-      const i = this.polygonObj.length - 1
+      const i = this.overlay.polygon.length - 1
 
       const polygonContextMenu = new AMap.ContextMenu()
       polygonContextMenu.addItem('删除', e => {
-        if (this.polygonObj.length <= this.BoundaryMinCount) {
+        if (this.overlay.polygon.length <= this.BoundaryMinCount) {
           warning(`至少绘制${this.BoundaryMinCount}个区域`)
         } else {
           if (draggable) {
-            this.polygonEditor[i].close()
-            this.polygonEditor.splice(i, 1)
+            this.overlay.polygonEditor[i].close()
+            this.overlay.polygonEditor.splice(i, 1)
           }
-          this.polygonObj[i].setMap(null)
-          this.polygonObj.splice(i, 1)
+          this.overlay.polygon[i].setMap(null)
+          this.overlay.polygon.splice(i, 1)
         }
       }, 0)
 
-      this.polygonObj[i].on('mouseout', e => {
+      this.overlay.polygon[i].on('mouseout', e => {
         this.text.setText('单击绘制点位')
       })
 
-      this.polygonObj[i].on('click', this.onMapClick)
+      this.overlay.polygon[i].on('click', this.onMapClick)
 
-      this.polygonObj[i].on('rightclick', e => {
+      this.overlay.polygon[i].on('rightclick', e => {
         polygonContextMenu.open(this.map, e.lnglat)
       })
 
-      this.polygonObj[i].on('mousemove', e => {
+      this.overlay.polygon[i].on('mousemove', e => {
         this.text.setText((draggable ? '拖拽角调整形状，' : '') + '右键删除')
         this.setTextPosition(e)
       })
 
       if (draggable) {
-        this.polygonEditor.push(AMap.PolygonEditor ?
-          new AMap.PolygonEditor(this.map, this.polygonObj[i]) :
-          new AMap.PolyEditor(this.map, this.polygonObj[i])
+        this.overlay.polygonEditor.push(AMap.PolygonEditor ?
+          new AMap.PolygonEditor(this.map, this.overlay.polygon[i]) :
+          new AMap.PolyEditor(this.map, this.overlay.polygon[i])
         )
-        this.polygonEditor[i].open()
+        this.overlay.polygonEditor[i].open()
       }
-      this.polygonObj[i].setMap(this.map)
+      this.overlay.polygon[i].setMap(this.map)
     },
   }
 }
