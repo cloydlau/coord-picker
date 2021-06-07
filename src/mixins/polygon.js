@@ -27,11 +27,11 @@ export default {
     },
     syncPolygon () {
       // 同步可能经过删除、节点变化的多边形
-      this.curBoundary = []
+      this.overlay.boundary = []
       this.overlay.polygon.map(v => {
         if (v) {
           // 新创建的polygon getPath()获取的lng和lat默认只保留6位小数 而R和Q是完整的
-          this.curBoundary.push({
+          this.overlay.boundary.push({
             path: Array.from(v.getPath(), v => ({ lng: this.roundOff(v.R), lat: this.roundOff(v.Q) }))
           })
         }
@@ -80,9 +80,9 @@ export default {
         }
       }, 0)
 
-      this.overlay.polygon[i].on('mouseout', e => {
+      /*this.overlay.polygon[i].on('mouseout', e => {
         this.text.setText('单击绘制点位')
-      })
+      })*/
 
       this.overlay.polygon[i].on('click', this.onMapClick)
 
@@ -90,10 +90,10 @@ export default {
         polygonContextMenu.open(this.map, e.lnglat)
       })
 
-      this.overlay.polygon[i].on('mousemove', e => {
+      /*this.overlay.polygon[i].on('mousemove', e => {
         this.text.setText((draggable ? '拖拽角调整形状，' : '') + '右键删除')
         this.setTextPosition(e)
-      })
+      })*/
 
       if (draggable) {
         this.overlay.polygonEditor.push(AMap.PolygonEditor ?

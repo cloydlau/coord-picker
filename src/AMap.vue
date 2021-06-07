@@ -35,13 +35,14 @@
       </div>
       <transition enter-active-class="animate__animated animate__backInLeft"
                   leave-active-class="animate__animated animate__backOutLeft">
-        <div v-loading="searching"
-             class="drawer"
-             v-show="searchResult.length>0"
+        <div
+          v-loading="searching"
+          class="drawer"
+          v-show="searchResult.length>0"
         >
           <div v-for="(v,i) of searchResult" :key="i" class="item" @click="locate(v)">
-            <h3>{{ v.name }}</h3>
-            <div style="margin:1rem;color:grey">{{ v.address }}</div>
+            <div>{{ v.name }}</div>
+            <div>{{ v.address }}</div>
           </div>
         </div>
       </transition>
@@ -52,8 +53,8 @@
       <div
         ref="map-container"
         id="map-container"
-        v-loading="loading"
-        element-loading-custom-class="coord-picker-loading"
+        v-loading="Loading"
+        element-loading-custom-class="coord-picker"
       />
 
       <div id="panel" class="scrollbar1">
@@ -61,42 +62,56 @@
       </div>
     </div>
 
-    <Toolbar v-if="!loading">
-      <el-tooltip effect="dark" content="绘制点位" placement="bottom">
-        <a @click.stop="active='marker'"
-           :class="{active:active==='marker'}">
+    <Toolbar v-show="!Loading">
+      <el-dropdown
+        @command="command=>{this[command](['marker'])}"
+        :class="{active:active==='marker'}"
+      >
+        <a @click.stop="active='marker'">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
               d="M15 17h3v-3h2v3h3v2h-3v3h-2v-3h-3v-2M9 6.5c1.4 0 2.5 1.1 2.5 2.5s-1.1 2.5-2.5 2.5S6.5 10.4 6.5 9S7.6 6.5 9 6.5M9 2c3.9 0 7 3.1 7 7c0 5.2-7 13-7 13S2 14.2 2 9c0-3.9 3.1-7 7-7m0 2C6.2 4 4 6.2 4 9c0 1 0 3 5 9.7C14 12 14 10 14 9c0-2.8-2.2-5-5-5z"
               fill="currentColor"></path>
           </svg>
         </a>
-      </el-tooltip>
-      <el-tooltip effect="dark" content="绘制图层" placement="bottom" v-if="Img">
-        <a :class="{active:active==='rectangle'}"
-           @click.stop="active='rectangle'"
-        >
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="initOverlays">重置点位</el-dropdown-item>
+          <el-dropdown-item command="clear">清除点位</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+      <el-dropdown
+        @command="command=>{this[command](['imageLayer'])}"
+        v-if="Img"
+        :class="{active:active==='rectangle'}"
+      >
+        <a @click.stop="active='rectangle'">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
               d="M21 15v3h3v2h-3v3h-2v-3h-3v-2h3v-3h2zm.008-12c.548 0 .992.445.992.993V13h-2V5H4v13.999L14 9l3 3v2.829l-3-3L6.827 19H14v2H2.992A.993.993 0 0 1 2 20.007V3.993A1 1 0 0 1 2.992 3h18.016zM8 7a2 2 0 1 1 0 4a2 2 0 0 1 0-4z"
               fill="currentColor"></path>
           </svg>
         </a>
-      </el-tooltip>
-      <el-tooltip effect="dark" content="绘制轮廓" placement="bottom" v-if="BoundaryMaxCount>0">
-        <a @click.stop="onPolygonBtnClick"
-           :class="{active:active==='polygon'}">
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="initOverlays">重置图层</el-dropdown-item>
+          <el-dropdown-item command="clear">清除图层</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+      <el-dropdown
+        @command="command=>{this[command](['polygon'])}"
+        v-if="BoundaryMaxCount>0"
+        :class="{active:active==='polygon'}"
+      >
+        <a @click.stop="onPolygonBtnClick">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path d="M17 15.7V13h2v4l-9 4l-7-7l4-9h4v2H8.3l-2.9 6.6l5 5l6.6-2.9M22 5v2h-3v3h-2V7h-3V5h3V2h2v3h3z"
                   fill="currentColor"></path>
           </svg>
         </a>
-      </el-tooltip>
-      <!--<el-tooltip effect="dark" content="重置" placement="bottom">
-        <a @click.stop="()=>{clear();locate()}">
-          <SvgIcon :data="require(`@icon/reset.svg`)"/>
-        </a>
-      </el-tooltip>-->
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="initOverlays">重置区域</el-dropdown-item>
+          <el-dropdown-item command="clear">清除区域</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
       <el-tooltip effect="dark" content="退出" placement="bottom">
         <a @click.stop="$emit('update:show', false)">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
@@ -117,7 +132,12 @@
       </el-tooltip>
     </Toolbar>
 
-    <div class="absolute left-3px bottom-40px" style="position:absolute;left:3px;bottom:40px;" id="zoom">
+    <div
+      v-show="!Loading"
+      class="absolute left-3px bottom-40px"
+      style="position:absolute;left:3px;bottom:40px;"
+      id="zoom"
+    >
       <span class="text-45px" style="color:#3297FD;font-size:35px;">{{ Zoom }}</span>
       <span class="text-10px" style="font-size:10px;"> 缩放级别</span>
     </div>
@@ -129,7 +149,7 @@ import { isEmpty, notEmpty, typeOf } from 'kayran'
 import 'kikimore/dist/style.css'
 import { Swal, Selector } from 'kikimore'
 const { error, warning, confirm, } = Swal
-import { throttle as throttling, cloneDeep } from 'lodash-es'
+import { throttle as throttling, cloneDeep, merge } from 'lodash-es'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
 import autoComplete from '@tarekraafat/autocomplete.js/dist/js/autoComplete'
@@ -191,13 +211,13 @@ export default {
       ...this.getInitData(),
       cities,
       active: null,
-      searching: false,
-      keyword: '',
-      searchResult: [],
-      loading: true,
+      initializing: true,
+      loading: false,
       //meny: null,
       //customClass: 'animate__animated animate__zoomIn',
-      autoCompleting: false,
+      keyword: '',
+      searching: false,
+      searchResult: [],
       autoCompleteList: [],
       autoCompleteInput: null,
       plugins: {
@@ -250,6 +270,9 @@ export default {
         city: true,
         district: true
       })
+    },
+    Loading () {
+      return this.loading || this.initializing
     },
   },
   watch: {
@@ -368,13 +391,13 @@ export default {
                 })
               }
 
-              this.loading = false
+              this.initializing = false
             })
           })
 
           this.active = 'marker'
 
-          this.text = new AMap.Text({
+          /*this.text = new AMap.Text({
             anchor: 'center', // 设置文本标记锚点
             offset: new AMap.Pixel(0, -20),
             style: {
@@ -387,7 +410,7 @@ export default {
             //zIndex: 9999 // MarkerList始终比它高10
           })
           this.text.setMap(this.map)
-          this.map.on('mousemove', this.setTextPosition)
+          this.map.on('mousemove', this.setTextPosition)*/
 
           this.map.on('click', this.onMapClick)
 
@@ -462,19 +485,19 @@ export default {
       ({
         'marker': () => {
           this.mouseTool?.close()
-          this.text.setText('单击绘制点位')
-          this.text.on('click', this.onMapClick)
+          //this.text.setText('单击绘制点位')
+          //this.text.on('click', this.onMapClick)
           this.map.on('click', this.onMapClick)
         },
         'rectangle': () => {
-          this.text.setText('按住左键并拖动绘制图层')
-          this.text.off('click', this.onMapClick)
+          //this.text.setText('按住左键并拖动绘制图层')
+          //this.text.off('click', this.onMapClick)
           this.map.off('click', this.onMapClick)
           this.mouseTool.rectangle(this.rectangleStyle)
         },
         'polygon': () => {
-          this.text.setText('单击确定区域起点，双击结束绘制')
-          this.text.off('click', this.onMapClick)
+          //this.text.setText('单击确定区域起点，双击结束绘制')
+          //this.text.off('click', this.onMapClick)
           this.map.off('click', this.onMapClick)
           this.drawPolygon()
         },
@@ -493,7 +516,40 @@ export default {
           this.baseCityInitialized = true
         }
       }
-    }
+    },
+    /*lng () {
+      this.locate()
+    },
+    lat () {
+      this.locate()
+    },
+    address () {
+      this.locate()
+    },
+    marker: {
+      handler () {
+        this.locate()
+      },
+      deep: true
+    },
+    imgNorthEastLng () {
+      this.locate()
+    },
+    imgNorthEastLat () {
+      this.locate()
+    },
+    imgSouthWestLng () {
+      this.locate()
+    },
+    imgSouthWestLat () {
+      this.locate()
+    },
+    boundary: {
+      handler () {
+        this.locate()
+      },
+      deep: true
+    },*/
   },
   methods: {
     /*convertLngLat () {
@@ -518,11 +574,11 @@ export default {
       }
       this[fnName](param)
     },
-    setTextPosition (e) {
+    /*setTextPosition (e) {
       this.throttle('setTextPosition', e => {
         this.text.setPosition([e.lnglat.lng, e.lnglat.lat])
       }, e, 30)
-    },
+    },*/
     initPlugins () {
       /**
        * 不写在watch原因：需要同步执行
@@ -544,22 +600,50 @@ export default {
         })
       }
     },
-    getInitData () {
-      return cloneDeep({
+    getInitData (arr) {
+      let result = {
+        overlay: {}
+      }
+      const base = {
         map: null,
-        overlay: {
-          imageLayer: null,
-          rectangle: null,
-          rectangleEditor: null,
-          marker: [],
-          polygon: [],
-          polygonEditor: [],
-        },
-        curBoundary: [],
         Zoom: null,
         baseCity: '',
         baseCityInitialized: false,
-      })
+      }
+      const overlay = {
+        marker: {
+          marker: [],
+        },
+        imageLayer: {
+          imageLayer: null,
+          rectangle: null,
+          rectangleEditor: null,
+          imgNorthEastLng: '',
+          imgNorthEastLat: '',
+          imgSouthWestLng: '',
+          imgSouthWestLat: '',
+        },
+        polygon: {
+          polygon: [],
+          polygonEditor: [],
+          boundary: [],
+        }
+      }
+      if (!arr) {
+        result = {
+          ...base,
+        }
+      }
+      for (let k in overlay) {
+        if (!arr || arr.includes(k)) {
+          result.overlay = {
+            ...result.overlay,
+            ...overlay[k]
+          }
+        }
+      }
+
+      return cloneDeep(result)
     },
     clear (arr) {
       if (Array.isArray(arr)) {
@@ -573,34 +657,32 @@ export default {
           this.plugins.MarkerList?.clearData()
         }
 
-        if (arr.includes('img')) {
+        if (arr.includes('imageLayer')) {
           if (this.overlay.imageLayer) {
             this.overlay.imageLayer.setMap(null)
+            this.overlay.rectangle.setMap(null)
             this.overlay.rectangleEditor.close()
           }
         }
 
         if (arr.includes('polygon')) {
-          if (this.overlay.polygonEditor.length > 0) {
-            this.overlay.polygonEditor.map(v => {
-              if (v) {
-                v.close()
-              }
-            })
-          }
+          this.overlay.polygon.map(v => {
+            v?.setMap(null)
+          })
+          this.overlay.polygonEditor.map(v => {
+            v?.close()
+          })
         }
       } else {
         this.map.clearMap() // 某些情况下未知报错
       }
 
-      Object.assign(this.$data, this.getInitData())
-      if (notEmpty(this.imgNorthEastLng) && notEmpty(this.imgSouthWestLng)) {
-        this.curImg.imgNorthEastLng = Math.max(this.imgNorthEastLng, this.imgSouthWestLng)
-        this.curImg.imgSouthWestLng = Math.min(this.imgNorthEastLng, this.imgSouthWestLng)
-      }
-      this.curImg.imgNorthEastLat = this.imgNorthEastLat
-      this.curImg.imgSouthWestLat = this.imgSouthWestLat
-
+      Object.assign(this.$data, {
+        overlay: {
+          ...this.overlay,
+          ...this.getInitData(arr).overlay
+        }
+      })
     },
     getAddress ([lng, lat]) {
       return new Promise((resolve, reject) => {
@@ -694,14 +776,14 @@ export default {
       this.$emit('update:zoom', this.Zoom)
       if (this.Img) {
         //this.address || ((isEmpty(this.lng) || isEmpty(this.lat)) ? this.baseCity : '')
-        this.$emit('update:imgNorthEastLng', this.roundOff(this.curImg.imgNorthEastLng))
-        this.$emit('update:imgNorthEastLat', this.roundOff(this.curImg.imgNorthEastLat))
-        this.$emit('update:imgSouthWestLng', this.roundOff(this.curImg.imgSouthWestLng))
-        this.$emit('update:imgSouthWestLat', this.roundOff(this.curImg.imgSouthWestLat))
+        this.$emit('update:imgNorthEastLng', this.roundOff(this.overlay.imgNorthEastLng))
+        this.$emit('update:imgNorthEastLat', this.roundOff(this.overlay.imgNorthEastLat))
+        this.$emit('update:imgSouthWestLng', this.roundOff(this.overlay.imgSouthWestLng))
+        this.$emit('update:imgSouthWestLat', this.roundOff(this.overlay.imgSouthWestLat))
       }
       if (this.BoundaryMaxCount > 0) {
         this.syncPolygon()
-        this.$emit('update:boundary', this.curBoundary)
+        this.$emit('update:boundary', this.overlay.boundary)
       }
       this.$emit('update:show', false)
     },
@@ -793,6 +875,7 @@ export default {
         },
         // 数据ID，如果不提供，默认使用数组索引，即index
         getDataId: function (item, index) {
+          console.log(item.id)
           return item.id
         },
         getInfoWindow: function (data, context, recycledInfoWindow) {
@@ -905,11 +988,11 @@ export default {
         }
       })
 
-      const that = this
+      //const that = this
       this.plugins.MarkerList.on('listElementMouseenter', function (event, record) {
         if (record && record.marker) {
 
-          that.text.setText('右键删除')
+          //that.text.setText('右键删除')
 
           //this.openInfoWindowOnRecord(record);
           //非选中的id
@@ -927,7 +1010,7 @@ export default {
           //this.openInfoWindowOnRecord(record);
           //非选中的id
 
-          that.text.setText('右键删除')
+          //that.text.setText('右键删除')
 
           if (!this.isSelectedDataId(record.id)) {
             //设置为hover样式
@@ -939,7 +1022,7 @@ export default {
 
       this.plugins.MarkerList.on('listElementMouseleave markerMouseout', function (event, record) {
 
-        that.text.setText('单击绘制点位')
+        //that.text.setText('单击绘制点位')
 
         if (record && record.marker) {
           if (!this.isSelectedDataId(record.id)) {
@@ -1011,49 +1094,43 @@ export default {
         })
       }
     },
-    async locate (selectedLocation) {
-      // 选中搜索项
-      if (selectedLocation) {
-        this.drawDistrict(selectedLocation.name)
-        //this.meny.close()
-        this.drawMarker({
-          ...selectedLocation,
-          longitude: selectedLocation.location.lng,
-          latitude: selectedLocation.location.lat,
-        })
-        this.setCenter([selectedLocation.location.lng, selectedLocation.location.lat])
-      }
-      // 初始化
-      else {
-        this.baseCity = await this.getBaseCity()
-        this.initPlugins()
-        let centerDesignated = false, hasOverlay = false
+    async initOverlays (arr) {
+      let centerDesignated = false, hasOverlay = false
 
-        /**
-         * 绘制覆盖物
-         */
-        // 传了图片 绘制图层
+      if (!arr || arr.includes('imageLayer')) {
         if (this.Img &&
-          notEmpty(this.curImg.imgSouthWestLng) &&
-          notEmpty(this.curImg.imgSouthWestLat) &&
-          notEmpty(this.curImg.imgNorthEastLng) &&
-          notEmpty(this.curImg.imgNorthEastLat)
+          notEmpty(this.imgSouthWestLng) &&
+          notEmpty(this.imgSouthWestLat) &&
+          notEmpty(this.imgNorthEastLng) &&
+          notEmpty(this.imgNorthEastLat)
         ) {
+          this.overlay.imgNorthEastLng =
+            (isEmpty(this.imgNorthEastLng) || isEmpty(this.imgSouthWestLng)) ?
+              '' :
+              Math.max(this.imgNorthEastLng, this.imgSouthWestLng) //1.x版本不兼容输入西北角
+          this.overlay.imgNorthEastLat = this.imgNorthEastLat
+          this.overlay.imgSouthWestLng =
+            (isEmpty(this.imgNorthEastLng) || isEmpty(this.imgSouthWestLng)) ?
+              '' :
+              Math.min(this.imgNorthEastLng, this.imgSouthWestLng) //1.x版本不兼容输入东南角
+          this.overlay.imgSouthWestLat = this.imgSouthWestLat
+
           this.drawImg(new AMap.Bounds(
-            new AMap.LngLat(this.curImg.imgSouthWestLng, this.curImg.imgSouthWestLat),
-            new AMap.LngLat(this.curImg.imgNorthEastLng, this.curImg.imgNorthEastLat),
+            new AMap.LngLat(this.overlay.imgSouthWestLng, this.overlay.imgSouthWestLat),
+            new AMap.LngLat(this.overlay.imgNorthEastLng, this.overlay.imgNorthEastLat),
           ))
           hasOverlay = true
         }
-        // 传了多边形 绘制多边形
+      }
+
+      if (!arr || arr.includes('polygon')) {
         if (this.boundary?.length > 0) {
           this.drawPolygon(this.boundary)
           hasOverlay = true
         }
+      }
 
-        /**
-         * 中心点定位
-         */
+      if (!arr || arr.includes('marker')) {
         // 传了中心点 将中心点当作一个点位
         if (notEmpty(this.lng) && notEmpty(this.lat)) {
           let address, name
@@ -1084,46 +1161,81 @@ export default {
             this.overlay.marker.push(v)
           })
         }
+        this.drawMarkerList(this.overlay.marker)
         // 如果点位只有一个 将其视为中心点
         if (this.overlay.marker.length === 1) {
           centerDesignated = true
         } else if (this.overlay.marker.length > 1) {
           hasOverlay = true
         }
-        this.drawMarkerList(this.overlay.marker)
-        // 如果没有传覆盖物且没有传zoom 给zoom赋默认值
-        if (centerDesignated && isEmpty(this.Zoom)) {
-          this.Zoom = 12
+      }
+
+      return {
+        centerDesignated,
+        hasOverlay,
+      }
+    },
+    async locate (selectedLocation) {
+      if (this.show) {
+        // 选中搜索项
+        if (selectedLocation) {
+          this.drawDistrict(selectedLocation.name)
+          //this.meny.close()
+          this.drawMarker({
+            ...selectedLocation,
+            longitude: selectedLocation.location.lng,
+            latitude: selectedLocation.location.lat,
+          })
+          this.setCenter([selectedLocation.location.lng, selectedLocation.location.lat])
         }
-        // 传了中心点 定位至该中心点
-        if (notEmpty(this.lng) && notEmpty(this.lat)) {
-          this.setCenter([this.lng, this.lat])
-        }
-        // 点位数量为1 定位至该点位
-        else if (this.overlay.marker.length === 1 && notEmpty(this.overlay.marker[0].longitude) && notEmpty(this.overlay.marker[0].latitude)) {
-          const { longitude, latitude } = this.overlay.marker[0]
-          this.setCenter([longitude, latitude])
-        }
-        // 定位至address
-        else if (this.address) {
-          const result = await this.useAmapApi('Geocoder.getLocation', this.address)
-          const { lng, lat } = result.geocodes[0]?.location
-          if (notEmpty(lng) && notEmpty(lat)) {
-            this.setCenter([lng, lat])
+        // 初始化
+        else {
+          this.baseCity = await this.getBaseCity()
+          this.initPlugins()
+
+          /**
+           * 绘制覆盖物
+           */
+          const result = await this.initOverlays()
+          const centerDesignated = result.centerDesignated, hasOverlay = result.hasOverlay
+
+          /**
+           * 中心点定位
+           */
+          // 如果没有传覆盖物且没有传zoom 给zoom赋默认值
+          if (centerDesignated && isEmpty(this.Zoom)) {
+            this.Zoom = 12
           }
-        }
-        // 存在覆盖物 将视图适配覆盖物
-        else if (hasOverlay) {
-          this.map.setFitView()
-        }
-        // 定位至baseCity
-        else if (this.baseCity) {
-          this.map.setCity(this.baseCity)
+          // 传了中心点 定位至该中心点
+          if (notEmpty(this.lng) && notEmpty(this.lat)) {
+            this.setCenter([this.lng, this.lat])
+          }
+          // 点位数量为1 定位至该点位
+          else if (this.overlay.marker.length === 1 && notEmpty(this.overlay.marker[0].longitude) && notEmpty(this.overlay.marker[0].latitude)) {
+            const { longitude, latitude } = this.overlay.marker[0]
+            this.setCenter([longitude, latitude])
+          }
+          // 定位至address
+          else if (this.address) {
+            const result = await this.useAmapApi('Geocoder.getLocation', this.address)
+            const { lng, lat } = result.geocodes[0]?.location
+            if (notEmpty(lng) && notEmpty(lat)) {
+              this.setCenter([lng, lat])
+            }
+          }
+          // 存在覆盖物 将视图适配覆盖物
+          else if (hasOverlay) {
+            this.map.setFitView()
+          }
+          // 定位至baseCity
+          else if (this.baseCity) {
+            this.map.setCity(this.baseCity)
+          }
         }
       }
     },
     getBaseCity () {
-      // 直辖市：['110100000000', '120100000000', '310100000000', '500100000000']
+      // 直辖市：['110100', '120100', '310100', '500100']
       let result = getFinalProp(this.city, globalProps.city, '')
       // 兼容非6位的行政区编码
       if (!isNaN(result)) {
@@ -1162,7 +1274,7 @@ export default {
         })
         .catch(result => {
           if (result.info === 'TIP_CITIES') {
-            warning('尝试输入更精确的关键字哦')
+            this.$message.info('未找到相关结果，尝试输入更精确的关键字，或切换城市哦')
           }
         })
         .finally(() => {
@@ -1171,11 +1283,7 @@ export default {
       }, null, 500)
     },
     useAmapApi () {
-      const loading = this.$loading({
-        lock: false,
-        background: 'transparent',
-        customClass: 'coord-picker-loading'
-      })
+      this.loading = true
       const apiName = arguments[0]
       const [plugin, fn] = apiName.split('.')
       let args = Array.from(arguments)
@@ -1188,7 +1296,7 @@ export default {
           } else {
             reject(result, status)
           }
-          loading.close()
+          this.loading = false
         })
       })
     }
@@ -1271,7 +1379,7 @@ export default {
   .drawer {
     box-sizing: border-box;
     //box-shadow: 50px 0 100px rgba(0, 0, 0, 0.5);
-    width: 275px;
+    width: 272px;
     height: 100%;
     overflow-y: auto;
     padding: 78px 16px 0 16px;
@@ -1282,12 +1390,20 @@ export default {
     background-color: #f7f7f7ab;
 
     & > .item {
-      padding: 0.5rem;
+      padding: 10px;
       cursor: pointer;
 
+      & > :first-child {
+        font-weight: bold;
+      }
+
+      & > :nth-child(2) {
+        margin-top: 5px;
+      }
+
       &:hover {
-        background-color: rgba(173, 216, 230, 0.4);
-        border-radius: 25px;
+        background-color: rgba(173, 216, 230, 0.3);
+        border-radius: 8px;
       }
     }
 
@@ -1326,11 +1442,13 @@ export default {
 </style>
 
 <style lang="scss">
-.el-loading-mask.coord-picker-loading {
-  left: 50%;
-  top: 50%;
-  bottom: unset;
-  right: unset;
-  transform: translate(-50%, -50%);
+.coord-picker {
+  &.el-loading-mask {
+    left: 50%;
+    top: 50%;
+    bottom: unset;
+    right: unset;
+    transform: translate(-50%, -50%);
+  }
 }
 </style>

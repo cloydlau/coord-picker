@@ -16,29 +16,13 @@ export default {
       },
     }
   },
-  computed: {
-    curImg () {
-      return Vue.observable({
-        imgNorthEastLng:
-          (isEmpty(this.imgNorthEastLng) || isEmpty(this.imgSouthWestLng)) ?
-            '' :
-            Math.max(this.imgNorthEastLng, this.imgSouthWestLng), //1.x版本不兼容输入西北角
-        imgNorthEastLat: this.imgNorthEastLat,
-        imgSouthWestLng:
-          (isEmpty(this.imgNorthEastLng) || isEmpty(this.imgSouthWestLng)) ?
-            '' :
-            Math.min(this.imgNorthEastLng, this.imgSouthWestLng), //1.x版本不兼容输入东南角
-        imgSouthWestLat: this.imgSouthWestLat,
-      })
-    }
-  },
   methods: {
     syncImgBounds (bounds) {
       //兼容1.x
-      this.curImg.imgNorthEastLng = bounds.northEast ? bounds.northEast.lng : bounds.northeast.lng
-      this.curImg.imgNorthEastLat = bounds.northEast ? bounds.northEast.lat : bounds.northeast.lat
-      this.curImg.imgSouthWestLng = bounds.southWest ? bounds.southWest.lng : bounds.southwest.lng
-      this.curImg.imgSouthWestLat = bounds.southWest ? bounds.southWest.lat : bounds.southwest.lat
+      this.overlay.imgNorthEastLng = bounds.northEast ? bounds.northEast.lng : bounds.northeast.lng
+      this.overlay.imgNorthEastLat = bounds.northEast ? bounds.northEast.lat : bounds.northeast.lat
+      this.overlay.imgSouthWestLng = bounds.southWest ? bounds.southWest.lng : bounds.southwest.lng
+      this.overlay.imgSouthWestLat = bounds.southWest ? bounds.southWest.lat : bounds.southwest.lat
       this.overlay.imageLayer.setBounds(bounds)
     },
     drawImg (bounds) {
@@ -61,13 +45,13 @@ export default {
 
       this.overlay.rectangle.on('click', this.onMapClick)
 
-      this.overlay.rectangle.on('mousemove', e => {
+      /*this.overlay.rectangle.on('mousemove', e => {
         this.text.setText('拖拽角调整大小')
         this.setTextPosition(e)
       })
       this.overlay.rectangle.on('mouseout', e => {
         this.text.setText('单击绘制点位')
-      })
+      })*/
 
       this.overlay.rectangleEditor = new AMap.RectangleEditor(this.map, this.overlay.rectangle)
 
@@ -79,9 +63,9 @@ export default {
         this.syncImgBounds(e.bounds || e.Rd)
       })
       //短距离平移触发
-      this.text.on('mouseup', e => {
+      /*this.text.on('mouseup', e => {
         this.syncImgBounds(this.overlay.rectangle.getBounds())
-      })
+      })*/
       //短距离平移触发
       this.overlay.rectangle.on('mouseup', e => {
         this.syncImgBounds(this.overlay.rectangle.getBounds())
