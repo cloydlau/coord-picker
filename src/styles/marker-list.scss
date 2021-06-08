@@ -15,12 +15,6 @@
   }
 }
 
-ul, li {
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-
 #panel {
   position: absolute;
   top: 75px;
@@ -32,90 +26,73 @@ ul, li {
 
   & > #myList {
     padding-bottom: 200px;
+
+    li.poibox {
+      list-style: none;
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+      backdrop-filter: blur(2px);
+      background-color: rgba(247, 247, 247, 0.95);
+      border: 2px solid #e9f1f6;
+      padding: 10px;
+      cursor: pointer;
+      position: relative;
+
+      &:not(:first-child) {
+        margin-top: 5px;
+      }
+
+      .el-icon-circle-close {
+        position: absolute;
+        font-size: 20px;
+        right: 5px;
+        top: -10px;
+        cursor: pointer;
+        z-index: 1;
+      }
+    }
+
+    li.poibox.selected {
+      border-left-color: #3297FD;
+      background: white;
+    }
+
+    li.poibox:hover {
+      background: white;
+    }
+
+    .poibox .poi-info-left {
+      .poi-title {
+        @include ellipsis(1);
+      }
+
+      .poi-addr {
+        margin: 5px 0 0;
+      }
+    }
+
+    .poibox .poi-imgbox {
+      width: 100px;
+      height: 74px;
+      vertical-align: top;
+      float: right;
+      margin-left: 8px;
+      overflow: hidden
+    }
+
+    .poibox .poi-img {
+      display: inline-block;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: 50% 50%;
+    }
+
+    h3.poi-title {
+      margin: 0;
+      font-size: 13px;
+    }
   }
-}
-
-#btnList {
-  position: absolute;
-  right: 300px;
-  top: 0;
-  padding: 0;
-  margin: 0;
-  z-index: 999;
-}
-
-#btnList li {
-  padding: 5px;
-}
-
-#btnList input {
-  padding: 3px 10px;
-  min-width: 120px;
-}
-
-li.poibox {
-  border-top-left-radius: 8px;
-  border-bottom-left-radius: 8px;
-  backdrop-filter: blur(2px);
-  background-color: rgba(247, 247, 247, 0.95);
-  border: 2px solid #e9f1f6;
-  padding: 10px;
-  cursor: pointer;
-  position: relative;
-
-  &:not(:first-child) {
-    margin-top: 5px;
-  }
-
-  .el-icon-circle-close {
-    position: absolute;
-    font-size: 20px;
-    right: 5px;
-    top: -10px;
-    cursor: pointer;
-    z-index: 1;
-  }
-}
-
-li.poibox.selected {
-  border-left-color: #3297FD;
-  background: white;
-}
-
-li.poibox:hover {
-  background: white;
-}
-
-h3.poi-title {
-  margin: 0;
-  font-size: 13px;
-}
-
-.poibox .poi-info-left {
-  .poi-title {
-    @include ellipsis(1);
-  }
-
-  .poi-addr {
-    margin: 5px 0 0;
-  }
-}
-
-.poibox .poi-imgbox {
-  width: 100px;
-  height: 74px;
-  vertical-align: top;
-  float: right;
-  margin-left: 8px;
-  overflow: hidden
-}
-
-.poibox .poi-img {
-  display: inline-block;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: 50% 50%;
 }
 
 .amap-simple-marker.my-marker .amap-simple-marker-label {
@@ -155,27 +132,10 @@ h3.poi-title {
 }
 
 .flash {
-  -webkit-animation-name: flash;
   animation-name: flash;
 }
 
 .animated {
-  -webkit-animation-duration: 1s;
   animation-duration: 1s;
-  -webkit-animation-fill-mode: both;
   animation-fill-mode: both;
-}
-
-.scrollbar1::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-  background-color: #fff;
-}
-
-.scrollbar1::-webkit-scrollbar {
-  width: 6px;
-  background-color: #fff;
-}
-
-.scrollbar1::-webkit-scrollbar-thumb {
-  background-color: #aaa;
 }

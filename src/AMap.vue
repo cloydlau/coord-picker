@@ -63,6 +63,18 @@
     </div>
 
     <Toolbar v-show="!Loading">
+      <el-tooltip effect="dark" content="使用帮助" placement="bottom">
+        <a @click.stop="help">
+          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"
+               role="img" width="32" height="32" preserveAspectRatio="xMidYMid meet"
+               viewBox="0 0 24 24">
+            <path
+              d="M11 18h2v-2h-2v2m1-16A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m0-14a4 4 0 0 0-4 4h2a2 2 0 0 1 2-2a2 2 0 0 1 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5a4 4 0 0 0-4-4z"
+              fill="currentColor"
+            />
+          </svg>
+        </a>
+      </el-tooltip>
       <el-dropdown
         @command="command=>{this[command](['marker'])}"
         :class="{active:active==='marker'}"
@@ -71,7 +83,8 @@
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
               d="M15 17h3v-3h2v3h3v2h-3v3h-2v-3h-3v-2M9 6.5c1.4 0 2.5 1.1 2.5 2.5s-1.1 2.5-2.5 2.5S6.5 10.4 6.5 9S7.6 6.5 9 6.5M9 2c3.9 0 7 3.1 7 7c0 5.2-7 13-7 13S2 14.2 2 9c0-3.9 3.1-7 7-7m0 2C6.2 4 4 6.2 4 9c0 1 0 3 5 9.7C14 12 14 10 14 9c0-2.8-2.2-5-5-5z"
-              fill="currentColor"></path>
+              fill="currentColor"
+            />
           </svg>
         </a>
         <el-dropdown-menu slot="dropdown">
@@ -88,7 +101,8 @@
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
               d="M21 15v3h3v2h-3v3h-2v-3h-3v-2h3v-3h2zm.008-12c.548 0 .992.445.992.993V13h-2V5H4v13.999L14 9l3 3v2.829l-3-3L6.827 19H14v2H2.992A.993.993 0 0 1 2 20.007V3.993A1 1 0 0 1 2.992 3h18.016zM8 7a2 2 0 1 1 0 4a2 2 0 0 1 0-4z"
-              fill="currentColor"></path>
+              fill="currentColor"
+            />
           </svg>
         </a>
         <el-dropdown-menu slot="dropdown">
@@ -104,7 +118,8 @@
         <a @click.stop="onPolygonBtnClick">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path d="M17 15.7V13h2v4l-9 4l-7-7l4-9h4v2H8.3l-2.9 6.6l5 5l6.6-2.9M22 5v2h-3v3h-2V7h-3V5h3V2h2v3h3z"
-                  fill="currentColor"></path>
+                  fill="currentColor"
+            />
           </svg>
         </a>
         <el-dropdown-menu slot="dropdown">
@@ -117,7 +132,8 @@
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
               d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10zm0-2a8 8 0 1 0 0-16a8 8 0 0 0 0 16zm0-9.414l2.828-2.829l1.415 1.415L13.414 12l2.829 2.828l-1.415 1.415L12 13.414l-2.828 2.829l-1.415-1.415L10.586 12L7.757 9.172l1.415-1.415L12 10.586z"
-              fill="currentColor"></path>
+              fill="currentColor"
+            />
           </svg>
         </a>
       </el-tooltip>
@@ -126,7 +142,8 @@
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
               d="M7 19v-6h10v6h2V7.828L16.172 5H5v14h2zM4 3h13l4 4v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm5 12v4h6v-4H9z"
-              fill="currentColor"></path>
+              fill="currentColor"
+            />
           </svg>
         </a>
       </el-tooltip>
@@ -559,6 +576,41 @@ export default {
         }
       })
     },*/
+    help () {
+      Swal.confirm({
+        titleText: '使用帮助',
+        html: `
+<ul style="text-align:left">
+  <li>点位</li>
+    <ul style="margin-bottom:1rem">
+      <li>添加：选中点位工具 → 点击地图；搜索位置 → 点击搜索结果</li>
+      <li>删除：右键点位 → 点击[删除]；点位列表 → 点击右上角[×]</li>
+      <li>重置：点位工具下拉菜单 → 重置点位</li>
+      <li>清除：点位工具下拉菜单 → 清除点位</li>
+    </ul>
+  ${this.Img ? `
+  <li>图层</li>
+    <ul style="margin-bottom:1rem">
+      <li>添加：选中图层工具 → 长按左键并拖动，松开完成绘制</li>
+      <li>重置：图层工具下拉菜单 → 重置图层</li>
+      <li>清除：图层工具下拉菜单 → 清除图层</li>
+    </ul>` : ''}
+  ${this.BoundaryMaxCount > 0 ? `
+  <li>轮廓</li>
+    <ul style="margin-bottom:1rem">
+      <li>添加：选中轮廓工具 → 单击地图确定起点，双击结束绘制</li>
+      <li>删除：右键轮廓 → 点击[删除]</li>
+      <li>重置：轮廓工具下拉菜单 → 重置轮廓</li>
+      <li>清除：轮廓工具下拉菜单 → 清除轮廓</li>
+    </ul>` : ''}
+</ul>
+                    `,
+        width: 700,
+        confirmButtonText: `ok`,
+        cancelButtonText: `不再提示`,
+        showCancelButton: false,
+      })
+    },
     setCenter (args) {
       if (isEmpty(this.Zoom)) {
         this.map.setCenter(args)
@@ -875,7 +927,6 @@ export default {
         },
         // 数据ID，如果不提供，默认使用数组索引，即index
         getDataId: function (item, index) {
-          console.log(item.id)
           return item.id
         },
         getInfoWindow: function (data, context, recycledInfoWindow) {
@@ -970,7 +1021,6 @@ export default {
       this.plugins.MarkerList.on('selectedChanged', function (event, info) {
         //checkBtnStats()
         if (info.selected) {
-          console.log(info)
           if (info.selected.marker) {
             //更新为选中样式
             info.selected.marker.setIconStyle(selectedIconStyle)
@@ -1131,8 +1181,18 @@ export default {
       }
 
       if (!arr || arr.includes('marker')) {
-        // 传了中心点 将中心点当作一个点位
-        if (notEmpty(this.lng) && notEmpty(this.lat)) {
+        // 传了点位 绘制点位
+        if (this.marker?.length > 0) {
+          cloneDeep(this.marker).map(v => {
+            v.longitude = v.lng
+            v.latitude = v.lat
+            delete v.lng
+            delete v.lat
+            this.overlay.marker.push(v)
+          })
+        }
+        // 只传了中心点 将中心点当作一个点位
+        else if (notEmpty(this.lng) && notEmpty(this.lat)) {
           let address, name
           if (this.address) {
             address = this.address
@@ -1150,16 +1210,6 @@ export default {
           }]
 
           centerDesignated = true
-        }
-        // 传了点位 绘制点位
-        if (this.marker?.length > 0) {
-          cloneDeep(this.marker).map(v => {
-            v.longitude = v.lng
-            v.latitude = v.lat
-            delete v.lng
-            delete v.lat
-            this.overlay.marker.push(v)
-          })
         }
         this.drawMarkerList(this.overlay.marker)
         // 如果点位只有一个 将其视为中心点

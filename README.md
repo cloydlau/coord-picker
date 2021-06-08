@@ -268,3 +268,9 @@ adcode信息可参考[城市编码表](https://lbs.amap.com/api/webservice/downl
 `1.4.15`（2.0存在诸多问题，性能也不如1.x，等待后续更新）
 
 <br>
+
+## Notice
+
+在打开coord-picker之前，请确保所有参数已传入，为避免与用户的操作发生冲突，组件内部不会监听参数后续的变化
+
+<br>

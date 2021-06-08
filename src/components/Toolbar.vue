@@ -37,7 +37,7 @@ $btnSize: 30px;
       display: flex;
       justify-content: center;
       align-items: center;
-      margin: 0 10px;
+      margin: 0 5px;
       box-sizing: border-box;
 
       ::v-deep a {
