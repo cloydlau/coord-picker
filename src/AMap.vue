@@ -30,7 +30,6 @@
             groupOptions: 'cities',
           }"
           :options="cities"
-          :remote="false"
         />
       </div>
       <transition enter-active-class="animate__animated animate__backInLeft"
