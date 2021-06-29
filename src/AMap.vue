@@ -87,7 +87,7 @@
           </svg>
         </a>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="initOverlays">重置点位</el-dropdown-item>
+          <el-dropdown-item command="reset">重置点位</el-dropdown-item>
           <el-dropdown-item command="clear">清除点位</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -105,7 +105,7 @@
           </svg>
         </a>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="initOverlays">重置图层</el-dropdown-item>
+          <el-dropdown-item command="reset">重置图层</el-dropdown-item>
           <el-dropdown-item command="clear">清除图层</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -122,7 +122,7 @@
           </svg>
         </a>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="initOverlays">重置区域</el-dropdown-item>
+          <el-dropdown-item command="reset">重置区域</el-dropdown-item>
           <el-dropdown-item command="clear">清除区域</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -695,6 +695,10 @@ export default {
       }
 
       return cloneDeep(result)
+    },
+    reset (arr) {
+      this.clear(arr)
+      this.initOverlays(arr)
     },
     clear (arr) {
       if (Array.isArray(arr)) {
