@@ -316,7 +316,7 @@ export default {
               'AMap.MouseTool',
               'AMap.RectangleEditor',
             ] : [],
-            ...this.boundary ? [
+            ...this.BoundaryMaxCount > 0 ? [
               'AMap.MouseTool',
               'AMap.Polygon',
               'AMap.ContextMenu',
@@ -700,9 +700,34 @@ export default {
       this.clear(arr)
       this.initOverlays(arr)
     },
+    isClearable (overlays = ['marker', 'imageLayer', 'polygon']) {
+      for (let v of overlays) {
+        switch (v) {
+          case 'marker': {
+            if (this.MarkerMinCount > 0 && this.overlay.marker.length > 0) {
+              warning(`至少绘制${this.MarkerMinCount}个点位`)
+              return false
+            }
+            break
+          }
+          case 'imageLayer': {
+            break
+          }
+          case 'polygon':
+            if (this.BoundaryMinCount > 0 && this.overlay.polygon.length > 0) {
+              warning(`至少绘制${this.BoundaryMinCount}个区域`)
+              return false
+            }
+        }
+      }
+    },
     clear (arr) {
       if (Array.isArray(arr)) {
         if (arr.includes('marker')) {
+          if (!this.isClearable(['marker'])) {
+            return
+          }
+
           this.overlay.marker.map(v => {
             if (v) {
               this.map.remove(v)
@@ -721,6 +746,10 @@ export default {
         }
 
         if (arr.includes('polygon')) {
+          if (!this.isClearable(['polygon'])) {
+            return
+          }
+
           this.overlay.polygon.map(v => {
             v?.setMap(null)
           })
@@ -729,6 +758,10 @@ export default {
           })
         }
       } else {
+        if (!this.isClearable()) {
+          return
+        }
+
         this.map.clearMap() // 某些情况下未知报错
       }
 
