@@ -504,17 +504,20 @@ export default {
           //this.text.setText('单击绘制点位')
           //this.text.on('click', this.onMapClick)
           this.map.on('click', this.onMapClick)
+          this.overlay.rectangle?.on('click', this.onMapClick)
         },
         'rectangle': () => {
           //this.text.setText('按住左键并拖动绘制图层')
           //this.text.off('click', this.onMapClick)
           this.map.off('click', this.onMapClick)
+          this.overlay.rectangle?.off('click', this.onMapClick)
           this.mouseTool.rectangle(this.rectangleStyle)
         },
         'polygon': () => {
           //this.text.setText('单击确定区域起点，双击结束绘制')
           //this.text.off('click', this.onMapClick)
           this.map.off('click', this.onMapClick)
+          this.overlay.rectangle?.off('click', this.onMapClick)
           this.drawPolygon()
         },
       })[newVal]()
