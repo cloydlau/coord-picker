@@ -2,7 +2,7 @@ lockfileVersion: 5.3
 
 specifiers:
   '@amap/amap-jsapi-loader': ^1.0.1
-  '@iconify/json': ^1.1.365
+  '@iconify/json': ^1.1.366
   '@tarekraafat/autocomplete.js': ^9.1.1
   element-ui: ^2.15.3
   json-editor-vue: ^0.1.6
@@ -10,7 +10,7 @@ specifiers:
   kikimore: ^0.1.13
   lodash-es: ^4.17.21
   sass: ^1.35.1
-  typescript: ^4.3.4
+  typescript: ^4.3.5
   vite: 2.2.4
   vite-plugin-icons: ^0.6.3
   vite-plugin-vue2: ^1.7.2
@@ -26,13 +26,13 @@ dependencies:
   lodash-es: 4.17.21
 
 devDependencies:
-  '@iconify/json': 1.1.365
+  '@iconify/json': 1.1.366
   element-ui: 2.15.3_vue@2.6.14
   json-editor-vue: 0.1.6_vue@2.6.14
   sass: 1.35.1
-  typescript: 4.3.4
+  typescript: 4.3.5
   vite: 2.2.4
-  vite-plugin-icons: 0.6.3_ad146a9742552221f05ab98aed1a147c
+  vite-plugin-icons: 0.6.3_8d11d67ed426267dc82fe6df91665706
   vite-plugin-vue2: 1.7.2_7150b1431e6e944072ca5afcd2a598a9
   vite-plugin-windicss: 1.1.1_vite@2.2.4
   vue: 2.6.14
@@ -352,8 +352,8 @@ packages:
     resolution: {integrity: sha512-LFelJDOLZ6JHlmlAkgrvmcu4hpNPB91KYcr4f60D/exzU1eNOb4/KCVHIydGHIQFaOacIOD+Xy+B7P1z812cZg==}
     dev: true
 
-  /@iconify/json/1.1.365:
-    resolution: {integrity: sha512-7JujYB9QoFpMg/Lq6cHuO8w52yOg+fJ5k4mDjyaNko3S0JC/ZrNJzaGAONwMvxBX7FDMl4MGNdkW2m1Pnj8YZg==}
+  /@iconify/json/1.1.366:
+    resolution: {integrity: sha512-aP8e7Fbt51oXiU0nrzcSiwWrj4Kvl6w39u6J6kCkwcPuAIGI0A8qtrrRP18uNBdOvcKQ1oxcrtrbDoQN9HCvbw==}
     dev: true
 
   /@nodelib/fs.scandir/2.1.5:
@@ -1013,7 +1013,7 @@ packages:
     hasBin: true
     dependencies:
       caniuse-lite: 1.0.30001241
-      electron-to-chromium: 1.3.762
+      electron-to-chromium: 1.3.763
     dev: true
 
   /browserslist/4.16.6:
@@ -1023,7 +1023,7 @@ packages:
     dependencies:
       caniuse-lite: 1.0.30001241
       colorette: 1.2.2
-      electron-to-chromium: 1.3.762
+      electron-to-chromium: 1.3.763
       escalade: 3.1.1
       node-releases: 1.1.73
     dev: true
@@ -1176,6 +1176,7 @@ packages:
 
   /core-js/2.6.12:
     resolution: {integrity: sha512-Kb2wC0fvsWfQrgk8HU5lW6U/Lcs8+9aaYcy4ZFc6DDlo4nZ7n70dEgE5rtR0oG6ufKDUnrwfWL1mXR5ljDatrQ==}
+    deprecated: core-js@<3.3 is no longer maintained and not recommended for usage due to the number of issues. Because of the V8 engine whims, feature detection in old core-js versions could cause a slowdown up to 100x even if nothing is polyfilled. Please, upgrade your dependencies to the actual version of core-js.
     requiresBuild: true
     dev: true
 
@@ -1248,8 +1249,8 @@ packages:
       ssr-window: 3.0.0
     dev: false
 
-  /electron-to-chromium/1.3.762:
-    resolution: {integrity: sha512-LehWjRpfPcK8F1Lf/NZoAwWLWnjJVo0SZeQ9j/tvnBWYcT99qDqgo4raAfS2oTKZjPrR/jxruh85DGgDUmywEA==}
+  /electron-to-chromium/1.3.763:
+    resolution: {integrity: sha512-UyvEPae0wvzsyNJhVfGeFSOlUkHEze8xSIiExO5tZQ8QTr7obFiJWGk3U4e7afFOJMQJDszqU/3Pk5jtKiaSEg==}
     dev: true
 
   /element-ui/2.15.3_vue@2.6.14:
@@ -1524,7 +1525,7 @@ packages:
       jsonrepair: 2.2.1
       kayran: 0.2.2
       lodash-es: 4.17.21
-      svelte-jsoneditor: 0.1.5
+      svelte-jsoneditor: 0.1.6
       vue: 2.6.14
       vue-json-viewer: 2.2.19
     transitivePeerDependencies:
@@ -1806,6 +1807,7 @@ packages:
   /querystring/0.2.1:
     resolution: {integrity: sha512-wkvS7mL/JMugcup3/rMitHmd9ecIGd2lhFhK9N3UUQ450h66d1r3Y9nvXzQAW1Lq+wyx61k/1pfKS5KuKiyEbg==}
     engines: {node: '>=0.4.x'}
+    deprecated: The
     dev: true
 
   /queue-microtask/1.2.3:
@@ -2023,8 +2025,8 @@ packages:
       svelte: 3.38.3
     dev: true
 
-  /svelte-jsoneditor/0.1.5:
-    resolution: {integrity: sha512-p/8TS1bL3Y2IK/cEP7pQUFP9HSlg1HbssUlmuBL+Qax9SmzYwmEPGHKuL/M/Va17K6JQKUVDR9q5EUIVQP1gmg==}
+  /svelte-jsoneditor/0.1.6:
+    resolution: {integrity: sha512-akijEuMPnhrjP1ul+iqIjA9Qa7oM8zl1wjzdPJ/mGlW9Q5+jLij5WaiF1PnrMOjjBpUmSPyrDfSGJ3/zn9saEg==}
     dependencies:
       '@fortawesome/free-regular-svg-icons': 5.15.3
       '@fortawesome/free-solid-svg-icons': 5.15.3
@@ -2039,7 +2041,7 @@ packages:
       lodash-es: 4.17.21
       natural-compare-lite: 1.4.0
       svelte-awesome: 2.3.2
-      svelte-select: 3.17.0
+      svelte-select: 4.2.0
       svelte-simple-modal: 0.10.4
       sveltip: 0.0.1
     transitivePeerDependencies:
@@ -2047,8 +2049,8 @@ packages:
       - svelte
     dev: true
 
-  /svelte-select/3.17.0:
-    resolution: {integrity: sha512-ITmX/XUiSdkaILmsTviKRkZPaXckM5/FA7Y8BhiUPoamaZG/ZDyOo6ydjFu9fDVFTbwoAUGUi6HBjs+ZdK2AwA==}
+  /svelte-select/4.2.0:
+    resolution: {integrity: sha512-YT1ySSunDhV8rzAMJXK91itqtLogBAVQzG6hXwQncp5vplVY2fGWJi0uwRV85HQT1KoqtWMuXmq+Gw449BC0CA==}
     dev: true
 
   /svelte-simple-modal/0.10.4:
@@ -2109,8 +2111,8 @@ packages:
       is-number: 7.0.0
     dev: true
 
-  /typescript/4.3.4:
-    resolution: {integrity: sha512-uauPG7XZn9F/mo+7MrsRjyvbxFpzemRjKEZXS4AK83oP2KKOJPvb+9cO/gmnv8arWZvhnjVOXz7B49m1l0e9Ew==}
+  /typescript/4.3.5:
+    resolution: {integrity: sha512-DqQgihaQ9cUrskJo9kIyW/+g0Vxsk8cDtZ52a3NGh0YNTfpUSArXSohyUGnvbPazEPLu398C0UxmKSOrPumUzA==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
@@ -2134,7 +2136,7 @@ packages:
     resolution: {integrity: sha512-013z8sU9tnAFDfJo4p8z38sqnj1GwRXzlawwbY4oXQMr6lCRMG9TXJ7fyXgVL1jFXyCwkb6xGVJRj6+gfQ2o8A==}
     dev: false
 
-  /vite-plugin-icons/0.6.3_ad146a9742552221f05ab98aed1a147c:
+  /vite-plugin-icons/0.6.3_8d11d67ed426267dc82fe6df91665706:
     resolution: {integrity: sha512-h+DNh9xMBhISNBZ/broslVRk/DbgDXV71u2Ienoz8G0W81+tzbtPHsE6imnwqW93h0qtS1VnVyOQlqsKcheLtw==}
     peerDependencies:
       '@iconify/json': '*'
@@ -2146,7 +2148,7 @@ packages:
       vue-template-compiler:
         optional: true
     dependencies:
-      '@iconify/json': 1.1.365
+      '@iconify/json': 1.1.366
       '@iconify/json-tools': 1.0.10
       vue-template-compiler: 2.6.14
       vue-template-es2015-compiler: 1.9.1

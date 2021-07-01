@@ -720,11 +720,12 @@ export default {
             }
         }
       }
+      return true
     },
     clear (arr) {
       if (Array.isArray(arr)) {
         if (arr.includes('marker')) {
-          if (!this.isClearable(['marker'])) {
+          if (!this.isClearable(arr)) {
             return
           }
 
@@ -746,7 +747,7 @@ export default {
         }
 
         if (arr.includes('polygon')) {
-          if (!this.isClearable(['polygon'])) {
+          if (!this.isClearable(arr)) {
             return
           }
 
@@ -758,9 +759,9 @@ export default {
           })
         }
       } else {
-        if (!this.isClearable()) {
+        /*if (!this.isClearable()) {
           return
-        }
+        }*/
 
         this.map.clearMap() // 某些情况下未知报错
       }
