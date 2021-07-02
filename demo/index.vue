@@ -22,9 +22,6 @@
       <el-form-item label="lat">
         <el-input v-model="props.lat" clearable/>
       </el-form-item>
-      <el-form-item label="zoom">
-        <el-input v-model="props.zoom" clearable/>
-      </el-form-item>
       <el-form-item label="precision">
         <el-input-number v-model="props.precision" clearable :min="0"/>
       </el-form-item>
@@ -68,6 +65,9 @@
       </el-form-item>
       <el-form-item label="imgSouthWestLat">
         <el-input v-model="props.imgSouthWestLat" clearable/>
+      </el-form-item>
+      <el-form-item label="mapOptions">
+        <json-editor-vue v-model="props.mapOptions"/>
       </el-form-item>
       <el-form-item label="boundary">
         <json-editor-vue v-model="props.boundary"/>
@@ -136,9 +136,12 @@ export default {
           }
         ],
         boundaryCount: [1, 3],
-        zoom: 12,
         precision: 6,
         addressComponent: undefined,
+        mapOptions: {
+          zoom: 12,
+          zooms: [12, 15]
+        }
       },
       /*addressComponent ({ province, city, district }) {
         return province + city + district

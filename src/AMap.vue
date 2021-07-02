@@ -154,7 +154,7 @@
       style="position:absolute;left:3px;bottom:40px;"
       id="zoom"
     >
-      <span class="text-45px" style="color:#3297FD;font-size:35px;">{{ Zoom }}</span>
+      <span class="text-45px" style="color:#3297FD;font-size:35px;">{{ MapOptions.zoom }}</span>
       <span class="text-10px" style="font-size:10px;"> 缩放级别</span>
     </div>
   </el-dialog>
@@ -205,9 +205,6 @@ export default {
     },
     markerCount: [Number, Array],
     city: String,
-    zoom: {
-      validator: value => ['string', 'null', 'number'].includes(typeOf(value)),
-    },
     img: {
       validator: value => ['string', 'null'].includes(typeOf(value)),
     },
@@ -221,6 +218,7 @@ export default {
     precision: Number,
     addressComponent: [Object, Function],
     boundaryCount: [Number, Array],
+    mapOptions: Object,
   },
   data () {
     return {
@@ -294,6 +292,10 @@ export default {
   watch: {
     show (newVal, oldVal) {
       if (newVal) {
+        this.MapOptions = getFinalProp(this.mapOptions, globalProps.mapOptions, /*{
+          viewMode: '3D',
+        }*/)
+
         //this.customClass = 'animate__animated animate__zoomIn'
         AMapLoader.load({
           'key': this.ApiKey, // 申请好的Web端开发者Key，首次调用 load 时必填
@@ -301,7 +303,7 @@ export default {
             version: '1.1',
             plugins: ['misc/MarkerList', 'overlay/SimpleMarker', 'overlay/SimpleInfoWindow']
           },
-          ...this.Version ? { version: this.Version, } : {}, // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
+          ...this.Version && { version: this.Version }, // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
           'plugins': [
             'AMap.Scale',
             'AMap.MapType',
@@ -328,10 +330,7 @@ export default {
           ]
         })
         .then(async AMap => {
-          this.map = new AMap.Map('map-container', {
-            //viewMode: '3D',
-            ...notEmpty(this.Zoom) && { zoom: this.Zoom, }
-          })
+          this.map = new AMap.Map('map-container', this.MapOptions)
 
           // 在图面添加比例尺控件，展示地图在当前层级和纬度下的比例尺
           this.map.addControl(new AMap.Scale())
@@ -430,11 +429,11 @@ export default {
 
           this.map.on('click', this.onMapClick)
 
-          if (notEmpty(this.zoom)) {
-            this.Zoom = Number(this.zoom)
+          if (notEmpty(this.MapOptions.zoom)) {
+            this.MapOptions.zoom = Number(this.MapOptions.zoom)
           }
           this.map.on('zoomchange', e => {
-            this.Zoom = this.map.getZoom()
+            this.MapOptions.zoom = this.map.getZoom()
           })
 
           if (this.Img || this.BoundaryMaxCount > 0) {
@@ -614,10 +613,10 @@ export default {
       })
     },
     setCenter (args) {
-      if (isEmpty(this.Zoom)) {
+      if (isEmpty(this.MapOptions.zoom)) {
         this.map.setCenter(args)
       } else {
-        this.map.setZoomAndCenter(this.Zoom, args)
+        this.map.setZoomAndCenter(this.MapOptions.zoom, args)
       }
     },
     throttle (fnName, fn, param, delay) {
@@ -660,9 +659,9 @@ export default {
       }
       const base = {
         map: null,
-        Zoom: null,
         baseCity: '',
         baseCityInitialized: false,
+        MapOptions: {},
       }
       const overlay = {
         marker: {
@@ -761,20 +760,21 @@ export default {
             v?.close()
           })
         }
+
+        Object.assign(this.$data, {
+          overlay: {
+            ...this.overlay,
+            ...this.getInitData(arr).overlay
+          }
+        })
       } else {
         /*if (!this.isClearable()) {
           return
         }*/
 
-        this.map.clearMap() // 某些情况下未知报错
+        this.map.clearMap()
+        Object.assign(this.$data, this.getInitData(arr))
       }
-
-      Object.assign(this.$data, {
-        overlay: {
-          ...this.overlay,
-          ...this.getInitData(arr).overlay
-        }
-      })
     },
     getAddress ([lng, lat]) {
       return new Promise((resolve, reject) => {
@@ -865,7 +865,7 @@ export default {
         delete v.latitude
         return v
       }))
-      this.$emit('update:zoom', this.Zoom)
+      this.$emit('update:mapOptions', this.MapOptions)
       if (this.Img) {
         //this.address || ((isEmpty(this.lng) || isEmpty(this.lat)) ? this.baseCity : '')
         this.$emit('update:imgNorthEastLng', this.roundOff(this.overlay.imgNorthEastLng))
@@ -1293,8 +1293,8 @@ export default {
            * 中心点定位
            */
           // 如果没有传覆盖物且没有传zoom 给zoom赋默认值
-          if (centerDesignated && isEmpty(this.Zoom)) {
-            this.Zoom = 12
+          if (centerDesignated && isEmpty(this.MapOptions.zoom)) {
+            this.MapOptions.zoom = 12
           }
           // 传了中心点 定位至该中心点
           if (notEmpty(this.lng) && notEmpty(this.lat)) {
@@ -1316,10 +1316,12 @@ export default {
           // 存在覆盖物 将视图适配覆盖物
           else if (hasOverlay) {
             this.map.setFitView()
+            this.map.setZoom(this.MapOptions.zoom)
           }
           // 定位至baseCity
           else if (this.baseCity) {
             this.map.setCity(this.baseCity)
+            this.map.setZoom(this.MapOptions.zoom)
           }
         }
       }

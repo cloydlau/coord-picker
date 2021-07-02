@@ -65,7 +65,7 @@ export default {
 | show.sync | 开关 | boolean | | false |
 | apiKey | 高德地图 js api key | string | | |
 | city* | 初始行政区 | string | | |
-| zoom.sync | 缩放级别 | number | | |
+| mapOptions.sync | [地图初始化参数对象](https://lbs.amap.com/api/javascript-api/reference/map) | object | | |
 | precision | 坐标精度（保留几位小数） | number | | 6 |
 | addressComponent* | 地址成分 | object, function | | |
 
@@ -145,6 +145,12 @@ adcode信息可参考[城市编码表](https://lbs.amap.com/api/webservice/downl
 ```
 ({ province, city, district ... }) => `${province} - ${city} - ${district}`
 ```
+
+### mapOptions
+
+::: tip 支持双向绑定？  
+mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
+:::
 
 <br>
 
