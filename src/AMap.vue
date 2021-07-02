@@ -111,7 +111,7 @@
       </el-dropdown>
       <el-dropdown
         @command="command=>{this[command](['polygon'])}"
-        v-if="BoundaryMaxCount>0"
+        v-if="PolygonMaxCount>0"
         :class="{active:active==='polygon'}"
       >
         <a @click.stop="onPolygonBtnClick">
@@ -212,7 +212,7 @@ export default {
     imgNorthEastLat: [Number, String],
     imgSouthWestLng: [Number, String],
     imgSouthWestLat: [Number, String],
-    boundary: {
+    polygon: {
       validator: value => ['null', 'array'].includes(typeOf(value)),
     },
     precision: Number,
@@ -245,14 +245,14 @@ export default {
     }
   },
   computed: {
-    BoundaryCount () {
-      return getFinalProp(this.boundaryCount, globalProps.boundaryCount, 0)
+    PolygonCount () {
+      return getFinalProp(this.polygonCount, globalProps.polygonCount, 0)
     },
-    BoundaryMaxCount () {
-      return Array.isArray(this.BoundaryCount) ? this.BoundaryCount[1] : this.BoundaryCount
+    PolygonMaxCount () {
+      return Array.isArray(this.PolygonCount) ? this.PolygonCount[1] : this.PolygonCount
     },
-    BoundaryMinCount () {
-      return Array.isArray(this.BoundaryCount) ? this.BoundaryCount[0] : undefined
+    PolygonMinCount () {
+      return Array.isArray(this.PolygonCount) ? this.PolygonCount[0] : undefined
     },
     MarkerCount () {
       return getFinalProp(this.markerCount, globalProps.markerCount, 1)
@@ -318,7 +318,7 @@ export default {
               'AMap.MouseTool',
               'AMap.RectangleEditor',
             ] : [],
-            ...this.BoundaryMaxCount > 0 ? [
+            ...this.PolygonMaxCount > 0 ? [
               'AMap.MouseTool',
               'AMap.Polygon',
               'AMap.ContextMenu',
@@ -436,7 +436,7 @@ export default {
             this.MapOptions.zoom = this.map.getZoom()
           })
 
-          if (this.Img || this.BoundaryMaxCount > 0) {
+          if (this.Img || this.PolygonMaxCount > 0) {
             this.mouseTool = new AMap.MouseTool(this.map)
             this.mouseTool.on('draw', e => {
               //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
@@ -444,15 +444,15 @@ export default {
               if (this.active === 'rectangle') {
                 this.active = 'marker'
                 //图层只允许有一个 清除之前绘制的
-                if (this.overlay.rectangle) {
+                if (this.overlay.rectangleInstance) {
                   this.overlay.rectangleEditor.close()
                   this.overlay.rectangleEditor = null
-                  this.overlay.rectangle.setMap(null)
+                  this.overlay.rectangleInstance.setMap(null)
                 }
-                this.overlay.rectangle = e.obj
-                //this.editImg(this.overlay.rectangle.getBounds()) 1.x中编辑绘制出来矩形会报错
+                this.overlay.rectangleInstance = e.obj
+                //this.editImg(this.overlay.rectangleInstance.getBounds()) 1.x中编辑绘制出来矩形会报错
                 e.obj.setMap(null) //1.x改为销毁绘制出来的矩形并新建一个矩形对象
-                this.drawImg(this.overlay.rectangle.getBounds())
+                this.drawImg(this.overlay.rectangleInstance.getBounds())
               }
                 //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
               //2.x：e.obj.className==='Overlay.Polygon'
@@ -462,7 +462,7 @@ export default {
                   ...this.polygonStyle,
                   fillColor: '#00D3FC',
                 })
-                this.overlay.polygon.push(e.obj)
+                this.overlay.polygonInstance.push(e.obj)
                 this.editPolygon()
               }
               this.mouseTool.close()
@@ -503,20 +503,20 @@ export default {
           //this.text.setText('单击绘制点位')
           //this.text.on('click', this.onMapClick)
           this.map.on('click', this.onMapClick)
-          this.overlay.rectangle?.on('click', this.onMapClick)
+          this.overlay.rectangleInstance?.on('click', this.onMapClick)
         },
         'rectangle': () => {
           //this.text.setText('按住左键并拖动绘制图层')
           //this.text.off('click', this.onMapClick)
           this.map.off('click', this.onMapClick)
-          this.overlay.rectangle?.off('click', this.onMapClick)
+          this.overlay.rectangleInstance?.off('click', this.onMapClick)
           this.mouseTool.rectangle(this.rectangleStyle)
         },
         'polygon': () => {
           //this.text.setText('单击确定区域起点，双击结束绘制')
           //this.text.off('click', this.onMapClick)
           this.map.off('click', this.onMapClick)
-          this.overlay.rectangle?.off('click', this.onMapClick)
+          this.overlay.rectangleInstance?.off('click', this.onMapClick)
           this.drawPolygon()
         },
       })[newVal]()
@@ -562,7 +562,7 @@ export default {
     imgSouthWestLat () {
       this.locate()
     },
-    boundary: {
+    polygon: {
       handler () {
         this.locate()
       },
@@ -596,7 +596,7 @@ export default {
       <li>重置：图层工具下拉菜单 → 重置图层</li>
       <li>清除：图层工具下拉菜单 → 清除图层</li>
     </ul>` : ''}
-  ${this.BoundaryMaxCount > 0 ? `
+  ${this.PolygonMaxCount > 0 ? `
   <li>轮廓</li>
     <ul style="margin-bottom:1rem">
       <li>添加：选中轮廓工具 → 单击地图确定起点，双击结束绘制</li>
@@ -645,7 +645,7 @@ export default {
         new AMap.AutoComplete(param) :
         new AMap.Autocomplete(param)
       this.plugins.PlaceSearch = new AMap.PlaceSearch(param)
-      if (this.BoundaryMaxCount > 0) {
+      if (this.PolygonMaxCount > 0) {
         this.plugins.DistrictSearch = new AMap.DistrictSearch({
           subdistrict: 0,   //获取边界不需要返回下级行政区
           extensions: 'all',  //返回行政区边界坐标组等具体信息
@@ -665,11 +665,11 @@ export default {
       }
       const overlay = {
         marker: {
-          marker: [],
+          markerInstance: [],
         },
         imageLayer: {
-          imageLayer: null,
-          rectangle: null,
+          imageLayerInstance: null,
+          rectangleInstance: null,
           rectangleEditor: null,
           imgNorthEastLng: '',
           imgNorthEastLat: '',
@@ -677,9 +677,9 @@ export default {
           imgSouthWestLat: '',
         },
         polygon: {
-          polygon: [],
+          polygonInstance: [],
           polygonEditor: [],
-          boundary: [],
+          polygon: [],
         }
       }
       if (!arr) {
@@ -706,7 +706,7 @@ export default {
       for (let v of overlays) {
         switch (v) {
           case 'marker': {
-            if (this.MarkerMinCount > 0 && this.overlay.marker.length > 0) {
+            if (this.MarkerMinCount > 0 && this.overlay.markerInstance.length > 0) {
               warning(`至少绘制${this.MarkerMinCount}个点位`)
               return false
             }
@@ -716,8 +716,8 @@ export default {
             break
           }
           case 'polygon':
-            if (this.BoundaryMinCount > 0 && this.overlay.polygon.length > 0) {
-              warning(`至少绘制${this.BoundaryMinCount}个区域`)
+            if (this.PolygonMinCount > 0 && this.overlay.polygonInstance.length > 0) {
+              warning(`至少绘制${this.PolygonMinCount}个区域`)
               return false
             }
         }
@@ -731,19 +731,19 @@ export default {
             return
           }
 
-          this.overlay.marker.map(v => {
+          this.overlay.markerInstance.map(v => {
             if (v) {
               this.map.remove(v)
             }
           })
-          this.overlay.marker.length = 0
+          this.overlay.markerInstance.length = 0
           this.plugins.MarkerList?.clearData()
         }
 
         if (arr.includes('imageLayer')) {
-          if (this.overlay.imageLayer) {
-            this.overlay.imageLayer.setMap(null)
-            this.overlay.rectangle.setMap(null)
+          if (this.overlay.imageLayerInstance) {
+            this.overlay.imageLayerInstance.setMap(null)
+            this.overlay.rectangleInstance.setMap(null)
             this.overlay.rectangleEditor.close()
           }
         }
@@ -753,7 +753,7 @@ export default {
             return
           }
 
-          this.overlay.polygon.map(v => {
+          this.overlay.polygonInstance.map(v => {
             v?.setMap(null)
           })
           this.overlay.polygonEditor.map(v => {
@@ -853,12 +853,12 @@ export default {
         this.$emit('update:lng', this.roundOff(lng))
         this.$emit('update:lat', this.roundOff(lat))
       } else {
-        const { longitude, latitude, address } = this.overlay.marker[0] || {}
+        const { longitude, latitude, address } = this.overlay.markerInstance[0] || {}
         this.$emit('update:lng', this.roundOff(longitude))
         this.$emit('update:lat', this.roundOff(latitude))
         this.$emit('update:address', address)
       }
-      this.$emit('update:marker', cloneDeep(this.overlay.marker).map(v => {
+      this.$emit('update:marker', cloneDeep(this.overlay.markerInstance).map(v => {
         v.lng = this.roundOff(v.longitude)
         v.lat = this.roundOff(v.latitude)
         delete v.longitude
@@ -873,14 +873,14 @@ export default {
         this.$emit('update:imgSouthWestLng', this.roundOff(this.overlay.imgSouthWestLng))
         this.$emit('update:imgSouthWestLat', this.roundOff(this.overlay.imgSouthWestLat))
       }
-      if (this.BoundaryMaxCount > 0) {
+      if (this.PolygonMaxCount > 0) {
         this.syncPolygon()
-        this.$emit('update:boundary', this.overlay.boundary)
+        this.$emit('update:polygon', this.overlay.polygon)
       }
       this.$emit('update:show', false)
     },
     drawMarker (markerOptions, isInit = false) {
-      if (this.MarkerMaxCount > 1 && this.overlay.marker.length >= this.MarkerMaxCount && !isInit) {
+      if (this.MarkerMaxCount > 1 && this.overlay.markerInstance.length >= this.MarkerMaxCount && !isInit) {
         warning(`最多标记${this.MarkerMaxCount}个点位`)
       } else {
         /*const position = [lng, lat]
@@ -895,7 +895,7 @@ export default {
           // 前景文字
           iconLabel: {
             // A,B,C.....
-            innerHTML: String.fromCharCode('A'.charCodeAt(0) + this.overlay.marker.length),
+            innerHTML: String.fromCharCode('A'.charCodeAt(0) + this.overlay.markerInstance.length),
           },
           map: this.map,
           position: [lng, lat],
@@ -924,15 +924,15 @@ export default {
           delete markerOptions.lat
         }
         if (this.MarkerMaxCount > 1) {
-          this.overlay.marker.push({
+          this.overlay.markerInstance.push({
             ...markerOptions,
             //address: isInit ? this.address || await this.getAddress([lng, lat]),
           })
         } else {
-          this.overlay.marker[0] = markerOptions
+          this.overlay.markerInstance[0] = markerOptions
         }
 
-        this.drawMarkerList(this.overlay.marker)
+        this.drawMarkerList(this.overlay.markerInstance)
       }
     },
     drawMarkerList (marker) {
@@ -951,8 +951,8 @@ export default {
         selectedIconStyle = 'darkblue' //选中时的图标样式
 
       window.__CoordPicker__deleteMarker = index => {
-        this.overlay.marker.splice(index, 1)
-        this.drawMarkerList(this.overlay.marker)
+        this.overlay.markerInstance.splice(index, 1)
+        this.drawMarkerList(this.overlay.markerInstance)
       }
 
       this.plugins.MarkerList = new MarkerList({
@@ -1000,11 +1000,11 @@ export default {
 
           const markerContextMenu = new AMap.ContextMenu()
           markerContextMenu.addItem('删除', e => {
-            if (this.overlay.marker.length <= this.MarkerMinCount) {
+            if (this.overlay.markerInstance.length <= this.MarkerMinCount) {
               warning(`至少绘制${this.MarkerMinCount}个点位`)
             } else {
-              this.overlay.marker.splice(context.index, 1)
-              this.drawMarkerList(this.overlay.marker)
+              this.overlay.markerInstance.splice(context.index, 1)
+              this.drawMarkerList(this.overlay.markerInstance)
             }
           }, 0)
 
@@ -1169,7 +1169,7 @@ export default {
       }
     },
     drawDistrict (districtName) {
-      if (districtName && this.BoundaryMaxCount > 0) {
+      if (districtName && this.PolygonMaxCount > 0) {
         this.useAmapApi('DistrictSearch.search', districtName)
         .then(result => {
           const bounds = result.districtList?.[0]?.boundaries
@@ -1214,8 +1214,8 @@ export default {
       }
 
       if (!arr || arr.includes('polygon')) {
-        if (this.boundary?.length > 0) {
-          this.drawPolygon(this.boundary)
+        if (this.polygon?.length > 0) {
+          this.drawPolygon(this.polygon)
           hasOverlay = true
         }
       }
@@ -1228,7 +1228,7 @@ export default {
             v.latitude = v.lat
             delete v.lng
             delete v.lat
-            this.overlay.marker.push(v)
+            this.overlay.markerInstance.push(v)
           })
         }
         // 只传了中心点 将中心点当作一个点位
@@ -1242,7 +1242,7 @@ export default {
             name = result.name
           }
 
-          this.overlay.marker = [{
+          this.overlay.markerInstance = [{
             longitude: this.lng,
             latitude: this.lat,
             address,
@@ -1251,11 +1251,11 @@ export default {
 
           centerDesignated = true
         }
-        this.drawMarkerList(this.overlay.marker)
+        this.drawMarkerList(this.overlay.markerInstance)
         // 如果点位只有一个 将其视为中心点
-        if (this.overlay.marker.length === 1) {
+        if (this.overlay.markerInstance.length === 1) {
           centerDesignated = true
-        } else if (this.overlay.marker.length > 1) {
+        } else if (this.overlay.markerInstance.length > 1) {
           hasOverlay = true
         }
       }
@@ -1301,8 +1301,8 @@ export default {
             this.setCenter([this.lng, this.lat])
           }
           // 点位数量为1 定位至该点位
-          else if (this.overlay.marker.length === 1 && notEmpty(this.overlay.marker[0].longitude) && notEmpty(this.overlay.marker[0].latitude)) {
-            const { longitude, latitude } = this.overlay.marker[0]
+          else if (this.overlay.markerInstance.length === 1 && notEmpty(this.overlay.markerInstance[0].longitude) && notEmpty(this.overlay.markerInstance[0].latitude)) {
+            const { longitude, latitude } = this.overlay.markerInstance[0]
             this.setCenter([longitude, latitude])
           }
           // 定位至address

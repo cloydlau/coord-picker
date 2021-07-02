@@ -6,7 +6,7 @@
 
 - √ 坐标拾取、绘制点位（双向绑定）
 - √ 拖拉拽绘制、编辑图片图层（双向绑定角坐标）
-- √ 拖拉拽绘制、编辑多边形（双向绑定轮廓坐标）
+- √ 拖拉拽绘制、编辑多边形（双向绑定多边形坐标）
 - √ POI搜索、搜索关键字自动补全
 - √ 根据传参情况智能初始化至合适的位置
 - √ 全局或局部引入 参数支持全局或局部配置
@@ -88,18 +88,15 @@ export default {
 
 | Attribute | Description | Type | Accepted Values | Default |
 | --- | --- | --- | --- | --- |
-| img | 图片url | string | | |
-| imgNorthEastLng.sync | 图片东北角经度 | number, string | | |
-| imgNorthEastLat.sync | 图片东北角纬度 | number, string | | |
-| imgSouthWestLng.sync | 图片西南角经度 | number, string | | |
-| imgSouthWestLat.sync | 图片西南角纬度 | number, string | | |
+| imageLayer | 图层 | object[] | | |
+| imageLayerCount | 图层数量限制 | number, number[] | | 0 |
 
-### 轮廓相关
+### 多边形相关
 
 | Attribute | Description | Type | Accepted Values | Default |
 | --- | --- | --- | --- | --- |
-| boundary.sync* | 区域轮廓列表 | object[] | | |
-| boundaryCount* | 区域数量限制 | number, number[] | | 0 |
+| polygon.sync* | 区域多边形列表 | object[] | | |
+| polygonCount* | 区域数量限制 | number, number[] | | 0 |
 
 ::: warning 坐标值类型  
 number和string都能接收 但返回时 由于js的number类型存在精度丢失问题 故返回string
@@ -113,7 +110,7 @@ number和string都能接收 但返回时 由于js的number类型存在精度丢�
 
 adcode信息可参考[城市编码表](https://lbs.amap.com/api/webservice/download)获取
 
-### markerCount, boundaryCount
+### markerCount, polygonCount
 
 - number
 
@@ -188,6 +185,14 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
 
 ## 绘制点位
 
+### 如何启用
+
+- `markerCount > 0` 时，开启编辑点位功能
+
+- `markerCount === 0` 时，也会依据marker参数渲染点位（只读）
+
+- `markerCount === 1 && marker.length === 1` 时，新绘制的点位将覆盖旧点位
+
 ### 数据格式
 
 ```
@@ -215,25 +220,48 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
 
 ### 如何启用
 
-`img` 参数不为空
+- `imageLayerCount > 0` 时，开启编辑图层功能
 
-### 图层数量
+- `imageLayerCount === 0` 时，也会依据imageLayer参数渲染图层（只读）
 
-目前仅支持一个，二次绘制会覆盖先前的图层
-
-<br>
-
-## 绘制轮廓
-
-### 如何启用
-
-`boundaryCount` 参数的值大于0
+- `imageLayerCount === 1 && imageLayer.length === 1` 时，新绘制的图层将覆盖旧图层
 
 ### 数据格式
 
 ```
 [
-  // 轮廓1
+  // 图层1
+  {
+    url: '图片链接',
+    southWest: ['经度', '纬度'],
+    northEast: ['经度', '纬度'],
+  },
+  // 图层2
+  {
+    url: '图片链接',
+    southWest: ['经度', '纬度'],
+    northEast: ['经度', '纬度'],
+  },
+]
+```
+
+<br>
+
+## 绘制多边形
+
+### 如何启用
+
+- `polygonCount > 0` 时，开启编辑多边形功能
+
+- `polygonCount === 0` 时，也会依据polygon参数渲染多边形（只读）
+
+- `polygonCount === 1 && polygon.length === 1` 时，新绘制的多边形将覆盖旧多边形
+
+### 数据格式
+
+```
+[
+  // 多边形1
   {
     path: [
       { 'lng': '106.44294', 'lat': '26.644338' },
@@ -241,7 +269,7 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
       { 'lng': '106.569282', 'lat': '26.585405' }
     ]
   },
-  // 轮廓2
+  // 多边形2
   {
     path: [
       { 'lng': '106.623527', 'lat': '26.52767' },

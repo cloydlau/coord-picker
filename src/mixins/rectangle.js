@@ -23,37 +23,37 @@ export default {
       this.overlay.imgNorthEastLat = bounds.northEast ? bounds.northEast.lat : bounds.northeast.lat
       this.overlay.imgSouthWestLng = bounds.southWest ? bounds.southWest.lng : bounds.southwest.lng
       this.overlay.imgSouthWestLat = bounds.southWest ? bounds.southWest.lat : bounds.southwest.lat
-      this.overlay.imageLayer.setBounds(bounds)
+      this.overlay.imageLayerInstance.setBounds(bounds)
     },
     drawImg (bounds) {
-      this.overlay.rectangle = new AMap.Rectangle({
+      this.overlay.rectangleInstance = new AMap.Rectangle({
         ...this.rectangleStyle,
         bounds,
       })
-      this.overlay.rectangle.setMap(this.map)
+      this.overlay.rectangleInstance.setMap(this.map)
       this.editImg(bounds)
     },
     editImg (bounds) {
-      if (!this.overlay.imageLayer) {
-        this.overlay.imageLayer = new AMap.ImageLayer({
+      if (!this.overlay.imageLayerInstance) {
+        this.overlay.imageLayerInstance = new AMap.ImageLayer({
           url: this.img,
           bounds,
         })
-        this.map.add(this.overlay.imageLayer)
+        this.map.add(this.overlay.imageLayerInstance)
       }
       this.syncImgBounds(bounds)
 
-      this.overlay.rectangle.on('click', this.onMapClick)
+      this.overlay.rectangleInstance.on('click', this.onMapClick)
 
-      /*this.overlay.rectangle.on('mousemove', e => {
+      /*this.overlay.rectangleInstance.on('mousemove', e => {
         this.text.setText('拖拽角调整大小')
         this.setTextPosition(e)
       })
-      this.overlay.rectangle.on('mouseout', e => {
+      this.overlay.rectangleInstance.on('mouseout', e => {
         this.text.setText('单击绘制点位')
       })*/
 
-      this.overlay.rectangleEditor = new AMap.RectangleEditor(this.map, this.overlay.rectangle)
+      this.overlay.rectangleEditor = new AMap.RectangleEditor(this.map, this.overlay.rectangleInstance)
 
       /**
        * 移动选框时 同步图片
@@ -64,16 +64,16 @@ export default {
       })
       //短距离平移触发
       /*this.text.on('mouseup', e => {
-        this.syncImgBounds(this.overlay.rectangle.getBounds())
+        this.syncImgBounds(this.overlay.rectangleInstance.getBounds())
       })*/
       //短距离平移触发
-      this.overlay.rectangle.on('mouseup', e => {
-        this.syncImgBounds(this.overlay.rectangle.getBounds())
+      this.overlay.rectangleInstance.on('mouseup', e => {
+        this.syncImgBounds(this.overlay.rectangleInstance.getBounds())
       })
       //长距离平移触发
       this.map.on('mouseup', e => {
-        if (this.overlay.rectangle) {
-          this.syncImgBounds(this.overlay.rectangle.getBounds())
+        if (this.overlay.rectangleInstance) {
+          this.syncImgBounds(this.overlay.rectangleInstance.getBounds())
         }
       })
 
