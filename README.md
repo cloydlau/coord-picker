@@ -5,7 +5,7 @@
 ## Features
 
 - √ 坐标拾取、绘制点位（双向绑定）
-- √ 拖拉拽绘制、编辑图片图层（双向绑定角坐标）
+- √ 拖拉拽绘制、编辑矩形/图层（双向绑定角坐标）
 - √ 拖拉拽绘制、编辑多边形（双向绑定多边形坐标）
 - √ POI搜索、搜索关键字自动补全
 - √ 根据传参情况智能初始化至合适的位置
@@ -84,12 +84,12 @@ export default {
 | marker.sync* | 点位列表 | object[] | | |
 | markerCount* | 点位数量限制 | number, number[] | | 1 |
 
-### 图层相关
+### 矩形相关
 
 | Attribute | Description | Type | Accepted Values | Default |
 | --- | --- | --- | --- | --- |
-| imageLayer | 图层 | object[] | | |
-| imageLayerCount | 图层数量限制 | number, number[] | | 0 |
+| rectangle | 矩形 | object[] | | |
+| rectangleCount | 矩形数量限制 | number, number[] | | 0 |
 
 ### 多边形相关
 
@@ -216,29 +216,29 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
 
 <br>
 
-## 绘制图层
+## 绘制矩形
 
 ### 如何启用
 
-- `imageLayerCount > 0` 时，开启编辑图层功能
+- `rectangleCount > 0` 时，开启编辑矩形功能
 
-- `imageLayerCount === 0` 时，也会依据imageLayer参数渲染图层（只读）
+- `rectangleCount === 0` 时，也会依据rectangle参数渲染矩形（只读）
 
-- `imageLayerCount === 1 && imageLayer.length === 1` 时，新绘制的图层将覆盖旧图层
+- `rectangleCount === 1 && rectangle.length === 1` 时，新绘制的矩形将覆盖旧矩形
 
 ### 数据格式
 
 ```
 [
-  // 图层1
+  // 矩形1
   {
-    url: '图片链接',
+    url: '图层图片链接',
     southWest: ['经度', '纬度'],
     northEast: ['经度', '纬度'],
   },
-  // 图层2
+  // 矩形2
   {
-    url: '图片链接',
+    url: '图层图片链接',
     southWest: ['经度', '纬度'],
     northEast: ['经度', '纬度'],
   },

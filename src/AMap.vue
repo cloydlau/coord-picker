@@ -92,11 +92,11 @@
         </el-dropdown-menu>
       </el-dropdown>
       <el-dropdown
-        @command="command=>{this[command](['imageLayer'])}"
-        v-if="Img"
+        @command="command=>{this[command](['rectangle'])}"
+        v-if="RectangleMaxCount>0"
         :class="{active:active==='rectangle'}"
       >
-        <a @click.stop="active='rectangle'">
+        <a @click.stop="onRectangleBtnClick">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
               d="M21 15v3h3v2h-3v3h-2v-3h-3v-2h3v-3h2zm.008-12c.548 0 .992.445.992.993V13h-2V5H4v13.999L14 9l3 3v2.829l-3-3L6.827 19H14v2H2.992A.993.993 0 0 1 2 20.007V3.993A1 1 0 0 1 2.992 3h18.016zM8 7a2 2 0 1 1 0 4a2 2 0 0 1 0-4z"
@@ -105,6 +105,7 @@
           </svg>
         </a>
         <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="setCurImage" v-if="Image.length>1">选择图片</el-dropdown-item>
           <el-dropdown-item command="reset">重置图层</el-dropdown-item>
           <el-dropdown-item command="clear">清除图层</el-dropdown-item>
         </el-dropdown-menu>
@@ -157,13 +158,27 @@
       <span class="text-45px" style="color:#3297FD;font-size:35px;">{{ MapOptions.zoom }}</span>
       <span class="text-10px" style="font-size:10px;"> 缩放级别</span>
     </div>
+
+    <FormDialog
+      :show.sync="curImage.show"
+      v-model="curImage.data"
+      append-to-body
+      :submit="curImage.submit"
+      @close="curImage.submit=null"
+    >
+      <PicViewer :value="Image">
+        <template v-slot="{ src, index }">
+          <img :src="src" alt="">
+        </template>
+      </PicViewer>
+    </FormDialog>
   </el-dialog>
 </template>
 
 <script>
 import { isEmpty, notEmpty, typeOf } from 'kayran'
 import 'kikimore/dist/style.css'
-import { Swal, Selector } from 'kikimore'
+import { Swal, Selector, FormDialog } from 'kikimore'
 const { error, warning, confirm, } = Swal
 import { throttle as throttling, cloneDeep, merge } from 'lodash-es'
 import AMapLoader from '@amap/amap-jsapi-loader'
@@ -180,11 +195,13 @@ import globalProps from './config'
 import { name } from '../package.json'
 const prefix = `[${name}] `
 import cities from './assets/city.json'
+import 'pic-viewer/dist/style.css'
+import PicViewer from 'pic-viewer'
 
 export default {
   name: 'CoordPicker',
   mixins: [polygon, rectangle],
-  components: { Toolbar, Selector },
+  components: { Toolbar, Selector, FormDialog, PicViewer },
   props: {
     show: {
       type: Boolean,
@@ -205,20 +222,18 @@ export default {
     },
     markerCount: [Number, Array],
     city: String,
-    img: {
-      validator: value => ['string', 'null'].includes(typeOf(value)),
-    },
-    imgNorthEastLng: [Number, String],
-    imgNorthEastLat: [Number, String],
-    imgSouthWestLng: [Number, String],
-    imgSouthWestLat: [Number, String],
     polygon: {
       validator: value => ['null', 'array'].includes(typeOf(value)),
     },
     precision: Number,
     addressComponent: [Object, Function],
-    boundaryCount: [Number, Array],
+    polygonCount: [Number, Array],
     mapOptions: Object,
+    image: {
+      validator: value => ['string', 'array', 'null'].includes(typeOf(value)),
+    },
+    rectangle: Array,
+    rectangleCount: [Number, Array],
   },
   data () {
     return {
@@ -245,6 +260,24 @@ export default {
     }
   },
   computed: {
+    Marker () {
+      return getFinalProp(this.marker, globalProps.marker)
+    },
+    Polygon () {
+      return getFinalProp(this.polygon, globalProps.polygon)
+    },
+    Rectangle () {
+      return getFinalProp(this.rectangle, globalProps.rectangle)
+    },
+    RectangleCount () {
+      return getFinalProp(this.rectangleCount, globalProps.rectangleCount, 0)
+    },
+    RectangleMaxCount () {
+      return Array.isArray(this.RectangleCount) ? this.RectangleCount[1] : this.RectangleCount
+    },
+    RectangleMinCount () {
+      return Array.isArray(this.RectangleCount) ? this.RectangleCount[0] : undefined
+    },
     PolygonCount () {
       return getFinalProp(this.polygonCount, globalProps.polygonCount, 0)
     },
@@ -263,8 +296,9 @@ export default {
     MarkerMinCount () {
       return Array.isArray(this.MarkerCount) ? this.MarkerCount[0] : undefined
     },
-    Img () {
-      return getFinalProp(this.img, globalProps.img)
+    Image () {
+      const temp = getFinalProp(this.image, globalProps.image)
+      return (temp && typeof temp === 'string') ? [temp] : temp
     },
     Version () {
       return ''
@@ -314,7 +348,7 @@ export default {
             ...this.Version?.startsWith('2.') ?
               ['AMap.AutoComplete'] :
               ['AMap.Autocomplete'],
-            ...this.Img ? [
+            ...this.RectangleMaxCount > 0 ? [
               'AMap.MouseTool',
               'AMap.RectangleEditor',
             ] : [],
@@ -436,7 +470,7 @@ export default {
             this.MapOptions.zoom = this.map.getZoom()
           })
 
-          if (this.Img || this.PolygonMaxCount > 0) {
+          if (this.RectangleMaxCount > 0 || this.PolygonMaxCount > 0) {
             this.mouseTool = new AMap.MouseTool(this.map)
             this.mouseTool.on('draw', e => {
               //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
@@ -450,9 +484,12 @@ export default {
                   this.overlay.rectangleInstance.setMap(null)
                 }
                 this.overlay.rectangleInstance = e.obj
-                //this.editImg(this.overlay.rectangleInstance.getBounds()) 1.x中编辑绘制出来矩形会报错
+                //this.editImage(this.overlay.rectangleInstance.getBounds()) 1.x中编辑绘制出来矩形会报错
                 e.obj.setMap(null) //1.x改为销毁绘制出来的矩形并新建一个矩形对象
-                this.drawImg(this.overlay.rectangleInstance.getBounds())
+                this.drawImage({
+                  url: this.curImage.curImage,
+                  bounds: this.overlay.rectangleInstance.getBounds()
+                })
               }
                 //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
               //2.x：e.obj.className==='Overlay.Polygon'
@@ -535,39 +572,6 @@ export default {
         }
       }
     },
-    /*lng () {
-      this.locate()
-    },
-    lat () {
-      this.locate()
-    },
-    address () {
-      this.locate()
-    },
-    marker: {
-      handler () {
-        this.locate()
-      },
-      deep: true
-    },
-    imgNorthEastLng () {
-      this.locate()
-    },
-    imgNorthEastLat () {
-      this.locate()
-    },
-    imgSouthWestLng () {
-      this.locate()
-    },
-    imgSouthWestLat () {
-      this.locate()
-    },
-    polygon: {
-      handler () {
-        this.locate()
-      },
-      deep: true
-    },*/
   },
   methods: {
     /*convertLngLat () {
@@ -577,6 +581,9 @@ export default {
         }
       })
     },*/
+    setCurImage () {
+      this.curImage.show = true
+    },
     help () {
       Swal.confirm({
         titleText: '使用帮助',
@@ -589,7 +596,7 @@ export default {
       <li>重置：点位工具下拉菜单 → 重置点位</li>
       <li>清除：点位工具下拉菜单 → 清除点位</li>
     </ul>
-  ${this.Img ? `
+  ${this.RectangleMaxCount > 0 ? `
   <li>图层</li>
     <ul style="margin-bottom:1rem">
       <li>添加：选中图层工具 → 长按左键并拖动，松开完成绘制</li>
@@ -662,19 +669,21 @@ export default {
         baseCity: '',
         baseCityInitialized: false,
         MapOptions: {},
+        curImage: {
+          show: false,
+          data: '',
+          submit: null
+        }
       }
       const overlay = {
         marker: {
           markerInstance: [],
         },
-        imageLayer: {
+        rectangle: {
           imageLayerInstance: null,
           rectangleInstance: null,
           rectangleEditor: null,
-          imgNorthEastLng: '',
-          imgNorthEastLat: '',
-          imgSouthWestLng: '',
-          imgSouthWestLat: '',
+          rectangle: [],
         },
         polygon: {
           polygonInstance: [],
@@ -702,7 +711,7 @@ export default {
       this.clear(arr)
       this.initOverlays(arr)
     },
-    isClearable (overlays = ['marker', 'imageLayer', 'polygon']) {
+    isClearable (overlays = ['marker', 'rectangle', 'polygon']) {
       for (let v of overlays) {
         switch (v) {
           case 'marker': {
@@ -712,7 +721,7 @@ export default {
             }
             break
           }
-          case 'imageLayer': {
+          case 'rectangle': {
             break
           }
           case 'polygon':
@@ -740,7 +749,7 @@ export default {
           this.plugins.MarkerList?.clearData()
         }
 
-        if (arr.includes('imageLayer')) {
+        if (arr.includes('rectangle')) {
           if (this.overlay.imageLayerInstance) {
             this.overlay.imageLayerInstance.setMap(null)
             this.overlay.rectangleInstance.setMap(null)
@@ -866,12 +875,9 @@ export default {
         return v
       }))
       this.$emit('update:mapOptions', this.MapOptions)
-      if (this.Img) {
+      if (this.RectangleMaxCount > 0) {
         //this.address || ((isEmpty(this.lng) || isEmpty(this.lat)) ? this.baseCity : '')
-        this.$emit('update:imgNorthEastLng', this.roundOff(this.overlay.imgNorthEastLng))
-        this.$emit('update:imgNorthEastLat', this.roundOff(this.overlay.imgNorthEastLat))
-        this.$emit('update:imgSouthWestLng', this.roundOff(this.overlay.imgSouthWestLng))
-        this.$emit('update:imgSouthWestLat', this.roundOff(this.overlay.imgSouthWestLat))
+        this.$emit('update:rectangle', this.roundOff(this.overlay.rectangle))
       }
       if (this.PolygonMaxCount > 0) {
         this.syncPolygon()
@@ -1176,7 +1182,10 @@ export default {
           if (bounds?.length) {
             confirm(`是否绘制${districtName}轮廓？`)
             .then(() => {
-              this.drawPolygon(Array.from(bounds, v => ({ path: v })), false)
+              this.drawPolygon({
+                polygon: Array.from(bounds, v => ({ path: v })),
+                editable: false
+              })
             })
           }
         })
@@ -1187,43 +1196,56 @@ export default {
     async initOverlays (arr) {
       let centerDesignated = false, hasOverlay = false
 
-      if (!arr || arr.includes('imageLayer')) {
-        if (this.Img &&
-          notEmpty(this.imgSouthWestLng) &&
-          notEmpty(this.imgSouthWestLat) &&
-          notEmpty(this.imgNorthEastLng) &&
-          notEmpty(this.imgNorthEastLat)
-        ) {
-          this.overlay.imgNorthEastLng =
-            (isEmpty(this.imgNorthEastLng) || isEmpty(this.imgSouthWestLng)) ?
-              '' :
-              Math.max(this.imgNorthEastLng, this.imgSouthWestLng) //1.x版本不兼容输入西北角
-          this.overlay.imgNorthEastLat = this.imgNorthEastLat
-          this.overlay.imgSouthWestLng =
-            (isEmpty(this.imgNorthEastLng) || isEmpty(this.imgSouthWestLng)) ?
-              '' :
-              Math.min(this.imgNorthEastLng, this.imgSouthWestLng) //1.x版本不兼容输入东南角
-          this.overlay.imgSouthWestLat = this.imgSouthWestLat
+      if (!arr || arr.includes('rectangle')) {
+        if (this.Image.length === 1) {
+          this.curImage.data = this.Image[0]
+        }
 
-          this.drawImg(new AMap.Bounds(
-            new AMap.LngLat(this.overlay.imgSouthWestLng, this.overlay.imgSouthWestLat),
-            new AMap.LngLat(this.overlay.imgNorthEastLng, this.overlay.imgNorthEastLat),
-          ))
-          hasOverlay = true
+        if (this.Rectangle?.length > 0) {
+          this.Rectangle.map(({ url, southWest, northEast }) => {
+            const [southWestLng, southWestLat] = southWest
+            const [northEastLng, northEastLat] = northEast
+
+            if (url && notEmpty(southWestLng) && notEmpty(southWestLat) && notEmpty(northEastLng) && notEmpty(northEastLat)) {
+              this.drawImage({
+                url,
+                bounds: new AMap.Bounds(
+                  new AMap.LngLat(
+                    // 1.x版本不兼容输入东南角
+                    (isEmpty(northEastLng) || isEmpty(southWestLng)) ? '' :
+                      Math.min(northEastLng, southWestLng),
+                    southWestLat
+                  ),
+                  new AMap.LngLat(
+                    // 1.x版本不兼容输入西北角
+                    (isEmpty(northEastLng) || isEmpty(southWestLng)) ? '' :
+                      Math.max(northEastLng, southWestLng),
+                    northEastLat
+                  ),
+                ),
+                editable: this.RectangleMaxCount > 0
+              })
+
+              hasOverlay = true
+            }
+          })
         }
       }
 
       if (!arr || arr.includes('polygon')) {
-        if (this.polygon?.length > 0) {
-          this.drawPolygon(this.polygon)
+        if (this.Polygon?.length > 0) {
+          this.drawPolygon({
+            polygon: this.Polygon,
+            editable: this.RectangleMaxCount > 0
+          })
           hasOverlay = true
         }
       }
 
       if (!arr || arr.includes('marker')) {
         // 传了点位 绘制点位
-        if (this.marker?.length > 0) {
-          cloneDeep(this.marker).map(v => {
+        if (this.Marker?.length > 0) {
+          cloneDeep(this.Marker).map(v => {
             v.longitude = v.lng
             v.latitude = v.lat
             delete v.lng
@@ -1448,7 +1470,6 @@ export default {
 }
 
 ::v-deep .el-dialog__body {
-  background-color: aliceblue;
   height: 100%;
   padding: 0;
 

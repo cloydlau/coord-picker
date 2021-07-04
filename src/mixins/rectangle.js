@@ -1,5 +1,6 @@
-import Vue from 'vue'
-import { isEmpty } from 'kayran'
+import 'kikimore/dist/style.css'
+import { Swal } from 'kikimore'
+const { warning } = Swal
 
 export default {
   data () {
@@ -17,6 +18,18 @@ export default {
     }
   },
   methods: {
+    onRectangleBtnClick () {
+      if (this.RectangleMaxCount > 0 && this.overlay.rectangleInstance.length >= this.RectangleMaxCount) {
+        warning(`最多绘制${this.PolygonMaxCount}个矩形`)
+      } else if (!this.curImage.data && this.Image.length > 1) {
+        this.curImage.submit = () => {
+          this.active = 'rectangle'
+        }
+        this.curImage.show = true
+      } else {
+        this.active = 'rectangle'
+      }
+    },
     syncImgBounds (bounds) {
       //兼容1.x
       this.overlay.imgNorthEastLng = bounds.northEast ? bounds.northEast.lng : bounds.northeast.lng
@@ -25,26 +38,26 @@ export default {
       this.overlay.imgSouthWestLat = bounds.southWest ? bounds.southWest.lat : bounds.southwest.lat
       this.overlay.imageLayerInstance.setBounds(bounds)
     },
-    drawImg (bounds) {
+    drawImage ({ url, bounds, editable = true }) {
       this.overlay.rectangleInstance = new AMap.Rectangle({
         ...this.rectangleStyle,
         bounds,
       })
       this.overlay.rectangleInstance.setMap(this.map)
-      this.editImg(bounds)
-    },
-    editImg (bounds) {
       if (!this.overlay.imageLayerInstance) {
         this.overlay.imageLayerInstance = new AMap.ImageLayer({
-          url: this.img,
+          url,
           bounds,
         })
         this.map.add(this.overlay.imageLayerInstance)
       }
-      this.syncImgBounds(bounds)
-
       this.overlay.rectangleInstance.on('click', this.onMapClick)
-
+      this.syncImgBounds(bounds)
+      if (editable) {
+        this.editImage()
+      }
+    },
+    editImage () {
       /*this.overlay.rectangleInstance.on('mousemove', e => {
         this.text.setText('拖拽角调整大小')
         this.setTextPosition(e)

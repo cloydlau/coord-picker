@@ -20,7 +20,7 @@ export default {
   methods: {
     onPolygonBtnClick () {
       if (this.PolygonMaxCount > 0 && this.overlay.polygonInstance.length >= this.PolygonMaxCount) {
-        warning(`最多绘制${this.PolygonMaxCount}个区域`)
+        warning(`最多绘制${this.PolygonMaxCount}个多边形`)
       } else {
         this.active = 'polygon'
       }
@@ -37,7 +37,7 @@ export default {
         }
       })
     },
-    drawPolygon (polygon, draggable) {
+    drawPolygon ({ polygon, editable }) {
       if (polygon) {
         for (let i = 0; i < polygon.length; i++) {
           const path = []
@@ -53,7 +53,7 @@ export default {
               map: this.map,
               path
             }))
-            this.editPolygon(draggable)
+            this.editPolygon(editable)
           }
         }
       } else {
@@ -63,7 +63,7 @@ export default {
         })
       }
     },
-    editPolygon (draggable = true) {
+    editPolygon (editable = true) {
       const i = this.overlay.polygonInstance.length - 1
 
       const polygonContextMenu = new AMap.ContextMenu()
@@ -71,7 +71,7 @@ export default {
         if (this.overlay.polygonInstance.length <= this.PolygonMinCount) {
           warning(`至少绘制${this.PolygonMinCount}个区域`)
         } else {
-          if (draggable) {
+          if (editable) {
             this.overlay.polygonEditor[i].close()
             this.overlay.polygonEditor.splice(i, 1)
           }
@@ -91,11 +91,11 @@ export default {
       })
 
       /*this.overlay.polygonInstance[i].on('mousemove', e => {
-        this.text.setText((draggable ? '拖拽角调整形状，' : '') + '右键删除')
+        this.text.setText((editable ? '拖拽角调整形状，' : '') + '右键删除')
         this.setTextPosition(e)
       })*/
 
-      if (draggable) {
+      if (editable) {
         this.overlay.polygonEditor.push(AMap.PolygonEditor ?
           new AMap.PolygonEditor(this.map, this.overlay.polygonInstance[i]) :
           new AMap.PolyEditor(this.map, this.overlay.polygonInstance[i])

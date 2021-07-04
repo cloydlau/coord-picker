@@ -51,26 +51,17 @@
           </el-radio-button>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="img">
-        <el-input v-model="props.img" clearable/>
-      </el-form-item>
-      <el-form-item label="imgNorthEastLng">
-        <el-input v-model="props.imgNorthEastLng" clearable/>
-      </el-form-item>
-      <el-form-item label="imgNorthEastLat">
-        <el-input v-model="props.imgNorthEastLat" clearable/>
-      </el-form-item>
-      <el-form-item label="imgSouthWestLng">
-        <el-input v-model="props.imgSouthWestLng" clearable/>
-      </el-form-item>
-      <el-form-item label="imgSouthWestLat">
-        <el-input v-model="props.imgSouthWestLat" clearable/>
+      <el-form-item label="image">
+        <el-input v-model="props.image" clearable/>
       </el-form-item>
       <el-form-item label="mapOptions">
         <json-editor-vue v-model="props.mapOptions"/>
       </el-form-item>
-      <el-form-item label="boundary">
-        <json-editor-vue v-model="props.boundary"/>
+      <el-form-item label="rectangle">
+        <json-editor-vue v-model="props.rectangle"/>
+      </el-form-item>
+      <el-form-item label="polygon">
+        <json-editor-vue v-model="props.polygon"/>
       </el-form-item>
     </el-form>
     <div slot="footer">
@@ -115,12 +106,16 @@ export default {
           }*/
         ],
         markerCount: 20,
-        img: 'https://pic4.zhimg.com/80/v2-670a8e55fc0dcb76fc4860c18963aaa8_720w.jpg',
-        imgNorthEastLng: 106.682739,
-        imgNorthEastLat: 26.610016,
-        imgSouthWestLng: 106.790543,
-        imgSouthWestLat: 26.506218,
-        boundary: [
+        image: 'https://pic4.zhimg.com/80/v2-670a8e55fc0dcb76fc4860c18963aaa8_720w.jpg',
+        rectangle: [
+          {
+            url: 'https://pic4.zhimg.com/80/v2-670a8e55fc0dcb76fc4860c18963aaa8_720w.jpg',
+            southWest: [106.790543, 26.506218],
+            northEast: [106.682739, 26.610016]
+          }
+        ],
+        rectangleCount: 2,
+        polygon: [
           {
             'path': [
               { 'lng': '106.44294', 'lat': '26.644338' },
@@ -135,7 +130,7 @@ export default {
             ]
           }
         ],
-        boundaryCount: [1, 3],
+        polygonCount: [1, 3],
         precision: 6,
         addressComponent: undefined,
         mapOptions: {
