@@ -5,7 +5,7 @@
 ## Features
 
 - √ 坐标拾取、绘制点位（双向绑定）
-- √ 拖拉拽绘制、编辑矩形/图层（双向绑定角坐标）
+- √ 拖拉拽绘制、编辑矩形/贴图（双向绑定角坐标）
 - √ 拖拉拽绘制、编辑多边形（双向绑定多边形坐标）
 - √ POI搜索、搜索关键字自动补全
 - √ 根据传参情况智能初始化至合适的位置
@@ -88,6 +88,7 @@ export default {
 
 | Attribute | Description | Type | Accepted Values | Default |
 | --- | --- | --- | --- | --- |
+| image | 嵌在矩形内的贴图 | string, string[] | | |
 | rectangle | 矩形 | object[] | | |
 | rectangleCount | 矩形数量限制 | number, number[] | | 0 |
 
@@ -95,8 +96,8 @@ export default {
 
 | Attribute | Description | Type | Accepted Values | Default |
 | --- | --- | --- | --- | --- |
-| polygon.sync* | 区域多边形列表 | object[] | | |
-| polygonCount* | 区域数量限制 | number, number[] | | 0 |
+| polygon.sync* | 多边形列表 | object[] | | |
+| polygonCount* | 多边形数量限制 | number, number[] | | 0 |
 
 ::: warning 坐标值类型  
 number和string都能接收 但返回时 由于js的number类型存在精度丢失问题 故返回string
@@ -224,21 +225,19 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
 
 - `rectangleCount === 0` 时，也会依据rectangle参数渲染矩形（只读）
 
-- `rectangleCount === 1 && rectangle.length === 1` 时，新绘制的矩形将覆盖旧矩形
-
 ### 数据格式
 
 ```
 [
   // 矩形1
   {
-    url: '图层图片链接',
+    url: '贴图链接',
     southwest: { lng: '经度', lat: '纬度' },
     northeast: { lng: '经度', lat: '纬度' },
   },
   // 矩形2
   {
-    url: '图层图片链接',
+    url: '贴图链接',
     southwest: { lng: '经度', lat: '纬度' },
     northeast: { lng: '经度', lat: '纬度' },
   },
@@ -254,8 +253,6 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
 - `polygonCount > 0` 时，开启编辑多边形功能
 
 - `polygonCount === 0` 时，也会依据polygon参数渲染多边形（只读）
-
-- `polygonCount === 1 && polygon.length === 1` 时，新绘制的多边形将覆盖旧多边形
 
 ### 数据格式
 
