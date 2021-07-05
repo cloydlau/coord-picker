@@ -1,69 +1,7 @@
 <template>
   <el-dialog visible :close-on-click-modal="false" :show-close="false" title="coord-picker">
-
-
     <CoordPicker v-bind.sync="props"/>
-
-
-    <el-form
-      label-position="right"
-      label-width="148px"
-      :model="props"
-    >
-      <el-form-item label="city">
-        <el-input v-model="props.city" clearable/>
-      </el-form-item>
-      <el-form-item label="address">
-        <el-input v-model="props.address" clearable/>
-      </el-form-item>
-      <el-form-item label="lng">
-        <el-input v-model="props.lng" clearable/>
-      </el-form-item>
-      <el-form-item label="lat">
-        <el-input v-model="props.lat" clearable/>
-      </el-form-item>
-      <el-form-item label="precision">
-        <el-input-number v-model="props.precision" clearable :min="0"/>
-      </el-form-item>
-      <el-form-item label="addressComponent">
-        <span style="margin-right: 30px">Type:</span>
-        <el-radio-group v-model="addressComponentType__">
-          <el-radio
-            :key="i"
-            :label="v.value"
-            v-for="(v,i) of [
-              {value:'function',text:'function'},
-              {value:'object',text:'object'},
-            ]"
-          >
-            {{ v.text }}
-          </el-radio>
-        </el-radio-group>
-
-        <el-radio-group
-          v-if="addressComponentType__==='object'"
-          v-model="addressComponentObject__"
-        >
-          <el-radio-button :label="undefined">完整地址</el-radio-button>
-          <el-radio-button :label="JSON.stringify({province:false})">去掉省</el-radio-button>
-          <el-radio-button :label="JSON.stringify({province:false,city:false})">去掉省市</el-radio-button>
-          <el-radio-button :label="JSON.stringify({province:false,city:false,district:false})">去掉省市县
-          </el-radio-button>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="image">
-        <el-input v-model="props.image" clearable/>
-      </el-form-item>
-      <el-form-item label="mapOptions">
-        <json-editor-vue v-model="props.mapOptions"/>
-      </el-form-item>
-      <el-form-item label="rectangle">
-        <json-editor-vue v-model="props.rectangle"/>
-      </el-form-item>
-      <el-form-item label="polygon">
-        <json-editor-vue v-model="props.polygon"/>
-      </el-form-item>
-    </el-form>
+    <json-editor-vue v-model="props"/>
     <div slot="footer">
       <el-button @click="props.show=true" type="primary">open</el-button>
     </div>
@@ -130,7 +68,7 @@ export default {
             ]
           }
         ],
-        polygonCount: [1, 3],
+        polygonCount: 3,
         precision: 6,
         addressComponent: undefined,
         mapOptions: {

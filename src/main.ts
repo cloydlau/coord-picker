@@ -1,4 +1,4 @@
-//import 'virtual:windi.css'
+import 'virtual:windi.css'
 
 import CoordPicker from './AMap.vue'
 import { init } from './config'

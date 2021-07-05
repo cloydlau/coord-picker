@@ -11,25 +11,23 @@ $btnSize: 30px;
 
 .toolbar {
   position: fixed;
-  top: 15px;
+  top: 18px;
   right: 0;
   height: 35px;
-  background: rgba(255, 255, 255, 0.9);
-  border-color: #003371;
 
   .panel {
+    background: rgba(255, 255, 255, 0.9);
     position: absolute;
     top: 0;
     right: 15px;
     height: 100%;
     border-radius: 25px;
-    -webkit-backdrop-filter: blur(2px);
     backdrop-filter: blur(2px);
     display: flex;
     align-items: center;
     justify-content: space-around;
-    padding: 0 10px;
-    border: 2px solid #0033714a;
+    padding: 3px 8px;
+    border: 1px solid rgba(64, 158, 255, 0.2);
 
     & > .el-tooltip, & > .el-dropdown {
       width: $btnSize;
@@ -49,8 +47,8 @@ $btnSize: 30px;
       }
 
       ::v-deep svg {
-        width: 20px;
-        height: 20px;
+        width: 22px;
+        height: 22px;
         cursor: pointer;
       }
 

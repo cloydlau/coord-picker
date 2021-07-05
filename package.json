@@ -50,7 +50,7 @@
     "vue": "2"
   },
   "devDependencies": {
-    "@iconify/json": "^1.1.369",
+    "@iconify/json": "^1.1.370",
     "element-ui": "^2.15.3",
     "json-editor-vue": "^0.1.6",
     "sass": "^1.35.1",

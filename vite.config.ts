@@ -14,7 +14,7 @@ export default defineConfig({
   },
   plugins: [
     createVuePlugin(/*options*/),
-    //WindiCSS(),
+    WindiCSS(),
     Icons(),
   ],
   build: {

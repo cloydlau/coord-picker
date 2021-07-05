@@ -7,6 +7,7 @@
     @close="$emit('update:show', false)"
     destroy-on-close
     v-if="show"
+    custom-class="coord-picker"
   >
     <!--<div slot="title" class="title">
       <span v-text="title||'坐标拾取'" class="title-text"/>
@@ -53,7 +54,7 @@
         ref="map-container"
         id="map-container"
         v-loading="Loading"
-        element-loading-custom-class="coord-picker"
+        element-loading-custom-class="map-container"
       />
 
       <div id="panel" class="scrollbar1">
@@ -61,7 +62,7 @@
       </div>
     </div>
 
-    <Toolbar v-show="!Loading">
+    <Toolbar>
       <el-tooltip effect="dark" content="使用帮助" placement="bottom">
         <a @click.stop="help">
           <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"
@@ -97,17 +98,16 @@
         :class="{active:active==='rectangle'}"
       >
         <a @click.stop="onRectangleBtnClick">
-          <svg width="1em" height="1em" viewBox="0 0 24 24">
-            <path
-              d="M21 15v3h3v2h-3v3h-2v-3h-3v-2h3v-3h2zm.008-12c.548 0 .992.445.992.993V13h-2V5H4v13.999L14 9l3 3v2.829l-3-3L6.827 19H14v2H2.992A.993.993 0 0 1 2 20.007V3.993A1 1 0 0 1 2.992 3h18.016zM8 7a2 2 0 1 1 0 4a2 2 0 0 1 0-4z"
-              fill="currentColor"
-            />
+          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"
+               role="img" width="32" height="32" preserveAspectRatio="xMidYMid meet"
+               viewBox="0 0 24 24">
+            <path d="M19 6h3v2h-3v3h-2V8h-3V6h3V3h2v3m-2 11v-3h2v5H3V6h8v2H5v9h12z" fill="currentColor"></path>
           </svg>
         </a>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="setCurImage" v-if="Image.length>1">选择图片</el-dropdown-item>
-          <el-dropdown-item command="reset">重置图层</el-dropdown-item>
-          <el-dropdown-item command="clear">清除图层</el-dropdown-item>
+          <el-dropdown-item command="setCurImage" v-if="Image.length>0">选择贴图</el-dropdown-item>
+          <el-dropdown-item command="reset">重置矩形</el-dropdown-item>
+          <el-dropdown-item command="clear">清除矩形</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
       <el-dropdown
@@ -128,7 +128,7 @@
         </el-dropdown-menu>
       </el-dropdown>
       <el-tooltip effect="dark" content="退出" placement="bottom">
-        <a @click.stop="$emit('update:show', false)">
+        <a @click.stop="close">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
               d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10zm0-2a8 8 0 1 0 0-16a8 8 0 0 0 0 16zm0-9.414l2.828-2.829l1.415 1.415L13.414 12l2.829 2.828l-1.415 1.415L12 13.414l-2.828 2.829l-1.415-1.415L10.586 12L7.757 9.172l1.415-1.415L12 10.586z"
@@ -137,7 +137,7 @@
           </svg>
         </a>
       </el-tooltip>
-      <el-tooltip effect="dark" content="保存并关闭" placement="bottom">
+      <el-tooltip :class="Loading&&'invisible'" effect="dark" content="保存并关闭" placement="bottom">
         <a @click.stop="confirm">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
@@ -160,15 +160,31 @@
     </div>
 
     <FormDialog
-      :show.sync="curImage.show"
-      v-model="curImage.data"
+      :show.sync="imagePicker.show"
+      v-model="imagePicker.data"
       append-to-body
-      :submit="curImage.submit"
-      @close="curImage.submit=null"
+      :retrieve="imagePicker.retrieve"
+      :submit="imagePicker.submit"
+      title="选择嵌在矩形内的贴图"
+      custom-class="imagePicker"
     >
-      <PicViewer :value="Image">
+      <PicViewer :value="Image" :viewerjs="false">
         <template v-slot="{ src, index }">
-          <img :src="src" alt="">
+          <div class="inline-block relative">
+            <img :src="src" class="h-148px cursor-pointer" alt="" @click="changeCurImage(src)">
+            <svg
+              xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"
+              role="img" width="32" height="32" preserveAspectRatio="xMidYMid meet"
+              viewBox="0 0 24 24"
+              class="absolute -right-3 -top-3 w-25px"
+              v-show="imagePicker.data===src"
+            >
+              <path
+                d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10s10-4.5 10-10S17.5 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+                fill="#409eff"
+              />
+            </svg>
+          </div>
         </template>
       </PicViewer>
     </FormDialog>
@@ -501,26 +517,30 @@ export default {
               //2.x：e.obj.className==='Overlay.Rectangle'
               if (this.active === 'rectangle') {
                 this.active = 'marker'
-                // 如果图层只允许有一个 清除之前绘制的
-                if (
+                // 如果矩形只允许有一个 清除之前绘制的
+                /*if (
                   this.Rectangle?.length === 1 &&
                   this.overlay.rectangleInstance.length === 1 &&
                   this.RectangleMaxCount === 1
                 ) {
                   this.overlay.rectangleInstance.pop().setMap(null)
                   this.overlay.rectangleEditor.pop().close()
-                }
+                }*/
                 //this.overlay.rectangleInstance.push(e.obj)
                 //this.editRectangle(this.overlay.rectangleInstance.getBounds()) 1.x中编辑绘制出来矩形会报错
                 e.obj.setMap(null) // 1.x改为销毁绘制出来的矩形并新建一个矩形对象
 
                 this.drawRectangle({
-                  url: this.curImage.curImage,
+                  url: this.curImage,
                   bounds: e.obj.getBounds()
                 })
+
+                /*this.$nextTick(() => {
+                  this.mouseTool.rectangle(this.rectangleStyle)
+                })*/
               }
-                //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
-              //2.x：e.obj.className==='Overlay.Polygon'
+                // 1.x：e.obj.CLASS_NAME==='AMap.Polygon'
+              // 2.x：e.obj.className==='Overlay.Polygon'
               else if (this.active === 'polygon') {
                 this.active = 'marker'
                 e.obj.setOptions({
@@ -528,7 +548,7 @@ export default {
                   fillColor: '#00D3FC',
                 })
                 this.overlay.polygonInstance.push(e.obj)
-                this.editPolygon()
+                this.editPolygon({ editable: true })
               }
               this.mouseTool.close()
             })
@@ -571,7 +591,7 @@ export default {
           //this.overlay.rectangleInstance?.on('click', this.onMapClick)
         },
         'rectangle': () => {
-          //this.text.setText('按住左键并拖动绘制图层')
+          //this.text.setText('按住左键并拖动绘制矩形')
           //this.text.off('click', this.onMapClick)
           this.map.off('click', this.onMapClick)
           //this.overlay.rectangleInstance?.off('click', this.onMapClick)
@@ -582,7 +602,7 @@ export default {
           //this.text.off('click', this.onMapClick)
           this.map.off('click', this.onMapClick)
           //this.overlay.rectangleInstance?.off('click', this.onMapClick)
-          this.drawPolygon()
+          this.drawPolygon({ editable: true })
         },
       })[newVal]()
     },
@@ -609,8 +629,16 @@ export default {
         }
       })
     },*/
+    close () {
+      confirm(`不保存并退出`).then(() => {
+        this.$emit('update:show', false)
+      })
+    },
+    changeCurImage (src) {
+      this.imagePicker.data = this.imagePicker.data === src ? '' : src
+    },
     setCurImage () {
-      this.curImage.show = true
+      this.imagePicker.show = true
     },
     help () {
       Swal.confirm({
@@ -626,19 +654,23 @@ export default {
       <li>清除：点位工具下拉菜单 → 清除点位</li>
     </ul>` : ''}
   ${this.RectangleStatus === 'editable' ? `
-  <li>图层</li>
+  <li>矩形</li>
     <ul style="margin-bottom:1rem">
-      <li>添加：选中图层工具 → 长按左键并拖动，松开完成绘制</li>
-      <li>重置：图层工具下拉菜单 → 重置图层</li>
-      <li>清除：图层工具下拉菜单 → 清除图层</li>
+      <li>添加：选中矩形工具 → 长按左键并拖动，松开完成绘制</li>
+      <li>选择贴图：矩形工具下拉菜单 → 选择贴图</li>
+      <li>调整形状：拖动矩形角上的圆点处</li>
+      <li>删除：右键矩形 → 点击[删除]</li>
+      <li>重置：矩形工具下拉菜单 → 重置矩形</li>
+      <li>清除：矩形工具下拉菜单 → 清除矩形</li>
     </ul>` : ''}
   ${this.PolygonStatus === 'editable' ? `
-  <li>轮廓</li>
+  <li>多边形</li>
     <ul style="margin-bottom:1rem">
-      <li>添加：选中轮廓工具 → 单击地图确定起点，双击结束绘制</li>
-      <li>删除：右键轮廓 → 点击[删除]</li>
-      <li>重置：轮廓工具下拉菜单 → 重置轮廓</li>
-      <li>清除：轮廓工具下拉菜单 → 清除轮廓</li>
+      <li>添加：选中多边形工具 → 单击地图确定起点，双击结束绘制</li>
+      <li>调整形状：拖动多边形角上的圆点处</li>
+      <li>删除：右键多边形 → 点击[删除]</li>
+      <li>重置：多边形工具下拉菜单 → 重置多边形</li>
+      <li>清除：多边形工具下拉菜单 → 清除多边形</li>
     </ul>` : ''}
 </ul>
                     `,
@@ -698,11 +730,21 @@ export default {
         baseCity: '',
         baseCityInitialized: false,
         MapOptions: {},
-        curImage: {
+        imagePicker: {
           show: false,
           data: '',
-          submit: null
-        }
+          retrieve: () => {
+            this.imagePicker.data = this.curImage
+          },
+          submit: () => {
+            this.curImage = this.imagePicker.data
+            this.active = 'rectangle'
+            if (!this.curImage) {
+              return confirm(`您没有选取任何贴图，绘制的矩形将是空心的`)
+            }
+          }
+        },
+        curImage: ''
       }
       const overlay = {
         marker: {
@@ -783,10 +825,11 @@ export default {
         }
 
         if (arr.includes('rectangle')) {
-          if (this.overlay.imageLayerInstance) {
-            this.overlay.imageLayerInstance.setMap(null)
-            this.overlay.rectangleInstance.setMap(null)
-            this.overlay.rectangleEditor.close()
+          for (let i = 0; i < this.overlay.rectangle.length; i++) {
+            this.overlay.rectangle.splice(i, 1)
+            this.overlay.rectangleInstance[i].setMap(null)
+            this.overlay.rectangleEditor[i].close()
+            this.overlay.imageLayerInstance[i]?.setMap(null)
           }
         }
 
@@ -795,12 +838,10 @@ export default {
             return
           }
 
-          this.overlay.polygonInstance.map(v => {
-            v?.setMap(null)
-          })
-          this.overlay.polygonEditor.map(v => {
-            v?.close()
-          })
+          for (let i = 0; i < this.overlay.polygonInstance.length; i++) {
+            this.overlay.polygonInstance[i].setMap(null)
+            this.overlay.polygonEditor[i]?.close()
+          }
         }
 
         Object.assign(this.$data, {
@@ -910,7 +951,7 @@ export default {
       this.$emit('update:mapOptions', this.MapOptions)
       if (this.RectangleStatus === 'editable') {
         //this.address || ((isEmpty(this.lng) || isEmpty(this.lat)) ? this.baseCity : '')
-        this.$emit('update:rectangle', this.roundOff(this.overlay.rectangle))
+        this.$emit('update:rectangle', this.overlay.rectangle)
       }
       if (this.PolygonStatus === 'editable') {
         this.syncPolygon()
@@ -1037,8 +1078,8 @@ export default {
             iconLabel: label
           })
 
-          const markerContextMenu = new AMap.ContextMenu()
-          markerContextMenu.addItem('删除', e => {
+          const contextMenu = new AMap.ContextMenu()
+          contextMenu.addItem('删除', e => {
             if (this.overlay.markerInstance.length <= this.MarkerMinCount) {
               warning(`至少绘制${this.MarkerMinCount}个点位`)
             } else {
@@ -1046,9 +1087,8 @@ export default {
               this.drawMarkerList(this.overlay.markerInstance)
             }
           }, 0)
-
           simpleMarker.on('rightclick', e => {
-            markerContextMenu.open(this.map, e.lnglat)
+            contextMenu.open(this.map, e.lnglat)
           })
 
           return simpleMarker
@@ -1231,7 +1271,7 @@ export default {
 
       if (!arr || arr.includes('rectangle')) {
         if (this.Image.length === 1) {
-          this.curImage.data = this.Image[0]
+          this.curImage = this.Image[0]
         }
 
         if (this.Rectangle?.length > 0) {
@@ -1459,11 +1499,11 @@ export default {
   cursor: crosshair !important;
 }
 
-::v-deep .el-dialog.is-fullscreen {
+::v-deep .coord-picker > .el-dialog.is-fullscreen {
   overflow: hidden;
 }
 
-::v-deep .el-dialog__header {
+::v-deep .coord-picker > .el-dialog__header {
   display: none; // flex
   box-sizing: border-box;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -1503,7 +1543,7 @@ export default {
   }
 }
 
-::v-deep .el-dialog__body {
+::v-deep .coord-picker > .el-dialog__body {
   height: 100%;
   padding: 0;
 
@@ -1586,10 +1626,18 @@ export default {
   top: unset;
   bottom: 95px;
 }
+
+::v-deep .imagePicker .el-dialog__body {
+  padding: 25px;
+
+  .footer {
+    padding: 10px 0 0 0;
+  }
+}
 </style>
 
 <style lang="scss">
-.coord-picker {
+.map-container {
   &.el-loading-mask {
     left: 50%;
     top: 50%;

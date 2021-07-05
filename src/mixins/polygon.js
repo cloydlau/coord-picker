@@ -19,7 +19,7 @@ export default {
   },
   methods: {
     onPolygonBtnClick () {
-      if (this.PolygonStatus === 'editable' && this.overlay.polygonInstance.length >= this.PolygonMaxCount) {
+      if (this.overlay.polygonInstance.length >= this.PolygonMaxCount) {
         warning(`最多绘制${this.PolygonMaxCount}个多边形`)
       } else {
         this.active = 'polygon'
@@ -63,22 +63,27 @@ export default {
         })
       }
     },
-    editPolygon (editable = true) {
+    editPolygon (editable) {
       const i = this.overlay.polygonInstance.length - 1
 
-      const polygonContextMenu = new AMap.ContextMenu()
-      polygonContextMenu.addItem('删除', e => {
-        if (this.overlay.polygonInstance.length <= this.PolygonMinCount) {
-          warning(`至少绘制${this.PolygonMinCount}个多边形`)
-        } else {
-          if (editable) {
-            this.overlay.polygonEditor[i].close()
-            this.overlay.polygonEditor.splice(i, 1)
+      if (this.PolygonStatus === 'editable') {
+        const polygonContextMenu = new AMap.ContextMenu()
+        polygonContextMenu.addItem('删除', e => {
+          if (this.overlay.polygonInstance.length <= this.PolygonMinCount) {
+            warning(`至少绘制${this.PolygonMinCount}个多边形`)
+          } else {
+            if (editable) {
+              this.overlay.polygonEditor[i].close()
+              this.overlay.polygonEditor.splice(i, 1)
+            }
+            this.overlay.polygonInstance[i].setMap(null)
+            this.overlay.polygonInstance.splice(i, 1)
           }
-          this.overlay.polygonInstance[i].setMap(null)
-          this.overlay.polygonInstance.splice(i, 1)
-        }
-      }, 0)
+        }, 0)
+        this.overlay.polygonInstance[i].on('rightclick', e => {
+          polygonContextMenu.open(this.map, e.lnglat)
+        })
+      }
 
       /*this.overlay.polygonInstance[i].on('mouseout', e => {
         this.text.setText('单击绘制点位')
@@ -86,22 +91,19 @@ export default {
 
       this.overlay.polygonInstance[i].on('click', this.onMapClick)
 
-      this.overlay.polygonInstance[i].on('rightclick', e => {
-        polygonContextMenu.open(this.map, e.lnglat)
-      })
-
       /*this.overlay.polygonInstance[i].on('mousemove', e => {
         this.text.setText((editable ? '拖拽角调整形状，' : '') + '右键删除')
         this.setTextPosition(e)
       })*/
 
+      let polygonEditor = null
       if (editable) {
-        this.overlay.polygonEditor.push(AMap.PolygonEditor ?
+        polygonEditor = AMap.PolygonEditor ?
           new AMap.PolygonEditor(this.map, this.overlay.polygonInstance[i]) :
           new AMap.PolyEditor(this.map, this.overlay.polygonInstance[i])
-        )
-        this.overlay.polygonEditor[i].open()
+        polygonEditor.open()
       }
+      this.overlay.polygonEditor.push(polygonEditor)
       this.overlay.polygonInstance[i].setMap(this.map)
     },
   }
