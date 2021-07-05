@@ -123,8 +123,8 @@
           </svg>
         </a>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="reset">重置区域</el-dropdown-item>
-          <el-dropdown-item command="clear">清除区域</el-dropdown-item>
+          <el-dropdown-item command="reset">重置多边形</el-dropdown-item>
+          <el-dropdown-item command="clear">清除多边形</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
       <el-tooltip effect="dark" content="退出" placement="bottom">
@@ -260,6 +260,27 @@ export default {
     }
   },
   computed: {
+    MarkerStatus () {
+      if (this.MarkerMaxCount > 0) {
+        return 'editable'
+      } else if (this.Marker?.length > 0) {
+        return 'readonly'
+      }
+    },
+    RectangleStatus () {
+      if (this.RectangleMaxCount > 0) {
+        return 'editable'
+      } else if (this.Rectangle?.length > 0) {
+        return 'readonly'
+      }
+    },
+    PolygonStatus () {
+      if (this.PolygonMaxCount > 0) {
+        return 'editable'
+      } else if (this.Polygon?.length > 0) {
+        return 'readonly'
+      }
+    },
     Marker () {
       return getFinalProp(this.marker, globalProps.marker)
     },
@@ -332,13 +353,13 @@ export default {
 
         //this.customClass = 'animate__animated animate__zoomIn'
         AMapLoader.load({
-          'key': this.ApiKey, // 申请好的Web端开发者Key，首次调用 load 时必填
+          key: this.ApiKey, // 申请好的Web端开发者Key，首次调用 load 时必填
           AMapUI: {
             version: '1.1',
             plugins: ['misc/MarkerList', 'overlay/SimpleMarker', 'overlay/SimpleInfoWindow']
           },
           ...this.Version && { version: this.Version }, // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
-          'plugins': [
+          plugins: [
             'AMap.Scale',
             'AMap.MapType',
             //'AMap.ControlBar',
@@ -348,18 +369,21 @@ export default {
             ...this.Version?.startsWith('2.') ?
               ['AMap.AutoComplete'] :
               ['AMap.Autocomplete'],
-            ...this.RectangleMaxCount > 0 ? [
+            ...this.RectangleStatus === 'editable' ? [
               'AMap.MouseTool',
               'AMap.RectangleEditor',
             ] : [],
-            ...this.PolygonMaxCount > 0 ? [
-              'AMap.MouseTool',
+            ...this.PolygonStatus === 'editable' ? [
               'AMap.Polygon',
+              'AMap.MouseTool',
               'AMap.ContextMenu',
               'AMap.DistrictSearch',
               ...this.Version?.startsWith('2.') ?
                 ['AMap.PolygonEditor',] :
                 ['AMap.PolyEditor',],
+            ] : [],
+            ...this.PolygonStatus === 'readonly' ? [
+              'AMap.Polygon',
             ] : [],
           ]
         })
@@ -470,25 +494,29 @@ export default {
             this.MapOptions.zoom = this.map.getZoom()
           })
 
-          if (this.RectangleMaxCount > 0 || this.PolygonMaxCount > 0) {
+          if (this.RectangleStatus === 'editable' || this.PolygonStatus === 'editable') {
             this.mouseTool = new AMap.MouseTool(this.map)
             this.mouseTool.on('draw', e => {
               //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
               //2.x：e.obj.className==='Overlay.Rectangle'
               if (this.active === 'rectangle') {
                 this.active = 'marker'
-                //图层只允许有一个 清除之前绘制的
-                if (this.overlay.rectangleInstance) {
-                  this.overlay.rectangleEditor.close()
-                  this.overlay.rectangleEditor = null
-                  this.overlay.rectangleInstance.setMap(null)
+                // 如果图层只允许有一个 清除之前绘制的
+                if (
+                  this.Rectangle?.length === 1 &&
+                  this.overlay.rectangleInstance.length === 1 &&
+                  this.RectangleMaxCount === 1
+                ) {
+                  this.overlay.rectangleInstance.pop().setMap(null)
+                  this.overlay.rectangleEditor.pop().close()
                 }
-                this.overlay.rectangleInstance = e.obj
-                //this.editImage(this.overlay.rectangleInstance.getBounds()) 1.x中编辑绘制出来矩形会报错
-                e.obj.setMap(null) //1.x改为销毁绘制出来的矩形并新建一个矩形对象
-                this.drawImage({
+                //this.overlay.rectangleInstance.push(e.obj)
+                //this.editRectangle(this.overlay.rectangleInstance.getBounds()) 1.x中编辑绘制出来矩形会报错
+                e.obj.setMap(null) // 1.x改为销毁绘制出来的矩形并新建一个矩形对象
+
+                this.drawRectangle({
                   url: this.curImage.curImage,
-                  bounds: this.overlay.rectangleInstance.getBounds()
+                  bounds: e.obj.getBounds()
                 })
               }
                 //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
@@ -540,20 +568,20 @@ export default {
           //this.text.setText('单击绘制点位')
           //this.text.on('click', this.onMapClick)
           this.map.on('click', this.onMapClick)
-          this.overlay.rectangleInstance?.on('click', this.onMapClick)
+          //this.overlay.rectangleInstance?.on('click', this.onMapClick)
         },
         'rectangle': () => {
           //this.text.setText('按住左键并拖动绘制图层')
           //this.text.off('click', this.onMapClick)
           this.map.off('click', this.onMapClick)
-          this.overlay.rectangleInstance?.off('click', this.onMapClick)
+          //this.overlay.rectangleInstance?.off('click', this.onMapClick)
           this.mouseTool.rectangle(this.rectangleStyle)
         },
         'polygon': () => {
-          //this.text.setText('单击确定区域起点，双击结束绘制')
+          //this.text.setText('单击确定多边形起点，双击结束绘制')
           //this.text.off('click', this.onMapClick)
           this.map.off('click', this.onMapClick)
-          this.overlay.rectangleInstance?.off('click', this.onMapClick)
+          //this.overlay.rectangleInstance?.off('click', this.onMapClick)
           this.drawPolygon()
         },
       })[newVal]()
@@ -589,21 +617,22 @@ export default {
         titleText: '使用帮助',
         html: `
 <ul style="text-align:left">
+  ${this.MarkerStatus === 'editable' ? `
   <li>点位</li>
     <ul style="margin-bottom:1rem">
       <li>添加：选中点位工具 → 点击地图；搜索位置 → 点击搜索结果</li>
       <li>删除：右键点位 → 点击[删除]；点位列表 → 点击右上角[×]</li>
       <li>重置：点位工具下拉菜单 → 重置点位</li>
       <li>清除：点位工具下拉菜单 → 清除点位</li>
-    </ul>
-  ${this.RectangleMaxCount > 0 ? `
+    </ul>` : ''}
+  ${this.RectangleStatus === 'editable' ? `
   <li>图层</li>
     <ul style="margin-bottom:1rem">
       <li>添加：选中图层工具 → 长按左键并拖动，松开完成绘制</li>
       <li>重置：图层工具下拉菜单 → 重置图层</li>
       <li>清除：图层工具下拉菜单 → 清除图层</li>
     </ul>` : ''}
-  ${this.PolygonMaxCount > 0 ? `
+  ${this.PolygonStatus === 'editable' ? `
   <li>轮廓</li>
     <ul style="margin-bottom:1rem">
       <li>添加：选中轮廓工具 → 单击地图确定起点，双击结束绘制</li>
@@ -652,7 +681,7 @@ export default {
         new AMap.AutoComplete(param) :
         new AMap.Autocomplete(param)
       this.plugins.PlaceSearch = new AMap.PlaceSearch(param)
-      if (this.PolygonMaxCount > 0) {
+      if (this.PolygonStatus === 'editable') {
         this.plugins.DistrictSearch = new AMap.DistrictSearch({
           subdistrict: 0,   //获取边界不需要返回下级行政区
           extensions: 'all',  //返回行政区边界坐标组等具体信息
@@ -680,9 +709,9 @@ export default {
           markerInstance: [],
         },
         rectangle: {
-          imageLayerInstance: null,
-          rectangleInstance: null,
-          rectangleEditor: null,
+          imageLayerInstance: [],
+          rectangleInstance: [],
+          rectangleEditor: [],
           rectangle: [],
         },
         polygon: {
@@ -722,11 +751,15 @@ export default {
             break
           }
           case 'rectangle': {
+            if (this.RectangleMinCount > 0 && this.overlay.rectangleInstance.length > 0) {
+              warning(`至少绘制${this.RectangleMinCount}个矩形`)
+              return false
+            }
             break
           }
           case 'polygon':
             if (this.PolygonMinCount > 0 && this.overlay.polygonInstance.length > 0) {
-              warning(`至少绘制${this.PolygonMinCount}个区域`)
+              warning(`至少绘制${this.PolygonMinCount}个多边形`)
               return false
             }
         }
@@ -875,11 +908,11 @@ export default {
         return v
       }))
       this.$emit('update:mapOptions', this.MapOptions)
-      if (this.RectangleMaxCount > 0) {
+      if (this.RectangleStatus === 'editable') {
         //this.address || ((isEmpty(this.lng) || isEmpty(this.lat)) ? this.baseCity : '')
         this.$emit('update:rectangle', this.roundOff(this.overlay.rectangle))
       }
-      if (this.PolygonMaxCount > 0) {
+      if (this.PolygonStatus === 'editable') {
         this.syncPolygon()
         this.$emit('update:polygon', this.overlay.polygon)
       }
@@ -1175,7 +1208,7 @@ export default {
       }
     },
     drawDistrict (districtName) {
-      if (districtName && this.PolygonMaxCount > 0) {
+      if (districtName && this.PolygonStatus === 'editable') {
         this.useAmapApi('DistrictSearch.search', districtName)
         .then(result => {
           const bounds = result.districtList?.[0]?.boundaries
@@ -1202,28 +1235,29 @@ export default {
         }
 
         if (this.Rectangle?.length > 0) {
-          this.Rectangle.map(({ url, southWest, northEast }) => {
-            const [southWestLng, southWestLat] = southWest
-            const [northEastLng, northEastLat] = northEast
+          this.Rectangle.map(v => {
+            const { url, southwest, northeast } = v || {}
+            const { lng: southwestLng, lat: southwestLat } = southwest || {}
+            const { lng: northeastLng, lat: northeastLat } = northeast || {}
 
-            if (url && notEmpty(southWestLng) && notEmpty(southWestLat) && notEmpty(northEastLng) && notEmpty(northEastLat)) {
-              this.drawImage({
+            if (notEmpty(southwestLng) && notEmpty(southwestLat) && notEmpty(northeastLng) && notEmpty(northeastLat)) {
+              this.drawRectangle({
                 url,
                 bounds: new AMap.Bounds(
                   new AMap.LngLat(
                     // 1.x版本不兼容输入东南角
-                    (isEmpty(northEastLng) || isEmpty(southWestLng)) ? '' :
-                      Math.min(northEastLng, southWestLng),
-                    southWestLat
+                    (isEmpty(northeastLng) || isEmpty(southwestLng)) ? '' :
+                      Math.min(northeastLng, southwestLng),
+                    southwestLat
                   ),
                   new AMap.LngLat(
                     // 1.x版本不兼容输入西北角
-                    (isEmpty(northEastLng) || isEmpty(southWestLng)) ? '' :
-                      Math.max(northEastLng, southWestLng),
-                    northEastLat
+                    (isEmpty(northeastLng) || isEmpty(southwestLng)) ? '' :
+                      Math.max(northeastLng, southwestLng),
+                    northeastLat
                   ),
                 ),
-                editable: this.RectangleMaxCount > 0
+                editable: this.RectangleStatus === 'editable'
               })
 
               hasOverlay = true
@@ -1236,7 +1270,7 @@ export default {
         if (this.Polygon?.length > 0) {
           this.drawPolygon({
             polygon: this.Polygon,
-            editable: this.RectangleMaxCount > 0
+            editable: this.RectangleStatus === 'editable'
           })
           hasOverlay = true
         }

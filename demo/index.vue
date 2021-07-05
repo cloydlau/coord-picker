@@ -110,8 +110,8 @@ export default {
         rectangle: [
           {
             url: 'https://pic4.zhimg.com/80/v2-670a8e55fc0dcb76fc4860c18963aaa8_720w.jpg',
-            southWest: [106.790543, 26.506218],
-            northEast: [106.682739, 26.610016]
+            southwest: { lng: 106.790543, lat: 26.506218 },
+            northeast: { lng: 106.682739, lat: 26.610016 },
           }
         ],
         rectangleCount: 2,

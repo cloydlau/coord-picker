@@ -233,14 +233,14 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
   // 矩形1
   {
     url: '图层图片链接',
-    southWest: ['经度', '纬度'],
-    northEast: ['经度', '纬度'],
+    southwest: { lng: '经度', lat: '纬度' },
+    northeast: { lng: '经度', lat: '纬度' },
   },
   // 矩形2
   {
     url: '图层图片链接',
-    southWest: ['经度', '纬度'],
-    northEast: ['经度', '纬度'],
+    southwest: { lng: '经度', lat: '纬度' },
+    northeast: { lng: '经度', lat: '纬度' },
   },
 ]
 ```

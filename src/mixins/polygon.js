@@ -19,7 +19,7 @@ export default {
   },
   methods: {
     onPolygonBtnClick () {
-      if (this.PolygonMaxCount > 0 && this.overlay.polygonInstance.length >= this.PolygonMaxCount) {
+      if (this.PolygonStatus === 'editable' && this.overlay.polygonInstance.length >= this.PolygonMaxCount) {
         warning(`最多绘制${this.PolygonMaxCount}个多边形`)
       } else {
         this.active = 'polygon'
@@ -69,7 +69,7 @@ export default {
       const polygonContextMenu = new AMap.ContextMenu()
       polygonContextMenu.addItem('删除', e => {
         if (this.overlay.polygonInstance.length <= this.PolygonMinCount) {
-          warning(`至少绘制${this.PolygonMinCount}个区域`)
+          warning(`至少绘制${this.PolygonMinCount}个多边形`)
         } else {
           if (editable) {
             this.overlay.polygonEditor[i].close()
