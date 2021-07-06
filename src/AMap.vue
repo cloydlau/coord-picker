@@ -1389,7 +1389,8 @@ export default {
            * 绘制覆盖物
            */
           const [result] = await waitFor(this.initOverlays())
-          const centerDesignated = result.centerDesignated, hasOverlay = result.hasOverlay
+          let centerDesignated = result.centerDesignated,
+            hasOverlay = result.hasOverlay
 
           /**
            * 中心点定位
@@ -1401,11 +1402,13 @@ export default {
           // 传了中心点 定位至该中心点
           if (notEmpty(this.lng) && notEmpty(this.lat)) {
             this.setCenter([this.lng, this.lat])
+            centerDesignated = true
           }
           // 点位数量为1 定位至该点位
           else if (this.overlay.markerInstance.length === 1 && notEmpty(this.overlay.markerInstance[0].longitude) && notEmpty(this.overlay.markerInstance[0].latitude)) {
             const { longitude, latitude } = this.overlay.markerInstance[0]
             this.setCenter([longitude, latitude])
+            centerDesignated = true
           }
           // 定位至address
           else if (this.address) {
@@ -1413,17 +1416,20 @@ export default {
             const { lng, lat } = result?.geocodes[0]?.location || {}
             if (notEmpty(lng) && notEmpty(lat)) {
               this.setCenter([lng, lat])
+              centerDesignated = true
             }
           }
-          // 存在覆盖物 将视图适配覆盖物
-          else if (hasOverlay) {
-            this.map.setFitView()
-            this.map.setZoom(this.MapOptions.zoom)
-          }
-          // 定位至baseCity
-          else if (this.baseCity) {
-            this.map.setCity(this.baseCity)
-            this.map.setZoom(this.MapOptions.zoom)
+          if (!centerDesignated) {
+            // 存在覆盖物 将视图适配覆盖物
+            if (hasOverlay) {
+              this.map.setFitView()
+              this.map.setZoom(this.MapOptions.zoom)
+            }
+            // 定位至baseCity
+            else if (this.baseCity) {
+              this.map.setCity(this.baseCity)
+              this.map.setZoom(this.MapOptions.zoom)
+            }
           }
 
           // 放在最后的原因是setZoom和setCity会触发zoomchange
