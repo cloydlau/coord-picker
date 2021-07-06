@@ -1316,7 +1316,7 @@ export default {
         if (this.Polygon?.length > 0) {
           this.drawPolygon({
             polygon: this.Polygon,
-            editable: this.RectangleStatus === 'editable'
+            editable: this.PolygonStatus === 'editable'
           })
           hasOverlay = true
         }
