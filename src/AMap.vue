@@ -105,7 +105,7 @@
           </svg>
         </a>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="setCurImage" v-if="Image.length>0">选择贴图</el-dropdown-item>
+          <el-dropdown-item command="setCurImage" v-if="RectangleImage.length>0">选择贴图</el-dropdown-item>
           <el-dropdown-item command="reset">重置矩形</el-dropdown-item>
           <el-dropdown-item command="clear">清除矩形</el-dropdown-item>
         </el-dropdown-menu>
@@ -168,7 +168,7 @@
       title="选择嵌在矩形内的贴图"
       custom-class="imagePicker"
     >
-      <PicViewer :value="Image" :viewerjs="false">
+      <PicViewer :value="RectangleImage" :viewerjs="false">
         <template v-slot="{ src, index }">
           <div class="inline-block relative">
             <img :src="src" class="h-148px cursor-pointer" alt="" @click="changeCurImage(src)">
@@ -245,7 +245,7 @@ export default {
     addressComponent: [Object, Function],
     polygonCount: [Number, Array],
     mapOptions: Object,
-    image: {
+    rectangleImage: {
       validator: value => ['string', 'array', 'null'].includes(typeOf(value)),
     },
     rectangle: Array,
@@ -333,8 +333,8 @@ export default {
     MarkerMinCount () {
       return Array.isArray(this.MarkerCount) ? this.MarkerCount[0] : undefined
     },
-    Image () {
-      const temp = getFinalProp(this.image, globalProps.image, [])
+    RectangleImage () {
+      const temp = getFinalProp(this.rectangleImage, globalProps.rectangleImage, [])
       return (typeof temp === 'string') ? [temp] : temp
     },
     Version () {
@@ -1272,8 +1272,8 @@ export default {
       let centerDesignated = false, hasOverlay = false
 
       if (!arr || arr.includes('rectangle')) {
-        if (this.Image.length === 1) {
-          this.curImage = this.Image[0]
+        if (this.RectangleImage.length === 1) {
+          this.curImage = this.RectangleImage[0]
         }
 
         if (this.Rectangle?.length > 0) {

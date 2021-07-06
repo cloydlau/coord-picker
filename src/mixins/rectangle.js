@@ -21,7 +21,7 @@ export default {
     onRectangleBtnClick () {
       if (this.overlay.rectangleInstance.length >= this.RectangleMaxCount) {
         warning(`最多绘制${this.RectangleMaxCount}个矩形`)
-      } else if (!this.curImage && this.Image.length > 1) {
+      } else if (!this.curImage && this.RectangleImage.length > 1) {
         this.imagePicker.show = true
       } else {
         this.active = 'rectangle'

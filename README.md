@@ -90,7 +90,7 @@ export default {
 | --- | --- | --- | --- | --- |
 | rectangle.sync | 矩形 | object[] | | |
 | rectangleCount | 矩形数量限制 | number, number[] | | 0 |
-| image | 嵌在矩形内的贴图url | string, string[] | | |
+| rectangleImage | 嵌在矩形内的贴图url | string, string[] | | |
 
 ### 多边形相关
 
