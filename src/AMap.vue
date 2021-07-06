@@ -557,7 +557,8 @@ export default {
         })
         .catch(e => {
           this.$emit('update:show', false)
-          error(`地图初始化失败：${e}`)
+          console.error(e)
+          error(`高德地图初始化失败：${JSON.stringify(e)}`)
         })
         .finally(e => {
         })
