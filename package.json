@@ -1,6 +1,6 @@
 {
   "name": "coord-picker",
-  "version": "0.3.6",
+  "version": "0.4.0",
   "author": "cloydlau",
   "license": "MIT",
   "description": "高德/腾讯地图坐标拾取器 / Coordinate picker for amap/tmap",
@@ -55,10 +55,10 @@
     "json-editor-vue": "^0.1.6",
     "sass": "^1.35.1",
     "typescript": "^4.3.5",
-    "vite": "2.2.4",
+    "vite": "^2.4.0",
     "vite-plugin-icons": "^0.6.4",
     "vite-plugin-vue2": "^1.7.2",
-    "vite-plugin-windicss": "^1.2.0",
+    "vite-plugin-windicss": "^1.2.3",
     "vue": "^2.6.14",
     "vue-template-compiler": "^2.6.14"
   }

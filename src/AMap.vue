@@ -334,8 +334,8 @@ export default {
       return Array.isArray(this.MarkerCount) ? this.MarkerCount[0] : undefined
     },
     Image () {
-      const temp = getFinalProp(this.image, globalProps.image)
-      return (temp && typeof temp === 'string') ? [temp] : temp
+      const temp = getFinalProp(this.image, globalProps.image, [])
+      return (typeof temp === 'string') ? [temp] : temp
     },
     Version () {
       return ''
@@ -363,9 +363,9 @@ export default {
   watch: {
     show (newVal, oldVal) {
       if (newVal) {
-        this.MapOptions = getFinalProp(this.mapOptions, globalProps.mapOptions, /*{
-          viewMode: '3D',
-        }*/)
+        this.MapOptions = getFinalProp(this.mapOptions, globalProps.mapOptions, {
+          //viewMode: '3D',
+        })
 
         //this.customClass = 'animate__animated animate__zoomIn'
         AMapLoader.load({
@@ -506,9 +506,6 @@ export default {
           if (notEmpty(this.MapOptions.zoom)) {
             this.MapOptions.zoom = Number(this.MapOptions.zoom)
           }
-          this.map.on('zoomchange', e => {
-            this.MapOptions.zoom = this.map.getZoom()
-          })
 
           if (this.RectangleStatus === 'editable' || this.PolygonStatus === 'editable') {
             this.mouseTool = new AMap.MouseTool(this.map)
@@ -740,7 +737,12 @@ export default {
             this.curImage = this.imagePicker.data
             this.active = 'rectangle'
             if (!this.curImage) {
-              return confirm(`您没有选取任何贴图，绘制的矩形将是空心的`)
+              return confirm({
+                title: `您没有选取任何贴图，绘制的矩形将是空心的`,
+                customClass: {
+                  popup: 'coord-picker-confirm',
+                }
+              })
             }
           }
         },
@@ -1284,16 +1286,20 @@ export default {
               this.drawRectangle({
                 url,
                 bounds: new AMap.Bounds(
+                  // 西南角
                   new AMap.LngLat(
-                    // 1.x版本不兼容输入东南角
+                    // 经度 1.x版本不兼容输入东南角
                     (isEmpty(northeastLng) || isEmpty(southwestLng)) ? '' :
                       Math.min(northeastLng, southwestLng),
+                    // 纬度
                     southwestLat
                   ),
+                  // 东北角
                   new AMap.LngLat(
-                    // 1.x版本不兼容输入西北角
+                    // 经度 1.x版本不兼容输入西北角
                     (isEmpty(northeastLng) || isEmpty(southwestLng)) ? '' :
                       Math.max(northeastLng, southwestLng),
+                    // 纬度
                     northeastLat
                   ),
                 ),
@@ -1419,6 +1425,11 @@ export default {
             this.map.setCity(this.baseCity)
             this.map.setZoom(this.MapOptions.zoom)
           }
+
+          // 放在最后的原因是setZoom和setCity会触发zoomchange
+          this.map.on('zoomchange', e => {
+            this.MapOptions.zoom = this.map.getZoom()
+          })
         }
       }
     },
@@ -1645,5 +1656,9 @@ export default {
     right: unset;
     transform: translate(-50%, -50%);
   }
+}
+
+.coord-picker-confirm {
+  width: fit-content;
 }
 </style>

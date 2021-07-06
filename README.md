@@ -64,7 +64,7 @@ export default {
 | --- | --- | --- | --- | --- |
 | show.sync | 开关 | boolean | | false |
 | apiKey | 高德地图 js api key | string | | |
-| city* | 初始行政区 | string | | |
+| city | 初始行政区 | string | | |
 | mapOptions.sync | [地图初始化参数对象](https://lbs.amap.com/api/javascript-api/reference/map) | object | | |
 | precision | 坐标精度（保留几位小数） | number | | 6 |
 | addressComponent* | 地址成分 | object, function | | |
@@ -81,23 +81,23 @@ export default {
 
 | Attribute | Description | Type | Accepted Values | Default |
 | --- | --- | --- | --- | --- |
-| marker.sync* | 点位列表 | object[] | | |
-| markerCount* | 点位数量限制 | number, number[] | | 1 |
+| marker.sync | 点位列表 | object[] | | |
+| markerCount | 点位数量限制 | number, number[] | | 1 |
 
 ### 矩形相关
 
 | Attribute | Description | Type | Accepted Values | Default |
 | --- | --- | --- | --- | --- |
-| image | 嵌在矩形内的贴图 | string, string[] | | |
-| rectangle | 矩形 | object[] | | |
+| rectangle.sync | 矩形 | object[] | | |
 | rectangleCount | 矩形数量限制 | number, number[] | | 0 |
+| image | 嵌在矩形内的贴图url | string, string[] | | |
 
 ### 多边形相关
 
 | Attribute | Description | Type | Accepted Values | Default |
 | --- | --- | --- | --- | --- |
-| polygon.sync* | 多边形列表 | object[] | | |
-| polygonCount* | 多边形数量限制 | number, number[] | | 0 |
+| polygon.sync | 多边形列表 | object[] | | |
+| polygonCount | 多边形数量限制 | number, number[] | | 0 |
 
 ::: warning 坐标值类型  
 number和string都能接收 但返回时 由于js的number类型存在精度丢失问题 故返回string
@@ -111,7 +111,11 @@ number和string都能接收 但返回时 由于js的number类型存在精度丢�
 
 adcode信息可参考[城市编码表](https://lbs.amap.com/api/webservice/download)获取
 
-### markerCount, polygonCount
+::: tip 长度超过6位数？  
+组件内部做了处理，如果你传入的city超过6位数，也会以仅保留前6位的形式支持。
+:::
+
+### markerCount, rectangleCount, polygonCount
 
 - number
 
@@ -146,7 +150,7 @@ adcode信息可参考[城市编码表](https://lbs.amap.com/api/webservice/downl
 
 ### mapOptions
 
-::: tip 支持双向绑定？  
+::: tip 为什么支持双向绑定？  
 mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
 :::
 
@@ -192,8 +196,6 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
 
 - `markerCount === 0` 时，也会依据marker参数渲染点位（只读）
 
-- `markerCount === 1 && marker.length === 1` 时，新绘制的点位将覆盖旧点位
-
 ### 数据格式
 
 ```
@@ -232,14 +234,14 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
   // 矩形1
   {
     url: '贴图链接',
-    southwest: { lng: '经度', lat: '纬度' },
-    northeast: { lng: '经度', lat: '纬度' },
+    southwest: { lng: '经度', lat: '纬度' }, // 西南角坐标（兼容东南角）
+    northeast: { lng: '经度', lat: '纬度' }, // 东北角坐标（兼容西北角）
   },
   // 矩形2
   {
     url: '贴图链接',
-    southwest: { lng: '经度', lat: '纬度' },
-    northeast: { lng: '经度', lat: '纬度' },
+    southwest: { lng: '经度', lat: '纬度' }, // 西南角坐标（兼容东南角）
+    northeast: { lng: '经度', lat: '纬度' }, // 东北角坐标（兼容西北角）
   },
 ]
 ```
