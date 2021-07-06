@@ -528,7 +528,7 @@ export default {
                 e.obj.setMap(null) // 1.x改为销毁绘制出来的矩形并新建一个矩形对象
 
                 this.drawRectangle({
-                  url: this.curImage,
+                  image: this.curImage,
                   bounds: e.obj.getBounds()
                 })
 
@@ -1278,13 +1278,13 @@ export default {
 
         if (this.Rectangle?.length > 0) {
           this.Rectangle.map(v => {
-            const { url, southwest, northeast } = v || {}
+            const { image, southwest, northeast } = v || {}
             const { lng: southwestLng, lat: southwestLat } = southwest || {}
             const { lng: northeastLng, lat: northeastLat } = northeast || {}
 
             if (notEmpty(southwestLng) && notEmpty(southwestLat) && notEmpty(northeastLng) && notEmpty(northeastLat)) {
               this.drawRectangle({
-                url,
+                image,
                 bounds: new AMap.Bounds(
                   // 西南角
                   new AMap.LngLat(

@@ -27,11 +27,11 @@ export default {
         this.active = 'rectangle'
       }
     },
-    syncRectangleBounds ({ i, url, bounds }) {
+    syncRectangleBounds ({ i, image, bounds }) {
       // 兼容1.x
       this.overlay.rectangle[i] = {
         ...this.overlay.rectangle[i],
-        ...url && { url },
+        ...image && { image },
         northeast: {
           lng: bounds.northEast ? bounds.northEast.lng : bounds.northeast.lng,
           lat: bounds.northEast ? bounds.northEast.lat : bounds.northeast.lat
@@ -44,7 +44,7 @@ export default {
       // 矩形可能不包含贴图 所以需要判空
       this.overlay.imageLayerInstance[i]?.setBounds(bounds)
     },
-    drawRectangle ({ url, bounds, editable = true }) {
+    drawRectangle ({ image, bounds, editable = true }) {
       const rectangleInstance = new AMap.Rectangle({
         ...this.rectangleStyle,
         bounds,
@@ -80,15 +80,15 @@ export default {
 
       rectangleInstance.setMap(this.map)
       let imageLayerInstance = null
-      if (url) {
+      if (image) {
         imageLayerInstance = new AMap.ImageLayer({
-          url,
+          url: image,
           bounds,
         })
         this.map.add(imageLayerInstance)
       }
       this.overlay.imageLayerInstance.push(imageLayerInstance)
-      this.syncRectangleBounds({ i, url, bounds })
+      this.syncRectangleBounds({ i, image, bounds })
 
       if (editable) {
         this.editRectangle({

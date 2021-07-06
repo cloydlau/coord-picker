@@ -233,13 +233,13 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
 [
   // 矩形1
   {
-    url: '贴图链接',
+    image: '贴图链接',
     southwest: { lng: '经度', lat: '纬度' }, // 西南角坐标（兼容东南角）
     northeast: { lng: '经度', lat: '纬度' }, // 东北角坐标（兼容西北角）
   },
   // 矩形2
   {
-    url: '贴图链接',
+    image: '贴图链接',
     southwest: { lng: '经度', lat: '纬度' }, // 西南角坐标（兼容东南角）
     northeast: { lng: '经度', lat: '纬度' }, // 东北角坐标（兼容西北角）
   },
