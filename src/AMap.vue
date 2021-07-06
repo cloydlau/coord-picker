@@ -192,7 +192,7 @@
 </template>
 
 <script>
-import { isEmpty, notEmpty, typeOf } from 'kayran'
+import { isEmpty, notEmpty, typeOf, waitFor } from 'kayran'
 import 'kikimore/dist/style.css'
 import { Swal, Selector, FormDialog } from 'kikimore'
 const { error, warning, confirm, } = Swal
@@ -898,7 +898,7 @@ export default {
     },
     async onMapClick (e) {
       const { lng: longitude, lat: latitude } = e.lnglat
-      const { address, name } = await this.getAddress([e.lnglat.lng, e.lnglat.lat])
+      const [{ address, name }] = await waitFor(this.getAddress([e.lnglat.lng, e.lnglat.lat]))
       this.drawMarker({
         longitude,
         latitude,
@@ -913,7 +913,6 @@ export default {
           resolve(result.tips || [])
         })
         .catch((result, status) => {
-          debugger
           if (status === 'no_data') {
             resolve([])
           } else {
@@ -1340,7 +1339,7 @@ export default {
           if (this.address) {
             address = this.address
           } else {
-            const result = await this.getAddress([this.lng, this.lat])
+            const [result] = await waitFor(this.getAddress([this.lng, this.lat]))
             address = result.address
             name = result.name
           }
@@ -1383,13 +1382,13 @@ export default {
         }
         // 初始化
         else {
-          this.baseCity = await this.getBaseCity()
+          this.baseCity = (await waitFor(this.getBaseCity()))[0]
           this.initPlugins()
 
           /**
            * 绘制覆盖物
            */
-          const result = await this.initOverlays()
+          const [result] = await waitFor(this.initOverlays())
           const centerDesignated = result.centerDesignated, hasOverlay = result.hasOverlay
 
           /**
@@ -1410,8 +1409,8 @@ export default {
           }
           // 定位至address
           else if (this.address) {
-            const result = await this.useAmapApi('Geocoder.getLocation', this.address)
-            const { lng, lat } = result.geocodes[0]?.location
+            const [result] = await waitFor(this.useAmapApi('Geocoder.getLocation', this.address))
+            const { lng, lat } = result?.geocodes[0]?.location || {}
             if (notEmpty(lng) && notEmpty(lat)) {
               this.setCenter([lng, lat])
             }
