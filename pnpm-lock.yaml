@@ -6,8 +6,8 @@ specifiers:
   '@tarekraafat/autocomplete.js': ^9.1.1
   element-ui: ^2.15.3
   json-editor-vue: ^0.1.6
-  kayran: ^0.2.2
-  kikimore: ^0.1.13
+  kayran: ^0.3.2
+  kikimore: ^0.2.1
   lodash-es: ^4.17.21
   pic-viewer: ^0.3.10
   sass: ^1.35.2
@@ -22,8 +22,8 @@ specifiers:
 dependencies:
   '@amap/amap-jsapi-loader': 1.0.1
   '@tarekraafat/autocomplete.js': 9.1.1
-  kayran: 0.2.2
-  kikimore: 0.1.13_element-ui@2.15.3+vue@2.6.14
+  kayran: 0.3.2
+  kikimore: 0.2.1_element-ui@2.15.3+vue@2.6.14
   lodash-es: 4.17.21
   pic-viewer: 0.3.10_element-ui@2.15.3+vue@2.6.14
 
@@ -1192,6 +1192,11 @@ packages:
     requiresBuild: true
     dev: true
 
+  /core-js/3.15.2:
+    resolution: {integrity: sha512-tKs41J7NJVuaya8DxIOCnl8QuPHx5/ZVbFo1oKgVl1qHFBBrDctzQGtuLjPpRdNTWmKPH6oEvgN/MUID+l485Q==}
+    requiresBuild: true
+    dev: false
+
   /cssesc/3.0.0:
     resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
     engines: {node: '>=4'}
@@ -1568,16 +1573,24 @@ packages:
       lodash-es: 4.17.21
       qs: 6.10.1
 
-  /kikimore/0.1.13_element-ui@2.15.3+vue@2.6.14:
-    resolution: {integrity: sha512-tSt/MrdRYrtpLKqwKXAkTUhoDisDTjZtyIx9UbNf2svtWtI0vRX4aSxMcTK19zvRx3B2CUYtLRja6lcKIKGKIg==}
+  /kayran/0.3.2:
+    resolution: {integrity: sha512-LsHSt2f06H5lDENyzUYMD/Q2N4CN6cjsf7f4dJKRobvf9NNR3/nWgKnmjrHZExeHTRSZAIkYcR/DkgEz7cT1ZQ==}
+    dependencies:
+      lodash-es: 4.17.21
+      qs: 6.9.6
+    dev: false
+
+  /kikimore/0.2.1_element-ui@2.15.3+vue@2.6.14:
+    resolution: {integrity: sha512-/crY87jVfggOMSMRGOdpI/1vkg4yBiGcEdaPdLHTvZpv5Ry/e8C2q0qeU8kpcgl7hzADn7m7TbbU8G6YYZPFGg==}
     peerDependencies:
       element-ui: '2'
       vue: 2.6.12
     dependencies:
       element-ui: 2.15.3_vue@2.6.14
-      kayran: 0.2.2
+      kayran: 0.3.2
       lodash-es: 4.17.21
       pic-viewer: 0.3.10_element-ui@2.15.3+vue@2.6.14
+      smooth-scrollbar: 8.6.2
       sweetalert2: 10.16.9
       vue: 2.6.14
     dev: false
@@ -1804,6 +1817,11 @@ packages:
     dependencies:
       side-channel: 1.0.4
 
+  /qs/6.9.6:
+    resolution: {integrity: sha512-TIRk4aqYLNoJUbd+g2lEdz5kLWIuTMRagAXxl78Q0RiVjAOugHmeKNGdd3cwo/ktpf9aL9epCfFqWDEKysUlLQ==}
+    engines: {node: '>=0.6'}
+    dev: false
+
   /querystring/0.2.1:
     resolution: {integrity: sha512-wkvS7mL/JMugcup3/rMitHmd9ecIGd2lhFhK9N3UUQ450h66d1r3Y9nvXzQAW1Lq+wyx61k/1pfKS5KuKiyEbg==}
     engines: {node: '>=0.4.x'}
@@ -1941,6 +1959,14 @@ packages:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
     dev: true
+
+  /smooth-scrollbar/8.6.2:
+    resolution: {integrity: sha512-ld0jfRM9ytP3ofjTUEwtURht6qjsTpsEK0/4a7Or+RMdPsMkpGrccZxWsJ1ycKW0rgkwdhKQPTyec6v3ElD9aA==}
+    dependencies:
+      core-js: 3.15.2
+      lodash-es: 4.17.21
+      tslib: 1.14.1
+    dev: false
 
   /source-map-js/0.6.2:
     resolution: {integrity: sha512-/3GptzWzu0+0MBQFrDKzw/DvvMTUORvgY6k6jd/VS6iCR4RDTKWH6v6WPwQoUO8667uQEf9Oe38DxAYWY5F/Ug==}
@@ -2110,6 +2136,10 @@ packages:
     dependencies:
       is-number: 7.0.0
     dev: true
+
+  /tslib/1.14.1:
+    resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
+    dev: false
 
   /typescript/4.3.5:
     resolution: {integrity: sha512-DqQgihaQ9cUrskJo9kIyW/+g0Vxsk8cDtZ52a3NGh0YNTfpUSArXSohyUGnvbPazEPLu398C0UxmKSOrPumUzA==}

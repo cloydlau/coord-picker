@@ -40,8 +40,8 @@
   "dependencies": {
     "@amap/amap-jsapi-loader": "^1.0.1",
     "@tarekraafat/autocomplete.js": "^9.1.1",
-    "kayran": "^0.2.2",
-    "kikimore": "^0.1.13",
+    "kayran": "^0.3.2",
+    "kikimore": "^0.2.1",
     "lodash-es": "^4.17.21",
     "pic-viewer": "^0.3.10"
   },
