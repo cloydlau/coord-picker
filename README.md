@@ -304,6 +304,10 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
 
 ## Notice
 
-在打开coord-picker之前，请确保所有参数已传入，为避免与用户的操作发生冲突，组件内部不会监听参数后续的变化
+- 在打开coord-picker之前，请确保所有参数已传入，为避免与用户的操作发生冲突，组件内部不会监听参数后续的变化
+- 与[vue-amap](https://github.com/ElemeFE/vue-amap) 冲突：
+  - 冲突的原因：AMap的在window对象上进行挂载，污染了全局，而vue-amap没有提供AMap的销毁方法。
+  - 关闭对话框时，coord-picker内部是调用官方的重置接口进行了销毁的。
+  - 建议：使用原生的高德地图JS API，原生的不会与coord-picker冲突。
 
 <br>
