@@ -17,7 +17,9 @@
 
 ![NPM](https://nodei.co/npm/coord-picker.png)
 
-Dependencies: vue element-ui
+```bash
+pnpm add coord-picker element-ui vue@2
+```
 
 ```ts
 // 全局引入
