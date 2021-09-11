@@ -18,7 +18,7 @@
 ![NPM](https://nodei.co/npm/coord-picker.png)
 
 ```bash
-pnpm add coord-picker element-ui vue@2
+pnpm add coord-picker vue@2 element-ui
 ```
 
 ```ts
