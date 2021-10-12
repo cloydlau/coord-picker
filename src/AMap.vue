@@ -8,6 +8,7 @@
     destroy-on-close
     v-if="show"
     custom-class="coord-picker"
+    v-on="$listeners"
   >
     <!--<div slot="title" class="title">
       <span v-text="title||'坐标拾取'" class="title-text"/>
@@ -19,13 +20,13 @@
           search()
           e.currentTarget.blur()
         }">
-        <Selector
+        <KiSelect
           class="region-selector"
-          ref="regionSelector"
+          ref="regionKiSelect"
           placeholder="当前城市"
           :label.sync='baseCity'
           :props="{
-            key: 'id',
+            value: 'id',
             label: 'name',
             groupLabel: 'name',
             groupOptions: 'cities',
@@ -127,8 +128,8 @@
           <el-dropdown-item command="clear">清除多边形</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
-      <el-tooltip effect="dark" content="退出" placement="bottom">
-        <a @click.stop="close">
+      <el-tooltip effect="dark" content="取消" placement="bottom">
+        <a @click.stop="cancel">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
               d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10zm0-2a8 8 0 1 0 0-16a8 8 0 0 0 0 16zm0-9.414l2.828-2.829l1.415 1.415L13.414 12l2.829 2.828l-1.415 1.415L12 13.414l-2.828 2.829l-1.415-1.415L10.586 12L7.757 9.172l1.415-1.415L12 10.586z"
@@ -137,7 +138,7 @@
           </svg>
         </a>
       </el-tooltip>
-      <el-tooltip :class="Loading&&'invisible'" effect="dark" content="保存并关闭" placement="bottom">
+      <el-tooltip :class="Loading&&'invisible'" effect="dark" content="确定" placement="bottom">
         <a @click.stop="confirm">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
@@ -159,7 +160,7 @@
       <span class="text-10px" style="font-size:10px;"> 缩放级别</span>
     </div>
 
-    <FormDialog
+    <KiFormDialog
       :show.sync="imagePicker.show"
       v-model="imagePicker.data"
       append-to-body
@@ -187,14 +188,14 @@
           </div>
         </template>
       </PicViewer>
-    </FormDialog>
+    </KiFormDialog>
   </el-dialog>
 </template>
 
 <script>
 import { isEmpty, notEmpty, typeOf, waitFor } from 'kayran'
 import 'kikimore/dist/style.css'
-import { Swal, Selector, FormDialog } from 'kikimore'
+import { Swal, Select as KiSelect, FormDialog as KiFormDialog } from 'kikimore'
 const { error, warning, confirm, } = Swal
 import { throttle as throttling, cloneDeep, merge } from 'lodash-es'
 import AMapLoader from '@amap/amap-jsapi-loader'
@@ -206,7 +207,7 @@ import './styles/marker-list.scss'
 import polygon from '@/mixins/polygon'
 import rectangle from '@/mixins/rectangle'
 import Toolbar from '@/components/Toolbar.vue'
-import { getFinalProp } from '@/utils'
+import { getFinalProp } from 'kayran'
 import globalProps from './config'
 import { name } from '../package.json'
 const prefix = `[${name}] `
@@ -217,7 +218,7 @@ import PicViewer from 'pic-viewer'
 export default {
   name: 'CoordPicker',
   mixins: [polygon, rectangle],
-  components: { Toolbar, Selector, FormDialog, PicViewer },
+  components: { Toolbar, KiSelect, KiFormDialog, PicViewer },
   props: {
     show: {
       type: Boolean,
@@ -298,16 +299,28 @@ export default {
       }
     },
     Marker () {
-      return getFinalProp(this.marker, globalProps.marker)
+      return getFinalProp([this.marker, globalProps.marker], {
+        name: 'marker',
+        type: 'array'
+      })
     },
     Polygon () {
-      return getFinalProp(this.polygon, globalProps.polygon)
+      return getFinalProp([this.polygon, globalProps.polygon], {
+        name: 'polygon',
+        type: 'array'
+      })
     },
     Rectangle () {
-      return getFinalProp(this.rectangle, globalProps.rectangle)
+      return getFinalProp([this.rectangle, globalProps.rectangle], {
+        name: 'rectangle',
+        type: 'array'
+      })
     },
     RectangleCount () {
-      return getFinalProp(this.rectangleCount, globalProps.rectangleCount, 0)
+      return getFinalProp([this.rectangleCount, globalProps.rectangleCount, 0], {
+        name: 'rectangleCount',
+        type: ['number', 'array']
+      })
     },
     RectangleMaxCount () {
       return Array.isArray(this.RectangleCount) ? this.RectangleCount[1] : this.RectangleCount
@@ -316,7 +329,10 @@ export default {
       return Array.isArray(this.RectangleCount) ? this.RectangleCount[0] : undefined
     },
     PolygonCount () {
-      return getFinalProp(this.polygonCount, globalProps.polygonCount, 0)
+      return getFinalProp([this.polygonCount, globalProps.polygonCount, 0], {
+        name: 'polygonCount',
+        type: ['number', 'array']
+      })
     },
     PolygonMaxCount () {
       return Array.isArray(this.PolygonCount) ? this.PolygonCount[1] : this.PolygonCount
@@ -325,7 +341,10 @@ export default {
       return Array.isArray(this.PolygonCount) ? this.PolygonCount[0] : undefined
     },
     MarkerCount () {
-      return getFinalProp(this.markerCount, globalProps.markerCount, 1)
+      return getFinalProp([this.markerCount, globalProps.markerCount, 1], {
+        name: 'markerCount',
+        type: ['number', 'array']
+      })
     },
     MarkerMaxCount () {
       return Array.isArray(this.MarkerCount) ? this.MarkerCount[1] : this.MarkerCount
@@ -334,7 +353,10 @@ export default {
       return Array.isArray(this.MarkerCount) ? this.MarkerCount[0] : undefined
     },
     RectangleImage () {
-      const temp = getFinalProp(this.rectangleImage, globalProps.rectangleImage, [])
+      const temp = getFinalProp([this.rectangleImage, globalProps.rectangleImage, []], {
+        name: 'rectangleImage',
+        type: ['string', 'array']
+      })
       return (typeof temp === 'string') ? [temp] : temp
     },
     Version () {
@@ -344,16 +366,26 @@ export default {
       return this.curSpot.address + ((isEmpty(this.curSpot.lng) || isEmpty(this.curSpot.lat)) ? '' : `（${this.curSpot.lng}，${this.curSpot.lat}）`)
     },*/
     ApiKey () {
-      return getFinalProp(this.apiKey, globalProps.apiKey)
+      return getFinalProp([this.apiKey, globalProps.apiKey], {
+        name: 'apiKey',
+        required: true,
+        type: 'string'
+      })
     },
     Precision () {
-      return getFinalProp(this.precision, globalProps.precision, 6)
+      return getFinalProp([this.precision, globalProps.precision, 6], {
+        name: 'precision',
+        type: 'number'
+      })
     },
     AddressComponent () {
-      return getFinalProp(this.addressComponent, globalProps.addressComponent, {
+      return getFinalProp([this.addressComponent, globalProps.addressComponent, {
         province: true,
         city: true,
         district: true
+      }], {
+        name: 'addressComponent',
+        type: ['object', 'function']
       })
     },
     Loading () {
@@ -363,8 +395,11 @@ export default {
   watch: {
     show (newVal, oldVal) {
       if (newVal) {
-        this.MapOptions = getFinalProp(this.mapOptions, globalProps.mapOptions, {
-          //viewMode: '3D',
+        this.MapOptions = getFinalProp([this.mapOptions, globalProps.mapOptions, /*{
+          viewMode: '3D',
+        }*/], {
+          name: 'mapOptions',
+          type: 'object'
         })
 
         //this.customClass = 'animate__animated animate__zoomIn'
@@ -612,7 +647,7 @@ export default {
           this.drawDistrict(n)
         } else {
           if (n && isNaN(n)) {
-            this.$refs.regionSelector.$refs.elSelect.selectedLabel = n
+            this.$refs.regionKiSelect.$refs.elSelect.selectedLabel = n
           }
           this.baseCityInitialized = true
         }
@@ -627,9 +662,10 @@ export default {
         }
       })
     },*/
-    close () {
+    cancel () {
       confirm(`不保存并退出`).then(() => {
         this.$emit('update:show', false)
+        this.$emit('cancel')
       })
     },
     changeCurImage (src) {
@@ -960,6 +996,7 @@ export default {
         this.$emit('update:polygon', this.overlay.polygon)
       }
       this.$emit('update:show', false)
+      this.$emit('confirm')
     },
     drawMarker (markerOptions, isInit = false) {
       if (this.MarkerMaxCount > 1 && this.overlay.markerInstance.length >= this.MarkerMaxCount && !isInit) {
@@ -1441,7 +1478,10 @@ export default {
     },
     getBaseCity () {
       // 直辖市：['110100', '120100', '310100', '500100']
-      let result = getFinalProp(this.city, globalProps.city, '')
+      let result = getFinalProp([this.city, globalProps.city, ''], {
+        name: 'city',
+        type: 'string'
+      })
       // 兼容非6位的行政区编码
       if (!isNaN(result)) {
         if (result.length < 6) {

@@ -1,7 +1,18 @@
 <template>
-  <el-dialog visible :close-on-click-modal="false" :show-close="false" title="coord-picker">
-    <CoordPicker v-bind.sync="props"/>
-    <json-editor-vue v-model="props"/>
+  <el-dialog
+    visible
+    :close-on-click-modal="false"
+    :show-close="false"
+    title="coord-picker"
+    @confirm="console.log('confirm')"
+    @cancel="console.log('cancel')"
+  >
+    <CoordPicker
+      v-bind.sync="props"
+      @cancel="console.log('cancel')"
+      @confirm="console.log('confirm')"
+    />
+    <JsonEditorVue :modelValue.sync="props"/>
     <div slot="footer">
       <el-button @click="props.show=true" type="primary">open</el-button>
     </div>
@@ -9,13 +20,13 @@
 </template>
 
 <script>
-import 'json-editor-vue/dist/style.css'
 import JsonEditorVue from 'json-editor-vue'
 
 export default {
   components: { JsonEditorVue },
   data () {
     return {
+      console,
       props: {
         show: false,
         apiKey: import.meta.env.VITE_APP_AMAP_JS_API_KEY,
