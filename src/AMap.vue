@@ -395,9 +395,9 @@ export default {
   watch: {
     show (newVal, oldVal) {
       if (newVal) {
-        this.MapOptions = getFinalProp([this.mapOptions, globalProps.mapOptions, /*{
-          viewMode: '3D',
-        }*/], {
+        this.MapOptions = getFinalProp([this.mapOptions, globalProps.mapOptions, {
+          //viewMode: '3D',
+        }], {
           name: 'mapOptions',
           type: 'object'
         })
