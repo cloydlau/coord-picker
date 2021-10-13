@@ -1404,6 +1404,11 @@ export default {
         hasOverlay,
       }
     },
+    watchZoom () {
+      this.map.on('zoomchange', e => {
+        this.MapOptions.zoom = this.map.getZoom()
+      })
+    },
     async locate (selectedLocation) {
       if (this.show) {
         // 选中搜索项
@@ -1460,19 +1465,22 @@ export default {
             // 存在覆盖物 将视图适配覆盖物
             if (hasOverlay) {
               this.map.setFitView()
-              this.map.setZoom(this.MapOptions.zoom)
             }
             // 定位至baseCity
             else if (this.baseCity) {
               this.map.setCity(this.baseCity)
-              this.map.setZoom(this.MapOptions.zoom)
             }
+            // setCity和setZoom同步调用时后者无效
+            setTimeout(() => {
+              this.map.setZoom(this.MapOptions.zoom)
+              // setZoom和setCity会立即触发zoomchange
+              setTimeout(() => {
+                this.watchZoom()
+              }, 500)
+            }, 500)
+          } else {
+            this.watchZoom()
           }
-
-          // 放在最后的原因是setZoom和setCity会触发zoomchange
-          this.map.on('zoomchange', e => {
-            this.MapOptions.zoom = this.map.getZoom()
-          })
         }
       }
     },
