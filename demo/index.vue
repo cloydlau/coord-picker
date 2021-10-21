@@ -29,7 +29,6 @@ export default {
       console,
       props: {
         show: false,
-        apiKey: import.meta.env.VITE_APP_AMAP_JS_API_KEY,
         lng: 106.679306,
         lat: 26.601421,
         address: '',

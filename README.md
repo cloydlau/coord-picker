@@ -58,9 +58,9 @@ export default {
 | Attribute | Description | Type | Accepted Values | Default |
 | --- | --- | --- | --- | --- |
 | show.sync | 开关 | boolean | | false |
-| apiKey | 高德地图 js api key | string | | |
+| loadOptions | [AMapLoader.load的参数](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) ,其中 `loadOptions.key` 必传 | object | | |
+| mapOptions[.sync] | [AMap.Map的参数2](https://lbs.amap.com/api/javascript-api/reference/map) | object | | |
 | city | 初始行政区 | string | | |
-| mapOptions.sync | [地图初始化参数对象](https://lbs.amap.com/api/javascript-api/reference/map) | object | | |
 | precision | 坐标精度（保留几位小数） | number | | 6 |
 | addressComponent* | 地址成分 | object, function | | |
 
@@ -155,8 +155,10 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
 
 | name | description | callback's arguments |
 | --- | --- | --- |
-| confirm | 点击确认按钮触发 | |
-| cancel | 点击取消按钮触发 | |
+| load | 高德地图加载完成时，即[AMapLoader.load().then](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) | AMap（同高德） |
+| error | 调用高德API报错时，含[AMapLoader.load().catch](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) | 同高德 |
+| confirm | 点击确认按钮时 | |
+| cancel | 点击取消按钮时 | |
 | ...el-dialog事件 |
 
 <br>
@@ -195,6 +197,8 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
 
 ## 绘制点位
 
+> 使用 `AMap.Marker`
+
 ### 如何启用
 
 - `markerCount > 0` 时，开启编辑点位功能
@@ -225,6 +229,8 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
 <br>
 
 ## 绘制矩形
+
+> 使用 `AMap.Rectangle` 和 `AMap.ImageLayer`
 
 ### 如何启用
 

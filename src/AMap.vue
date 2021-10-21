@@ -224,7 +224,6 @@ export default {
       type: Boolean,
       required: true
     },
-    apiKey: String,
     lat: {
       validator: value => ['string', 'null', 'number'].includes(typeOf(value)),
     },
@@ -234,23 +233,18 @@ export default {
     address: {
       validator: value => ['string', 'null'].includes(typeOf(value)),
     },
-    marker: {
-      validator: value => ['object', 'array', 'null'].includes(typeOf(value)),
-    },
-    markerCount: [Number, Array],
-    city: String,
-    polygon: {
-      validator: value => ['null', 'array'].includes(typeOf(value)),
-    },
-    precision: Number,
-    addressComponent: [Object, Function],
-    polygonCount: [Number, Array],
-    mapOptions: Object,
-    rectangleImage: {
-      validator: value => ['string', 'array', 'null'].includes(typeOf(value)),
-    },
-    rectangle: Array,
-    rectangleCount: [Number, Array],
+    marker: {},
+    markerCount: {},
+    city: {},
+    polygon: {},
+    precision: {},
+    addressComponent: {},
+    polygonCount: {},
+    mapOptions: {},
+    loadOptions: {},
+    rectangleImage: {},
+    rectangle: {},
+    rectangleCount: {},
   },
   data () {
     return {
@@ -301,19 +295,19 @@ export default {
     Marker () {
       return getFinalProp([this.marker, globalProps.marker], {
         name: 'marker',
-        type: 'array'
+        type: ['object', 'array', 'null']
       })
     },
     Polygon () {
       return getFinalProp([this.polygon, globalProps.polygon], {
         name: 'polygon',
-        type: 'array'
+        type: ['array', 'null']
       })
     },
     Rectangle () {
       return getFinalProp([this.rectangle, globalProps.rectangle], {
         name: 'rectangle',
-        type: 'array'
+        type: ['array', 'null']
       })
     },
     RectangleCount () {
@@ -359,19 +353,9 @@ export default {
       })
       return (typeof temp === 'string') ? [temp] : temp
     },
-    Version () {
-      return ''
-    },
     /*title () {
       return this.curSpot.address + ((isEmpty(this.curSpot.lng) || isEmpty(this.curSpot.lat)) ? '' : `（${this.curSpot.lng}，${this.curSpot.lat}）`)
     },*/
-    ApiKey () {
-      return getFinalProp([this.apiKey, globalProps.apiKey], {
-        name: 'apiKey',
-        required: true,
-        type: 'string'
-      })
-    },
     Precision () {
       return getFinalProp([this.precision, globalProps.precision, 6], {
         name: 'precision',
@@ -391,10 +375,47 @@ export default {
     Loading () {
       return this.loading || this.initializing
     },
+    LoadOptions () {
+      return getFinalProp([this.loadOptions, globalProps.loadOptions, {
+        AMapUI: {
+          version: '1.1',
+          plugins: ['misc/MarkerList', 'overlay/SimpleMarker', 'overlay/SimpleInfoWindow']
+        },
+        //...this.Version && { version: this.Version }, // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
+        plugins: [
+          'AMap.Scale',
+          'AMap.MapType',
+          //'AMap.ControlBar',
+          'AMap.Geocoder',
+          'AMap.CitySearch',
+          'AMap.PlaceSearch',
+          'AMap.Autocomplete', // 2.x为AMap.AutoComplete
+          ...this.RectangleStatus === 'editable' ? [
+            'AMap.MouseTool',
+            'AMap.RectangleEditor',
+          ] : [],
+          ...this.PolygonStatus === 'editable' ? [
+            'AMap.Polygon',
+            'AMap.MouseTool',
+            'AMap.ContextMenu',
+            'AMap.DistrictSearch',
+            'AMap.PolyEditor', // 2.x为AMap.PolygonEditor
+          ] : [],
+          ...this.PolygonStatus === 'readonly' ? [
+            'AMap.Polygon',
+          ] : [],
+        ]
+      }], {
+        name: 'loadOptions',
+        required: true,
+        type: 'object',
+        camelCase: false,
+      })
+    }
   },
   watch: {
-    show (newVal, oldVal) {
-      if (newVal) {
+    show (n, o) {
+      if (n) {
         this.MapOptions = getFinalProp([this.mapOptions, globalProps.mapOptions, {
           //viewMode: '3D',
         }], {
@@ -403,41 +424,7 @@ export default {
         })
 
         //this.customClass = 'animate__animated animate__zoomIn'
-        AMapLoader.load({
-          key: this.ApiKey, // 申请好的Web端开发者Key，首次调用 load 时必填
-          AMapUI: {
-            version: '1.1',
-            plugins: ['misc/MarkerList', 'overlay/SimpleMarker', 'overlay/SimpleInfoWindow']
-          },
-          ...this.Version && { version: this.Version }, // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
-          plugins: [
-            'AMap.Scale',
-            'AMap.MapType',
-            //'AMap.ControlBar',
-            'AMap.Geocoder',
-            'AMap.CitySearch',
-            'AMap.PlaceSearch',
-            ...this.Version?.startsWith('2.') ?
-              ['AMap.AutoComplete'] :
-              ['AMap.Autocomplete'],
-            ...this.RectangleStatus === 'editable' ? [
-              'AMap.MouseTool',
-              'AMap.RectangleEditor',
-            ] : [],
-            ...this.PolygonStatus === 'editable' ? [
-              'AMap.Polygon',
-              'AMap.MouseTool',
-              'AMap.ContextMenu',
-              'AMap.DistrictSearch',
-              ...this.Version?.startsWith('2.') ?
-                ['AMap.PolygonEditor',] :
-                ['AMap.PolyEditor',],
-            ] : [],
-            ...this.PolygonStatus === 'readonly' ? [
-              'AMap.Polygon',
-            ] : [],
-          ]
-        })
+        AMapLoader.load(this.LoadOptions)
         .then(async AMap => {
           this.map = new AMap.Map('map-container', this.MapOptions)
 
@@ -589,9 +576,12 @@ export default {
           //this.map.addControl(new AMap.ControlBar())
 
           await this.locate()
+
+          this.$emit('load', AMap)
         })
         .catch(e => {
           this.$emit('update:show', false)
+          this.$emit('error', e)
           console.error(e)
           error(`高德地图初始化失败：${JSON.stringify(e)}`)
         })
@@ -1061,7 +1051,7 @@ export default {
         return
       }
 
-      const { MarkerList, SimpleMarker, SimpleInfoWindow } = AMapUI
+      const { MarkerList, SimpleMarker, SimpleInfoWindow } = window.AMapUI
       // 即jQuery/Zepto
       const $ = MarkerList.utils.$
 
@@ -1548,6 +1538,7 @@ export default {
             resolve(result, status)
           } else {
             reject(result, status)
+            this.$emit('error', status, result)
           }
           this.loading = false
         })

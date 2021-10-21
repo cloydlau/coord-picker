@@ -7,7 +7,9 @@ Vue.use(ElementUI)
 
 import CoordPicker from '../src/main.ts'
 Vue.use(CoordPicker, {
-  apiKey: import.meta.env.VITE_APP_AMAP_JS_API_KEY,
+  loadOptions: {
+    key: import.meta.env.VITE_APP_AMAP_JS_API_KEY,
+  },
   city: '',
   precision: 6,
   addressComponent: {
