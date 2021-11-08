@@ -1680,7 +1680,7 @@ export default {
 
 ::v-deep .amap-maptypecontrol {
   top: unset;
-  bottom: 95px;
+  bottom: 115px;
 }
 
 ::v-deep .imagePicker .el-dialog__body {
