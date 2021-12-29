@@ -891,7 +891,7 @@ export default {
     getAddress ([lng, lat]) {
       return new Promise((resolve, reject) => {
         if (this.plugins.Geocoder) {
-          this.useAmapApi('Geocoder.getAddress', [lng, lat])
+          this.useAMapAPI('Geocoder.getAddress', [lng, lat])
           .then(result => {
             if (result.regeocode?.formattedAddress) {
               const { province, city, district, township } = result.regeocode.addressComponent
@@ -934,7 +934,7 @@ export default {
     },
     fetchSuggestions (queryString, cb) {
       return new Promise((resolve, reject) => {
-        this.useAmapApi('AutoComplete.search', this.keyword)
+        this.useAMapAPI('AutoComplete.search', this.keyword)
         .then(result => {
           resolve(result.tips || [])
         })
@@ -1278,7 +1278,7 @@ export default {
     },
     drawDistrict (districtName) {
       if (districtName && this.PolygonStatus === 'editable') {
-        this.useAmapApi('DistrictSearch.search', districtName)
+        this.useAMapAPI('DistrictSearch.search', districtName)
         .then(result => {
           const bounds = result.districtList?.[0]?.boundaries
           if (bounds?.length) {
@@ -1444,7 +1444,7 @@ export default {
           }
           // 定位至address
           else if (this.address) {
-            const [result] = await waitFor(this.useAmapApi('Geocoder.getLocation', this.address))
+            const [result] = await waitFor(this.useAMapAPI('Geocoder.getLocation', this.address))
             const { lng, lat } = result?.geocodes[0]?.location || {}
             if (notEmpty(lng) && notEmpty(lat)) {
               this.setCenter([lng, lat])
@@ -1493,7 +1493,7 @@ export default {
           resolve(result)
         } else {
           this.plugins.CitySearch = new AMap.CitySearch()
-          this.useAmapApi('CitySearch.getLocalCity')
+          this.useAMapAPI('CitySearch.getLocalCity')
           .then(result => {
             resolve(result.city)
           })
@@ -1511,7 +1511,7 @@ export default {
       this.searching = true
       this.throttle('search', () => {
 
-        this.useAmapApi('PlaceSearch.search', this.keyword)
+        this.useAMapAPI('PlaceSearch.search', this.keyword)
         .then(result => {
           this.searchResult = result.poiList?.pois || []
         })
@@ -1525,7 +1525,7 @@ export default {
         })
       }, null, 500)
     },
-    useAmapApi () {
+    useAMapAPI () {
       this.loading = true
       const apiName = arguments[0]
       const [plugin, fn] = apiName.split('.')
