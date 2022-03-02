@@ -35,7 +35,9 @@
     "build": "vite build",
     "serve": "vite preview",
     "clean": "rd /s /q .\\node_modules",
-    "ri": "npm run clean && pnpm i"
+    "ri": "npm run clean && pnpm i",
+    "u": "node scripts/upgrade.js",
+    "release": "node scripts/release.js"
   },
   "dependencies": {
     "@tarekraafat/autocomplete.js": "^9.1.1",
@@ -55,9 +57,14 @@
     "@amap/amap-jsapi-loader": "latest",
     "@iconify/json": "latest",
     "@vue/composition-api": "latest",
+    "chalk": "^4.1.2",
     "element-ui": "latest",
+    "enquirer": "latest",
+    "execa": "^4.1.0",
     "json-editor-vue": "latest",
+    "minimist": "latest",
     "sass": "latest",
+    "semver": "latest",
     "svelte-jsoneditor": "latest",
     "typescript": "latest",
     "unplugin-icons": "latest",
