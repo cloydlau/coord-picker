@@ -1,5 +1,6 @@
 import 'kikimore/dist/style.css'
 import { Swal } from 'kikimore'
+
 const { warning } = Swal
 import { notEmpty } from 'kayran'
 
@@ -19,10 +20,13 @@ export default {
   },
   methods: {
     onPolygonBtnClick () {
-      if (this.overlay.polygonInstance.length >= this.PolygonMaxCount) {
-        warning(`最多绘制${this.PolygonMaxCount}个多边形`)
-      } else {
-        this.active = 'polygon'
+      // 只读模式点击无效果
+      if (this.PolygonMaxCount > 0) {
+        if (this.overlay.polygonInstance.length >= this.PolygonMaxCount) {
+          warning(`最多绘制${this.PolygonMaxCount}个多边形`)
+        } else {
+          this.active = 'polygon'
+        }
       }
     },
     syncPolygon () {

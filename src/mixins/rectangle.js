@@ -1,5 +1,6 @@
 import 'kikimore/dist/style.css'
 import { Swal } from 'kikimore'
+
 const { warning } = Swal
 
 export default {
@@ -19,12 +20,15 @@ export default {
   },
   methods: {
     onRectangleBtnClick () {
-      if (this.overlay.rectangleInstance.length >= this.RectangleMaxCount) {
-        warning(`最多绘制${this.RectangleMaxCount}个矩形`)
-      } else if (!this.curImage && this.RectangleImage.length > 1) {
-        this.imagePicker.show = true
-      } else {
-        this.active = 'rectangle'
+      // 只读模式点击无效果
+      if (this.RectangleMaxCount > 0) {
+        if (this.overlay.rectangleInstance.length >= this.RectangleMaxCount) {
+          warning(`最多绘制${this.RectangleMaxCount}个矩形`)
+        } else if (!this.curImage && this.RectangleImage.length > 1) {
+          this.imagePicker.show = true
+        } else {
+          this.active = 'rectangle'
+        }
       }
     },
     syncRectangleBounds ({ i, image, bounds }) {

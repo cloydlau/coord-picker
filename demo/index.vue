@@ -62,7 +62,7 @@ export default {
             northeast: { lng: 106.682739, lat: 26.610016 },
           }
         ],
-        rectangleCount: 2,
+        rectangleCount: 0,
         polygon: [
           {
             'path': [
@@ -83,7 +83,7 @@ export default {
         addressComponent: undefined,
         mapOptions: {
           zoom: 12,
-          zooms: [12, 15]
+          //zooms: [12, 15]
         }
       },
       /*addressComponent ({ province, city, district }) {

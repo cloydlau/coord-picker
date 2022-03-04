@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :visible.sync="show"
+    :visible="show"
     :fullscreen="true"
     :append-to-body="true"
     :show-close="false"
@@ -95,29 +95,36 @@
       </el-dropdown>
       <el-dropdown
         @command="command=>{this[command](['rectangle'])}"
-        v-if="RectangleMaxCount>0"
         :class="{active:active==='rectangle'}"
       >
         <a @click.stop="onRectangleBtnClick">
-          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"
-               role="img" width="32" height="32" preserveAspectRatio="xMidYMid meet"
-               viewBox="0 0 24 24">
+          <svg
+            xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"
+            role="img" width="32" height="32" preserveAspectRatio="xMidYMid meet"
+            viewBox="0 0 24 24"
+            :class="!RectangleMaxCount && 'disabled'"
+          >
             <path d="M19 6h3v2h-3v3h-2V8h-3V6h3V3h2v3m-2 11v-3h2v5H3V6h8v2H5v9h12z" fill="currentColor"></path>
           </svg>
         </a>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="setCurImage" v-if="RectangleImage.length>0">选择贴图</el-dropdown-item>
+          <el-dropdown-item command="setCurImage" v-if="RectangleMaxCount > 0 && RectangleImage.length > 0">选择贴图
+          </el-dropdown-item>
           <el-dropdown-item command="reset">重置矩形</el-dropdown-item>
           <el-dropdown-item command="clear">清除矩形</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
       <el-dropdown
         @command="command=>{this[command](['polygon'])}"
-        v-if="PolygonMaxCount>0"
         :class="{active:active==='polygon'}"
       >
         <a @click.stop="onPolygonBtnClick">
-          <svg width="1em" height="1em" viewBox="0 0 24 24">
+          <svg
+            :class="!PolygonMaxCount && 'disabled'"
+            width="1em"
+            height="1em"
+            viewBox="0 0 24 24"
+          >
             <path d="M17 15.7V13h2v4l-9 4l-7-7l4-9h4v2H8.3l-2.9 6.6l5 5l6.6-2.9M22 5v2h-3v3h-2V7h-3V5h3V2h2v3h3z"
                   fill="currentColor"
             />
@@ -196,6 +203,7 @@
 import { isEmpty, notEmpty, typeOf, waitFor } from 'kayran'
 import 'kikimore/dist/style.css'
 import { Swal, Select as KiSelect, FormDialog as KiFormDialog } from 'kikimore'
+
 const { error, warning, confirm, } = Swal
 import { throttle as throttling, cloneDeep, merge } from 'lodash-es'
 import AMapLoader from '@amap/amap-jsapi-loader'
@@ -210,6 +218,7 @@ import Toolbar from '@/components/Toolbar.vue'
 import { getFinalProp } from 'kayran'
 import globalProps from './config'
 import { name } from '../package.json'
+
 const prefix = `[${name}] `
 import cities from './assets/city.json'
 import 'pic-viewer/dist/style.css'
@@ -855,10 +864,10 @@ export default {
 
         if (arr.includes('rectangle')) {
           for (let i = 0; i < this.overlay.rectangle.length; i++) {
+            this.overlay.imageLayerInstance[i]?.setMap(null)
             this.overlay.rectangle.splice(i, 1)
             this.overlay.rectangleInstance[i].setMap(null)
-            this.overlay.rectangleEditor[i].close()
-            this.overlay.imageLayerInstance[i]?.setMap(null)
+            this.overlay.rectangleEditor[i]?.close() // 只读模式 rectangleEditor 为空
           }
         }
 

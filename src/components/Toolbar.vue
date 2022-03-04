@@ -50,6 +50,10 @@ $btnSize: 30px;
         width: 22px;
         height: 22px;
         cursor: pointer;
+
+        &.disabled {
+          cursor: unset;
+        }
       }
 
       &:hover ::v-deep svg {
