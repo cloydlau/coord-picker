@@ -152,7 +152,7 @@ async function publishPackage (pkgName, version, runIfNotDry) {
   const releaseTag = semver.prerelease(version) && semver.prerelease(version)[0] || null
 
   step(`Publishing ${pkgName}...`)
-  await runIfNotDry('pnpm', ['config', 'delete', 'registry'])
+  await runIfNotDry('npm', ['config', 'delete', 'registry'])
   try {
     /*await runIfNotDry(
       // note: use of yarn is intentional here as we rely on its publishing
