@@ -865,10 +865,10 @@ export default {
         if (arr.includes('rectangle')) {
           for (let i = 0; i < this.overlay.rectangle.length; i++) {
             this.overlay.imageLayerInstance[i]?.setMap(null)
-            this.overlay.rectangle.splice(i, 1)
             this.overlay.rectangleInstance[i].setMap(null)
             this.overlay.rectangleEditor[i]?.close() // 只读模式 rectangleEditor 为空
           }
+          this.overlay.rectangle.length = 0
         }
 
         if (arr.includes('polygon')) {

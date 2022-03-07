@@ -62,7 +62,7 @@ export default {
             northeast: { lng: 106.682739, lat: 26.610016 },
           }
         ],
-        rectangleCount: 0,
+        rectangleCount: 2,
         polygon: [
           {
             'path': [
