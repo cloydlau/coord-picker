@@ -94,6 +94,7 @@
         </el-dropdown-menu>
       </el-dropdown>
       <el-dropdown
+        v-if="(rectangle && rectangle.length) || RectangleMaxCount > 0"
         @command="command=>{this[command](['rectangle'])}"
         :class="{active:active==='rectangle'}"
       >
@@ -115,6 +116,7 @@
         </el-dropdown-menu>
       </el-dropdown>
       <el-dropdown
+        v-if="(polygon && polygon.length) || PolygonMaxCount > 0"
         @command="command=>{this[command](['polygon'])}"
         :class="{active:active==='polygon'}"
       >
