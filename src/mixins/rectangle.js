@@ -37,12 +37,12 @@ export default {
         ...this.overlay.rectangle[i],
         ...image && { image },
         northeast: {
-          lng: bounds.northEast ? bounds.northEast.lng : bounds.northeast.lng,
-          lat: bounds.northEast ? bounds.northEast.lat : bounds.northeast.lat
+          lng: bounds.northEast ? this.roundOff(bounds.northEast.lng) : this.roundOff(bounds.northeast.lng),
+          lat: bounds.northEast ? this.roundOff(bounds.northEast.lat) : this.roundOff(bounds.northeast.lat)
         },
         southwest: {
-          lng: bounds.southWest ? bounds.southWest.lng : bounds.southwest.lng,
-          lat: bounds.southWest ? bounds.southWest.lat : bounds.southwest.lat
+          lng: bounds.southWest ? this.roundOff(bounds.southWest.lng) : this.roundOff(bounds.southwest.lng),
+          lat: bounds.southWest ? this.roundOff(bounds.southWest.lat) : this.roundOff(bounds.southwest.lat)
         }
       }
       // 矩形可能不包含贴图 所以需要判空
