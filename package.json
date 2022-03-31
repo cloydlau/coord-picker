@@ -40,6 +40,7 @@
     "release": "node scripts/release.js"
   },
   "dependencies": {
+    "@amap/amap-jsapi-loader": "latest",
     "@tarekraafat/autocomplete.js": "^9.1.1",
     "kayran": "latest",
     "kikimore": "latest",
@@ -49,12 +50,10 @@
     "viewerjs": "latest"
   },
   "peerDependencies": {
-    "@amap/amap-jsapi-loader": "1",
     "element-ui": "2",
     "vue": "2"
   },
   "devDependencies": {
-    "@amap/amap-jsapi-loader": "latest",
     "@iconify/json": "latest",
     "@vue/composition-api": "latest",
     "chalk": "^4.1.2",

@@ -118,10 +118,9 @@ export default {
        * 移动选框时 同步矩形角坐标
        */
       rectangleEditor.on('adjust', e => {
-        // 兼容1.x
         this.syncRectangleBounds({
           i,
-          bounds: e.bounds || e.Rd
+          bounds: e.bounds || e.Td // 兼容 1.x
         })
       })
       // 短距离平移触发

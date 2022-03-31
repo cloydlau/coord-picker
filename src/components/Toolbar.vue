@@ -14,6 +14,7 @@ $btnSize: 30px;
   top: 18px;
   right: 0;
   height: 35px;
+  z-index: 10000; // 用于移动端：高于左侧搜索框
 
   .panel {
     background: rgba(255, 255, 255, 0.9);

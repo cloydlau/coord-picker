@@ -392,7 +392,7 @@ export default {
           version: '1.1',
           plugins: ['misc/MarkerList', 'overlay/SimpleMarker', 'overlay/SimpleInfoWindow']
         },
-        //...this.Version && { version: this.Version }, // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
+        //version: '1.4.15', // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
         plugins: [
           'AMap.Scale',
           'AMap.MapType',
