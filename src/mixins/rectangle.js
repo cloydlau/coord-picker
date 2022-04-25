@@ -1,7 +1,5 @@
-import 'kikimore/dist/style.css'
-import { Swal } from 'kikimore'
-
-const { warning } = Swal
+import 'cozyalert/dist/style.css'
+import { warning } from 'cozyalert'
 
 export default {
   data () {

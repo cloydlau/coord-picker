@@ -12,7 +12,7 @@
       @cancel="console.log('cancel')"
       @confirm="console.log('confirm')"
     />
-    <JsonEditorVue :modelValue.sync="props"/>
+    <JsonEditorVue v-model="props"/>
     <div slot="footer">
       <el-button @click="props.show=true" type="primary">open</el-button>
     </div>

@@ -34,10 +34,14 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "c": "rd /s /q .\\node_modules",
-    "ri": "npm run c && pnpm i",
+    "clean": "rd /s /q .\\node_modules",
+    "ri": "npm run clean && pnpm i",
     "u": "node scripts/upgrade.js",
-    "release": "node scripts/release.js"
+    "r": "node scripts/release.js",
+    "rs": "node scripts/release.js --straightforward",
+    "test": "vitest --config ./vitest.config.ts",
+    "test2": "vitest --config ./vitest.vue2.config.ts",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@amap/amap-jsapi-loader": "latest",
@@ -46,8 +50,7 @@
     "kikimore": "latest",
     "lodash-es": "latest",
     "pic-viewer": "latest",
-    "sweetalert2": "latest",
-    "viewerjs": "latest"
+    "cozyalert": "latest"
   },
   "peerDependencies": {
     "element-ui": "2",
@@ -64,7 +67,6 @@
     "minimist": "latest",
     "sass": "latest",
     "semver": "latest",
-    "svelte-jsoneditor": "latest",
     "typescript": "latest",
     "unplugin-icons": "latest",
     "vite": "latest",

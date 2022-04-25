@@ -204,9 +204,10 @@
 <script>
 import { isEmpty, notEmpty, typeOf, waitFor } from 'kayran'
 import 'kikimore/dist/style.css'
-import { Swal, Select as KiSelect, FormDialog as KiFormDialog } from 'kikimore'
+import { Select as KiSelect, FormDialog as KiFormDialog } from 'kikimore'
+import 'cozyalert/dist/style.css'
+import { error, warning, confirm } from 'cozyalert'
 
-const { error, warning, confirm, } = Swal
 import { throttle as throttling, cloneDeep, merge } from 'lodash-es'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
@@ -676,7 +677,7 @@ export default {
       this.imagePicker.show = true
     },
     help () {
-      Swal.confirm({
+      confirm({
         titleText: '使用帮助',
         html: `
 <ul style="text-align:left">
