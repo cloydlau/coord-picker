@@ -5,7 +5,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 import ElementUI from 'element-ui'
 Vue.use(ElementUI)
 
-import CoordPicker from '../src/main.ts'
+import CoordPicker from '../src'
 Vue.use(CoordPicker, {
   loadOptions: {
     key: import.meta.env.VITE_APP_AMAP_JS_API_KEY,

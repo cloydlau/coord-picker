@@ -1,24 +1,24 @@
-# coord-picker / 坐标拾取
+# coord-picker
 
 ![图片](./preview.png)
 
-## Features
+## 特性
 
-- √ 坐标拾取、绘制点位（双向绑定）
-- √ 拖拉拽绘制、编辑矩形/贴图（双向绑定角坐标）
-- √ 拖拉拽绘制、编辑多边形（双向绑定多边形坐标）
-- √ POI搜索、搜索关键字自动补全
-- √ 根据传参情况智能初始化至合适的位置
-- √ 全局或局部引入 参数支持全局或局部配置
+- 坐标拾取、绘制点位（双向绑定）
+- 拖拉拽绘制矩形、内嵌贴图的矩形（双向绑定角坐标）
+- 拖拉拽绘制多边形（双向绑定多边形坐标）
+- POI搜索、搜索关键字自动补全
+- 根据传参情况智能初始化至合适的位置
+- 全局或局部引入，参数支持全局或局部配置（[vue-global-config](https://github.com/cloydlau/vue-global-config.git) 提供技术支持）
 
 <br>
 
-## Installation
+## 安装
 
 ![NPM](https://nodei.co/npm/coord-picker.png)
 
 ```bash
-npm add coord-picker vue@2 @amap/amap-jsapi-loader element-ui
+npm add coord-picker element-ui
 ```
 
 ```ts
@@ -51,14 +51,14 @@ export default {
 
 <br>
 
-## Props
+## 参数
 
 ### 基础参数
 
 | Attribute | Description | Type | Accepted Values | Default |
 | --- | --- | --- | --- | --- |
 | show.sync | 开关 | boolean | | false |
-| loadOptions | [AMapLoader.load的参数](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) ,其中 `loadOptions.key` 必传 | object | | |
+| loadOptions | [AMapLoader.load的参数](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) ，其中 `loadOptions.key` 必传 | object | | |
 | mapOptions[.sync] | [AMap.Map的参数2](https://lbs.amap.com/api/javascript-api/reference/map) | object | | |
 | city | 初始行政区 | string | | |
 | precision | 坐标精度（保留几位小数） | number | | 6 |
@@ -106,9 +106,9 @@ number和string都能接收 但返回时 由于js的number类型存在精度丢�
 
 adcode信息可参考[城市编码表](https://lbs.amap.com/api/webservice/download)获取
 
-::: tip 长度超过6位数？  
+长度超过6位数？
+
 组件内部做了处理，如果你传入的city超过6位数，也会以仅保留前6位的形式支持。
-:::
 
 ### markerCount, rectangleCount, polygonCount
 
@@ -163,7 +163,7 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
 
 <br>
 
-## Config rules
+## 参数配置规则
 
 - 双向绑定参数（`v-model` / `value` / `*.sync`）仅支持局部配置
 - 其余参数均支持全局或局部配置
@@ -303,7 +303,7 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
 
 ## 坐标系统
 
-高德、腾讯地图通用的 `GCJ-02`
+高德、腾讯地图通用的 GCJ-02
 
 <br>
 
@@ -315,6 +315,6 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
 
 ## Notice
 
-在打开coord-picker之前，请确保所有参数已传入，为避免与用户的操作发生冲突，组件内部不会监听参数后续的变化
+在打开 coord-picker 之前，请确保所有参数已传入，为避免与用户的操作发生冲突，组件内部不会监听参数后续的变化
 
 <br>

@@ -3,7 +3,7 @@
   "version": "0.6.5",
   "author": "cloydlau",
   "license": "MIT",
-  "description": "高德/腾讯地图坐标拾取器 / Coordinate picker for amap/tmap",
+  "description": "Coordinates picker for AMap & TMap / 高德 & 腾讯地图坐标拾取工具",
   "keywords": [
     "地图选点",
     "坐标拾取",
@@ -46,11 +46,12 @@
   "dependencies": {
     "@amap/amap-jsapi-loader": "latest",
     "@tarekraafat/autocomplete.js": "^9.1.1",
+    "cozyalert": "latest",
     "kayran": "latest",
     "kikimore": "latest",
     "lodash-es": "latest",
     "pic-viewer": "latest",
-    "cozyalert": "latest"
+    "vue-global-config": "^0.0.2"
   },
   "peerDependencies": {
     "element-ui": "2",
@@ -68,10 +69,10 @@
     "sass": "latest",
     "semver": "latest",
     "typescript": "latest",
+    "unocss": "latest",
     "unplugin-icons": "latest",
     "vite": "latest",
     "vite-plugin-vue2": "latest",
-    "vite-plugin-windicss": "latest",
     "vue": "2.6.12",
     "vue-template-compiler": "2.6.12"
   }

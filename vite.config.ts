@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import { createVuePlugin } from 'vite-plugin-vue2'
-import WindiCSS from 'vite-plugin-windicss'
+import Unocss from 'unocss/vite'
+import { presetUno, presetAttributify } from 'unocss'
 import Icons from 'unplugin-icons/vite'
 import { name } from './package.json'
 const { resolve } = require('path')
@@ -14,13 +15,19 @@ export default defineConfig({
   },
   plugins: [
     createVuePlugin(/*options*/),
-    WindiCSS(),
+    Unocss({
+      presets: [
+        presetAttributify({ /* options */ }),
+        presetUno(),
+        // ...other presets
+      ]
+    }),
     Icons(),
   ],
   build: {
     lib: {
       name,
-      entry: 'src/main.ts'
+      entry: 'src/index.ts'
     },
     rollupOptions: {
       // 请确保外部化那些你的库中不需要的依赖

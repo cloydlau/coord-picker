@@ -1,47 +1,27 @@
 <template>
-  <el-dialog
-    :visible="show"
-    :fullscreen="true"
-    :append-to-body="true"
-    :show-close="false"
-    @close="$emit('update:show', false)"
-    destroy-on-close
-    v-if="show"
-    custom-class="coord-picker"
-    v-on="$listeners"
-  >
+  <el-dialog :visible="show" :fullscreen="true" :append-to-body="true" :show-close="false"
+    @close="$emit('update:show', false)" destroy-on-close v-if="show" custom-class="coord-picker" v-on="$listeners">
     <!--<div slot="title" class="title">
       <span v-text="title||'坐标拾取'" class="title-text"/>
     </div>-->
     <div style="height:100%">
       <div class="autoComplete-wrapper">
-        <span class="magnifier"/>
-        <input id="autoComplete" tabindex="1" v-model="keyword" @keyup.enter="e=>{
+        <span class="magnifier" />
+        <input id="autoComplete" tabindex="1" v-model="keyword" @keyup.enter="e => {
           search()
           e.currentTarget.blur()
         }">
-        <KiSelect
-          class="region-selector"
-          ref="regionKiSelect"
-          placeholder="当前城市"
-          :label.sync='baseCity'
-          :props="{
-            value: 'id',
-            label: 'name',
-            groupLabel: 'name',
-            groupOptions: 'cities',
-          }"
-          :options="cities"
-        />
+        <KiSelect class="region-selector" ref="regionKiSelect" placeholder="当前城市" :label.sync='baseCity' :props="{
+          value: 'id',
+          label: 'name',
+          groupLabel: 'name',
+          groupOptions: 'cities',
+        }" :options="cities" />
       </div>
       <transition enter-active-class="animate__animated animate__backInLeft"
-                  leave-active-class="animate__animated animate__backOutLeft">
-        <div
-          v-loading="searching"
-          class="drawer"
-          v-show="searchResult.length>0"
-        >
-          <div v-for="(v,i) of searchResult" :key="i" class="item" @click="locate(v)">
+        leave-active-class="animate__animated animate__backOutLeft">
+        <div v-loading="searching" class="drawer" v-show="searchResult.length > 0">
+          <div v-for="(v, i) of searchResult" :key="i" class="item" @click="locate(v)">
             <div>{{ v.name }}</div>
             <div>{{ v.address }}</div>
           </div>
@@ -51,15 +31,10 @@
         <i class="el-icon-search"/>
         <span>搜索</span>
       </div>-->
-      <div
-        ref="map-container"
-        id="map-container"
-        v-loading="Loading"
-        element-loading-custom-class="map-container"
-      />
+      <div ref="map-container" id="map-container" v-loading="Loading" element-loading-custom-class="map-container" />
 
       <div id="panel" class="scrollbar1">
-        <ul id="myList"/>
+        <ul id="myList" />
       </div>
     </div>
 
@@ -67,25 +42,19 @@
       <el-tooltip effect="dark" content="使用帮助" placement="bottom">
         <a @click.stop="help">
           <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"
-               role="img" width="32" height="32" preserveAspectRatio="xMidYMid meet"
-               viewBox="0 0 24 24">
+            role="img" width="32" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24">
             <path
               d="M11 18h2v-2h-2v2m1-16A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m0-14a4 4 0 0 0-4 4h2a2 2 0 0 1 2-2a2 2 0 0 1 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5a4 4 0 0 0-4-4z"
-              fill="currentColor"
-            />
+              fill="currentColor" />
           </svg>
         </a>
       </el-tooltip>
-      <el-dropdown
-        @command="command=>{this[command](['marker'])}"
-        :class="{active:active==='marker'}"
-      >
-        <a @click.stop="active='marker'">
+      <el-dropdown @command="command => { this[command](['marker']) }" :class="{ active: active === 'marker' }">
+        <a @click.stop="active = 'marker'">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
               d="M15 17h3v-3h2v3h3v2h-3v3h-2v-3h-3v-2M9 6.5c1.4 0 2.5 1.1 2.5 2.5s-1.1 2.5-2.5 2.5S6.5 10.4 6.5 9S7.6 6.5 9 6.5M9 2c3.9 0 7 3.1 7 7c0 5.2-7 13-7 13S2 14.2 2 9c0-3.9 3.1-7 7-7m0 2C6.2 4 4 6.2 4 9c0 1 0 3 5 9.7C14 12 14 10 14 9c0-2.8-2.2-5-5-5z"
-              fill="currentColor"
-            />
+              fill="currentColor" />
           </svg>
         </a>
         <el-dropdown-menu slot="dropdown">
@@ -93,18 +62,12 @@
           <el-dropdown-item command="clear">清除点位</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
-      <el-dropdown
-        v-if="(rectangle && rectangle.length) || RectangleMaxCount > 0"
-        @command="command=>{this[command](['rectangle'])}"
-        :class="{active:active==='rectangle'}"
-      >
+      <el-dropdown v-if="(rectangle && rectangle.length) || RectangleMaxCount > 0"
+        @command="command => { this[command](['rectangle']) }" :class="{ active: active === 'rectangle' }">
         <a @click.stop="onRectangleBtnClick">
-          <svg
-            xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"
-            role="img" width="32" height="32" preserveAspectRatio="xMidYMid meet"
-            viewBox="0 0 24 24"
-            :class="!RectangleMaxCount && 'disabled'"
-          >
+          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"
+            role="img" width="32" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"
+            :class="!RectangleMaxCount && 'disabled'">
             <path d="M19 6h3v2h-3v3h-2V8h-3V6h3V3h2v3m-2 11v-3h2v5H3V6h8v2H5v9h12z" fill="currentColor"></path>
           </svg>
         </a>
@@ -115,21 +78,12 @@
           <el-dropdown-item command="clear">清除矩形</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
-      <el-dropdown
-        v-if="(polygon && polygon.length) || PolygonMaxCount > 0"
-        @command="command=>{this[command](['polygon'])}"
-        :class="{active:active==='polygon'}"
-      >
+      <el-dropdown v-if="(polygon && polygon.length) || PolygonMaxCount > 0"
+        @command="command => { this[command](['polygon']) }" :class="{ active: active === 'polygon' }">
         <a @click.stop="onPolygonBtnClick">
-          <svg
-            :class="!PolygonMaxCount && 'disabled'"
-            width="1em"
-            height="1em"
-            viewBox="0 0 24 24"
-          >
+          <svg :class="!PolygonMaxCount && 'disabled'" width="1em" height="1em" viewBox="0 0 24 24">
             <path d="M17 15.7V13h2v4l-9 4l-7-7l4-9h4v2H8.3l-2.9 6.6l5 5l6.6-2.9M22 5v2h-3v3h-2V7h-3V5h3V2h2v3h3z"
-                  fill="currentColor"
-            />
+              fill="currentColor" />
           </svg>
         </a>
         <el-dropdown-menu slot="dropdown">
@@ -142,61 +96,46 @@
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
               d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10zm0-2a8 8 0 1 0 0-16a8 8 0 0 0 0 16zm0-9.414l2.828-2.829l1.415 1.415L13.414 12l2.829 2.828l-1.415 1.415L12 13.414l-2.828 2.829l-1.415-1.415L10.586 12L7.757 9.172l1.415-1.415L12 10.586z"
-              fill="currentColor"
-            />
+              fill="currentColor" />
           </svg>
         </a>
       </el-tooltip>
-      <el-tooltip :class="Loading&&'invisible'" effect="dark" content="确定" placement="bottom">
+      <el-tooltip :class="Loading && 'invisible'" effect="dark" content="确定" placement="bottom">
         <a @click.stop="confirm">
           <svg width="1em" height="1em" viewBox="0 0 24 24">
             <path
               d="M7 19v-6h10v6h2V7.828L16.172 5H5v14h2zM4 3h13l4 4v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm5 12v4h6v-4H9z"
-              fill="currentColor"
-            />
+              fill="currentColor" />
           </svg>
         </a>
       </el-tooltip>
     </Toolbar>
 
-    <div
-      v-show="!Loading"
-      class="absolute left-3px bottom-40px"
-      style="position:absolute;left:3px;bottom:40px;"
-      id="zoom"
-    >
+    <div v-show="!Loading" class="absolute left-3px bottom-40px" style="position:absolute;left:3px;bottom:40px;"
+      id="zoom">
       <span class="text-45px" style="color:#3297FD;font-size:35px;">{{ MapOptions.zoom }}</span>
       <span class="text-10px" style="font-size:10px;"> 缩放级别</span>
     </div>
 
-    <KiFormDialog
-      :show.sync="imagePicker.show"
-      v-model="imagePicker.data"
-      append-to-body
-      :retrieve="imagePicker.retrieve"
-      :submit="imagePicker.submit"
-      title="选择嵌在矩形内的贴图"
-      custom-class="imagePicker"
-    >
-      <PicViewer :value="RectangleImage" :viewerjs="false">
-        <template v-slot="{ src, index }">
-          <div class="inline-block relative">
-            <img :src="src" class="h-148px cursor-pointer" alt="" @click="changeCurImage(src)">
-            <svg
-              xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"
-              role="img" width="32" height="32" preserveAspectRatio="xMidYMid meet"
-              viewBox="0 0 24 24"
-              class="absolute -right-3 -top-3 w-25px"
-              v-show="imagePicker.data===src"
-            >
-              <path
-                d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10s10-4.5 10-10S17.5 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
-                fill="#409eff"
-              />
-            </svg>
-          </div>
-        </template>
-      </PicViewer>
+    <KiFormDialog :show.sync="imagePicker.show" v-model="imagePicker.data" append-to-body
+      :retrieve="imagePicker.retrieve" :submit="imagePicker.submit" title="选择嵌在矩形内的贴图" custom-class="imagePicker">
+      <div flex="~">
+        <PicViewer :value="RectangleImage" :viewerjs="false">
+          <template v-slot="{ src }">
+            <div class="inline-block relative">
+              <img :src="src" class="h-148px cursor-pointer" alt="" @click="changeCurImage(src)">
+              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"
+                role="img" width="32" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"
+                class="absolute -right-3 -top-3 w-25px" v-show="imagePicker.data === src">
+                <path
+                  d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10s10-4.5 10-10S17.5 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+                  fill="#409eff" />
+              </svg>
+            </div>
+          </template>
+        </PicViewer>
+        <!-- <Imgpond v-model="rectangleImage" ml="8px"/> -->
+      </div>
     </KiFormDialog>
   </el-dialog>
 </template>
@@ -207,8 +146,7 @@ import 'kikimore/dist/style.css'
 import { Select as KiSelect, FormDialog as KiFormDialog } from 'kikimore'
 import 'cozyalert/dist/style.css'
 import { error, warning, confirm } from 'cozyalert'
-
-import { throttle as throttling, cloneDeep, merge } from 'lodash-es'
+import { throttle as throttling, cloneDeep } from 'lodash-es'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
 import autoComplete from '@tarekraafat/autocomplete.js/dist/js/autoComplete'
@@ -218,14 +156,13 @@ import './styles/marker-list.scss'
 import polygon from '@/mixins/polygon'
 import rectangle from '@/mixins/rectangle'
 import Toolbar from '@/components/Toolbar.vue'
-import { getFinalProp } from 'kayran'
-import globalProps from './config'
 import { name } from '../package.json'
-
 const prefix = `[${name}] `
 import cities from './assets/city.json'
 import 'pic-viewer/dist/style.css'
 import PicViewer from 'pic-viewer'
+import { conclude } from 'vue-global-config'
+import { globalProps } from './index'
 
 export default {
   name: 'CoordPicker',
@@ -258,7 +195,7 @@ export default {
     rectangle: {},
     rectangleCount: {},
   },
-  data () {
+  data() {
     return {
       ...this.getInitData(),
       cities,
@@ -283,99 +220,99 @@ export default {
     }
   },
   computed: {
-    MarkerStatus () {
+    MarkerStatus() {
       if (this.MarkerMaxCount > 0) {
         return 'editable'
       } else if (this.Marker?.length > 0) {
         return 'readonly'
       }
     },
-    RectangleStatus () {
+    RectangleStatus() {
       if (this.RectangleMaxCount > 0) {
         return 'editable'
       } else if (this.Rectangle?.length > 0) {
         return 'readonly'
       }
     },
-    PolygonStatus () {
+    PolygonStatus() {
       if (this.PolygonMaxCount > 0) {
         return 'editable'
       } else if (this.Polygon?.length > 0) {
         return 'readonly'
       }
     },
-    Marker () {
-      return getFinalProp([this.marker, globalProps.marker], {
+    Marker() {
+      return conclude([this.marker, globalProps.marker], {
         name: 'marker',
         type: ['object', 'array', 'null']
       })
     },
-    Polygon () {
-      return getFinalProp([this.polygon, globalProps.polygon], {
+    Polygon() {
+      return conclude([this.polygon, globalProps.polygon], {
         name: 'polygon',
         type: ['array', 'null']
       })
     },
-    Rectangle () {
-      return getFinalProp([this.rectangle, globalProps.rectangle], {
+    Rectangle() {
+      return conclude([this.rectangle, globalProps.rectangle], {
         name: 'rectangle',
         type: ['array', 'null']
       })
     },
-    RectangleCount () {
-      return getFinalProp([this.rectangleCount, globalProps.rectangleCount, 0], {
-        name: 'rectangleCount',
-        type: ['number', 'array']
-      })
-    },
-    RectangleMaxCount () {
-      return Array.isArray(this.RectangleCount) ? this.RectangleCount[1] : this.RectangleCount
-    },
-    RectangleMinCount () {
-      return Array.isArray(this.RectangleCount) ? this.RectangleCount[0] : undefined
-    },
-    PolygonCount () {
-      return getFinalProp([this.polygonCount, globalProps.polygonCount, 0], {
-        name: 'polygonCount',
-        type: ['number', 'array']
-      })
-    },
-    PolygonMaxCount () {
-      return Array.isArray(this.PolygonCount) ? this.PolygonCount[1] : this.PolygonCount
-    },
-    PolygonMinCount () {
-      return Array.isArray(this.PolygonCount) ? this.PolygonCount[0] : undefined
-    },
-    MarkerCount () {
-      return getFinalProp([this.markerCount, globalProps.markerCount, 1], {
-        name: 'markerCount',
-        type: ['number', 'array']
-      })
-    },
-    MarkerMaxCount () {
-      return Array.isArray(this.MarkerCount) ? this.MarkerCount[1] : this.MarkerCount
-    },
-    MarkerMinCount () {
-      return Array.isArray(this.MarkerCount) ? this.MarkerCount[0] : undefined
-    },
-    RectangleImage () {
-      const temp = getFinalProp([this.rectangleImage, globalProps.rectangleImage, []], {
+    RectangleImage() {
+      const temp = conclude([this.rectangleImage, globalProps.rectangleImage, []], {
         name: 'rectangleImage',
         type: ['string', 'array']
       })
       return (typeof temp === 'string') ? [temp] : temp
     },
+    RectangleCount() {
+      return conclude([this.rectangleCount, globalProps.rectangleCount, 0], {
+        name: 'rectangleCount',
+        type: ['number', 'array']
+      })
+    },
+    RectangleMaxCount() {
+      return Array.isArray(this.RectangleCount) ? this.RectangleCount[1] : this.RectangleCount
+    },
+    RectangleMinCount() {
+      return Array.isArray(this.RectangleCount) ? this.RectangleCount[0] : undefined
+    },
+    PolygonCount() {
+      return conclude([this.polygonCount, globalProps.polygonCount, 0], {
+        name: 'polygonCount',
+        type: ['number', 'array']
+      })
+    },
+    PolygonMaxCount() {
+      return Array.isArray(this.PolygonCount) ? this.PolygonCount[1] : this.PolygonCount
+    },
+    PolygonMinCount() {
+      return Array.isArray(this.PolygonCount) ? this.PolygonCount[0] : undefined
+    },
+    MarkerCount() {
+      return conclude([this.markerCount, globalProps.markerCount, 1], {
+        name: 'markerCount',
+        type: ['number', 'array']
+      })
+    },
+    MarkerMaxCount() {
+      return Array.isArray(this.MarkerCount) ? this.MarkerCount[1] : this.MarkerCount
+    },
+    MarkerMinCount() {
+      return Array.isArray(this.MarkerCount) ? this.MarkerCount[0] : undefined
+    },
     /*title () {
       return this.curSpot.address + ((isEmpty(this.curSpot.lng) || isEmpty(this.curSpot.lat)) ? '' : `（${this.curSpot.lng}，${this.curSpot.lat}）`)
     },*/
-    Precision () {
-      return getFinalProp([this.precision, globalProps.precision, 6], {
+    Precision() {
+      return conclude([this.precision, globalProps.precision, 6], {
         name: 'precision',
         type: 'number'
       })
     },
-    AddressComponent () {
-      return getFinalProp([this.addressComponent, globalProps.addressComponent, {
+    AddressComponent() {
+      return conclude([this.addressComponent, globalProps.addressComponent, {
         province: true,
         city: true,
         district: true
@@ -384,11 +321,11 @@ export default {
         type: ['object', 'function']
       })
     },
-    Loading () {
+    Loading() {
       return this.loading || this.initializing
     },
-    LoadOptions () {
-      return getFinalProp([this.loadOptions, globalProps.loadOptions, {
+    LoadOptions() {
+      return conclude([this.loadOptions, globalProps.loadOptions, {
         AMapUI: {
           version: '1.1',
           plugins: ['misc/MarkerList', 'overlay/SimpleMarker', 'overlay/SimpleInfoWindow']
@@ -426,9 +363,9 @@ export default {
     }
   },
   watch: {
-    show (n, o) {
+    show(n, o) {
       if (n) {
-        this.MapOptions = getFinalProp([this.mapOptions, globalProps.mapOptions, {
+        this.MapOptions = conclude([this.mapOptions, globalProps.mapOptions, {
           //viewMode: '3D',
         }], {
           name: 'mapOptions',
@@ -437,168 +374,168 @@ export default {
 
         //this.customClass = 'animate__animated animate__zoomIn'
         AMapLoader.load(this.LoadOptions)
-        .then(async AMap => {
-          this.map = new AMap.Map('map-container', this.MapOptions)
+          .then(async AMap => {
+            this.map = new AMap.Map('map-container', this.MapOptions)
 
-          // 在图面添加比例尺控件，展示地图在当前层级和纬度下的比例尺
-          this.map.addControl(new AMap.Scale())
+            // 在图面添加比例尺控件，展示地图在当前层级和纬度下的比例尺
+            this.map.addControl(new AMap.Scale())
 
-          // 在图面添加类别切换控件，实现默认图层与卫星图、实施交通图层之间切换的控制
-          this.map.addControl(new AMap.MapType())
+            // 在图面添加类别切换控件，实现默认图层与卫星图、实施交通图层之间切换的控制
+            this.map.addControl(new AMap.MapType())
 
-          this.map.on('complete', () => {
-            this.$nextTick(() => {
-              /*this.meny = Meny.create({
-                // The element that will be animated in from off screen
-                menuElement: document.querySelector('.drawer'),
-                // The contents that gets pushed aside while Meny is active
-                contentsElement: document.querySelector('#map-container'),
-                // [optional] The alignment of the menu (top/right/bottom/left)
-                position: Meny.getQuery().p || 'left',
-                // [optional] The height of the menu (when using top/bottom position)
-                height: 200,
-                // [optional] The width of the menu (when using left/right position)
-                width: 384,
-                // [optional] Distance from mouse (in pixels) when menu should open
-                threshold: 40,
-                // [optional] Use mouse movement to automatically open/close
-                mouse: true,
-                // [optional] Use touch swipe events to open/close
-                touch: true,
-                angle: 15.5
-              })*/
+            this.map.on('complete', () => {
+              this.$nextTick(() => {
+                /*this.meny = Meny.create({
+                  // The element that will be animated in from off screen
+                  menuElement: document.querySelector('.drawer'),
+                  // The contents that gets pushed aside while Meny is active
+                  contentsElement: document.querySelector('#map-container'),
+                  // [optional] The alignment of the menu (top/right/bottom/left)
+                  position: Meny.getQuery().p || 'left',
+                  // [optional] The height of the menu (when using top/bottom position)
+                  height: 200,
+                  // [optional] The width of the menu (when using left/right position)
+                  width: 384,
+                  // [optional] Distance from mouse (in pixels) when menu should open
+                  threshold: 40,
+                  // [optional] Use mouse movement to automatically open/close
+                  mouse: true,
+                  // [optional] Use touch swipe events to open/close
+                  touch: true,
+                  angle: 15.5
+                })*/
 
-              const autoCompleteEl = document.querySelector('#autoComplete')
-              autoCompleteEl.addEventListener('blur', e => {
-                let el = document.querySelector('#autoComplete_list')
-                if (el) {
-                  el.style.visibility = 'hidden'
-                }
-              })
-              autoCompleteEl.addEventListener('focus', e => {
-                let el = document.querySelector('#autoComplete_list')
-                if (el) {
-                  document.querySelector('#autoComplete_list').style.visibility = 'visible'
-                }
-              })
-
-              if (!this.autoCompleteInput) {
-                this.autoCompleteInput = new autoComplete({
-                  data: {                              // Data src [Array, Function, Async] | (REQUIRED)
-                    src: async () => {
-                      if (isEmpty(this.keyword)) {
-                        this.searchResult = []
-                        return []
-                      } else {
-                        return await this.fetchSuggestions()
-                      }
-                    },
-                    key: ['name'],
-                    cache: false
-                  },
-                  placeHolder: '搜索位置',              // Place Holder text                 | (Optional)
-                  selector: '#autoComplete',           // Input field selector              | (Optional)
-                  threshold: 1,                        // Min. Chars length to start Engine | (Optional)
-                  debounce: 300,                       // Post duration for engine to start | (Optional)
-                  searchEngine: 'loose',               // Search Engine type/mode           | (Optional)
-                  resultsList: {                       // Rendered results list object      | (Optional)
-                    render: true,
-                  },
-                  maxResults: 10,                      // Max. number of rendered results | (Optional)
-                  highlight: true,                     // Highlight matching results      | (Optional)
-                  onSelection: feedback => {           // Action script onSelection event | (Optional)
-                    //console.log(feedback.selection.value.image_url)
-                    this.keyword = feedback.selection.value.name
-                    document.querySelector('#autoComplete_list').style.visibility = 'hidden'
+                const autoCompleteEl = document.querySelector('#autoComplete')
+                autoCompleteEl.addEventListener('blur', e => {
+                  let el = document.querySelector('#autoComplete_list')
+                  if (el) {
+                    el.style.visibility = 'hidden'
                   }
                 })
-              }
-
-              this.initializing = false
-            })
-          })
-
-          this.active = 'marker'
-
-          /*this.text = new AMap.Text({
-            anchor: 'center', // 设置文本标记锚点
-            offset: new AMap.Pixel(0, -20),
-            style: {
-              'border-radius': '17.5px',
-              'padding': '5px 10px',
-              'border-width': 0,
-              'box-shadow': '0 2px 6px 0 rgba(114, 124, 245, .5)',
-              'text-align': 'center',
-            },
-            //zIndex: 9999 // MarkerList始终比它高10
-          })
-          this.text.setMap(this.map)
-          this.map.on('mousemove', this.setTextPosition)*/
-
-          this.map.on('click', this.onMapClick)
-
-          if (notEmpty(this.MapOptions.zoom)) {
-            this.MapOptions.zoom = Number(this.MapOptions.zoom)
-          }
-
-          if (this.RectangleStatus === 'editable' || this.PolygonStatus === 'editable') {
-            this.mouseTool = new AMap.MouseTool(this.map)
-            this.mouseTool.on('draw', e => {
-              //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
-              //2.x：e.obj.className==='Overlay.Rectangle'
-              if (this.active === 'rectangle') {
-                this.active = 'marker'
-                // 如果矩形只允许有一个 清除之前绘制的
-                /*if (
-                  this.Rectangle?.length === 1 &&
-                  this.overlay.rectangleInstance.length === 1 &&
-                  this.RectangleMaxCount === 1
-                ) {
-                  this.overlay.rectangleInstance.pop().setMap(null)
-                  this.overlay.rectangleEditor.pop().close()
-                }*/
-                //this.overlay.rectangleInstance.push(e.obj)
-                //this.editRectangle(this.overlay.rectangleInstance.getBounds()) 1.x中编辑绘制出来矩形会报错
-                e.obj.setMap(null) // 1.x改为销毁绘制出来的矩形并新建一个矩形对象
-
-                this.drawRectangle({
-                  image: this.curImage,
-                  bounds: e.obj.getBounds()
+                autoCompleteEl.addEventListener('focus', e => {
+                  let el = document.querySelector('#autoComplete_list')
+                  if (el) {
+                    document.querySelector('#autoComplete_list').style.visibility = 'visible'
+                  }
                 })
 
-                /*this.$nextTick(() => {
-                  this.mouseTool.rectangle(this.rectangleStyle)
-                })*/
-              }
+                if (!this.autoCompleteInput) {
+                  this.autoCompleteInput = new autoComplete({
+                    data: {                              // Data src [Array, Function, Async] | (REQUIRED)
+                      src: async () => {
+                        if (isEmpty(this.keyword)) {
+                          this.searchResult = []
+                          return []
+                        } else {
+                          return await this.fetchSuggestions()
+                        }
+                      },
+                      key: ['name'],
+                      cache: false
+                    },
+                    placeHolder: '搜索位置',              // Place Holder text                 | (Optional)
+                    selector: '#autoComplete',           // Input field selector              | (Optional)
+                    threshold: 1,                        // Min. Chars length to start Engine | (Optional)
+                    debounce: 300,                       // Post duration for engine to start | (Optional)
+                    searchEngine: 'loose',               // Search Engine type/mode           | (Optional)
+                    resultsList: {                       // Rendered results list object      | (Optional)
+                      render: true,
+                    },
+                    maxResults: 10,                      // Max. number of rendered results | (Optional)
+                    highlight: true,                     // Highlight matching results      | (Optional)
+                    onSelection: feedback => {           // Action script onSelection event | (Optional)
+                      //console.log(feedback.selection.value.image_url)
+                      this.keyword = feedback.selection.value.name
+                      document.querySelector('#autoComplete_list').style.visibility = 'hidden'
+                    }
+                  })
+                }
+
+                this.initializing = false
+              })
+            })
+
+            this.active = 'marker'
+
+            /*this.text = new AMap.Text({
+              anchor: 'center', // 设置文本标记锚点
+              offset: new AMap.Pixel(0, -20),
+              style: {
+                'border-radius': '17.5px',
+                'padding': '5px 10px',
+                'border-width': 0,
+                'box-shadow': '0 2px 6px 0 rgba(114, 124, 245, .5)',
+                'text-align': 'center',
+              },
+              //zIndex: 9999 // MarkerList始终比它高10
+            })
+            this.text.setMap(this.map)
+            this.map.on('mousemove', this.setTextPosition)*/
+
+            this.map.on('click', this.onMapClick)
+
+            if (notEmpty(this.MapOptions.zoom)) {
+              this.MapOptions.zoom = Number(this.MapOptions.zoom)
+            }
+
+            if (this.RectangleStatus === 'editable' || this.PolygonStatus === 'editable') {
+              this.mouseTool = new AMap.MouseTool(this.map)
+              this.mouseTool.on('draw', e => {
+                //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
+                //2.x：e.obj.className==='Overlay.Rectangle'
+                if (this.active === 'rectangle') {
+                  this.active = 'marker'
+                  // 如果矩形只允许有一个 清除之前绘制的
+                  /*if (
+                    this.Rectangle?.length === 1 &&
+                    this.overlay.rectangleInstance.length === 1 &&
+                    this.RectangleMaxCount === 1
+                  ) {
+                    this.overlay.rectangleInstance.pop().setMap(null)
+                    this.overlay.rectangleEditor.pop().close()
+                  }*/
+                  //this.overlay.rectangleInstance.push(e.obj)
+                  //this.editRectangle(this.overlay.rectangleInstance.getBounds()) 1.x中编辑绘制出来矩形会报错
+                  e.obj.setMap(null) // 1.x改为销毁绘制出来的矩形并新建一个矩形对象
+
+                  this.drawRectangle({
+                    image: this.curImage,
+                    bounds: e.obj.getBounds()
+                  })
+
+                  /*this.$nextTick(() => {
+                    this.mouseTool.rectangle(this.rectangleStyle)
+                  })*/
+                }
                 // 1.x：e.obj.CLASS_NAME==='AMap.Polygon'
-              // 2.x：e.obj.className==='Overlay.Polygon'
-              else if (this.active === 'polygon') {
-                this.active = 'marker'
-                e.obj.setOptions({
-                  ...this.polygonStyle,
-                  fillColor: '#00D3FC',
-                })
-                this.overlay.polygonInstance.push(e.obj)
-                this.editPolygon({ editable: true })
-              }
-              this.mouseTool.close()
-            })
-          }
+                // 2.x：e.obj.className==='Overlay.Polygon'
+                else if (this.active === 'polygon') {
+                  this.active = 'marker'
+                  e.obj.setOptions({
+                    ...this.polygonStyle,
+                    fillColor: '#00D3FC',
+                  })
+                  this.overlay.polygonInstance.push(e.obj)
+                  this.editPolygon({ editable: true })
+                }
+                this.mouseTool.close()
+              })
+            }
 
-          //this.map.addControl(new AMap.ControlBar())
+            //this.map.addControl(new AMap.ControlBar())
 
-          await this.locate()
+            await this.locate()
 
-          this.$emit('load', AMap)
-        })
-        .catch(e => {
-          this.$emit('update:show', false)
-          this.$emit('error', e)
-          console.error(e)
-          error(`高德地图初始化失败：${JSON.stringify(e)}`)
-        })
-        .finally(e => {
-        })
+            this.$emit('load', AMap)
+          })
+          .catch(e => {
+            this.$emit('update:show', false)
+            this.$emit('error', e)
+            console.error(e)
+            error(`高德地图初始化失败：${JSON.stringify(e)}`)
+          })
+          .finally(e => {
+          })
       } else {
         // 正常退出
         if (this.map) {
@@ -613,10 +550,10 @@ export default {
         }
       }
     },
-    keyword () {
+    keyword() {
       this.search()
     },
-    active (newVal) {
+    active(newVal) {
       ({
         'marker': () => {
           this.mouseTool?.close()
@@ -641,7 +578,7 @@ export default {
         },
       })[newVal]()
     },
-    baseCity (n) {
+    baseCity(n) {
       if (this.show) {
         this.initPlugins()
         if (this.baseCityInitialized) {
@@ -664,19 +601,19 @@ export default {
         }
       })
     },*/
-    cancel () {
+    cancel() {
       confirm(`不保存并退出`).then(() => {
         this.$emit('update:show', false)
         this.$emit('cancel')
       })
     },
-    changeCurImage (src) {
+    changeCurImage(src) {
       this.imagePicker.data = this.imagePicker.data === src ? '' : src
     },
-    setCurImage () {
+    setCurImage() {
       this.imagePicker.show = true
     },
-    help () {
+    help() {
       confirm({
         titleText: '使用帮助',
         html: `
@@ -716,14 +653,14 @@ export default {
         showCancelButton: false,
       })
     },
-    setCenter (args) {
+    setCenter(args) {
       if (isEmpty(this.MapOptions.zoom)) {
         this.map.setCenter(args)
       } else {
         this.map.setZoomAndCenter(this.MapOptions.zoom, args)
       }
     },
-    throttle (fnName, fn, param, delay) {
+    throttle(fnName, fn, param, delay) {
       //const functionName = /function\s*(\w*)/i.exec(fn.toString())[1]
       fnName += 'Throttle'
       if (!this[fnName]) {
@@ -736,7 +673,7 @@ export default {
         this.text.setPosition([e.lnglat.lng, e.lnglat.lat])
       }, e, 30)
     },*/
-    initPlugins () {
+    initPlugins() {
       /**
        * 不写在watch原因：需要同步执行
        */
@@ -757,7 +694,7 @@ export default {
         })
       }
     },
-    getInitData (arr) {
+    getInitData(arr) {
       let result = {
         overlay: {}
       }
@@ -819,11 +756,11 @@ export default {
 
       return cloneDeep(result)
     },
-    reset (arr) {
+    reset(arr) {
       this.clear(arr)
       this.initOverlays(arr)
     },
-    isClearable (overlays = ['marker', 'rectangle', 'polygon']) {
+    isClearable(overlays = ['marker', 'rectangle', 'polygon']) {
       for (let v of overlays) {
         switch (v) {
           case 'marker': {
@@ -849,7 +786,7 @@ export default {
       }
       return true
     },
-    clear (arr) {
+    clear(arr) {
       if (Array.isArray(arr)) {
         if (arr.includes('marker')) {
           if (!this.isClearable(arr)) {
@@ -900,41 +837,41 @@ export default {
         Object.assign(this.$data, this.getInitData(arr))
       }
     },
-    getAddress ([lng, lat]) {
+    getAddress([lng, lat]) {
       return new Promise((resolve, reject) => {
         if (this.plugins.Geocoder) {
           this.useAMapAPI('Geocoder.getAddress', [lng, lat])
-          .then(result => {
-            if (result.regeocode?.formattedAddress) {
-              const { province, city, district, township } = result.regeocode.addressComponent
-              const name = result.regeocode.formattedAddress.replace(province + city + district + township, '')
-              if (typeof this.AddressComponent === 'function') {
-                resolve({ address: this.AddressComponent(result.regeocode.addressComponent), name })
-              } else {
-                let address = result.regeocode.formattedAddress
-                for (let k in this.AddressComponent) {
-                  if (this.AddressComponent[k] === false) {
-                    address = address.replace(result.regeocode.addressComponent[k], '')
+            .then(result => {
+              if (result.regeocode?.formattedAddress) {
+                const { province, city, district, township } = result.regeocode.addressComponent
+                const name = result.regeocode.formattedAddress.replace(province + city + district + township, '')
+                if (typeof this.AddressComponent === 'function') {
+                  resolve({ address: this.AddressComponent(result.regeocode.addressComponent), name })
+                } else {
+                  let address = result.regeocode.formattedAddress
+                  for (let k in this.AddressComponent) {
+                    if (this.AddressComponent[k] === false) {
+                      address = address.replace(result.regeocode.addressComponent[k], '')
+                    }
                   }
+                  resolve({ city, address, name })
                 }
-                resolve({ city, address, name })
+              } else {
+                reject()
               }
-            } else {
+            }).catch(e => {
+              console.error(e)
+            })
+            .catch(result => {
               reject()
-            }
-          }).catch(e => {
-            console.error(e)
-          })
-          .catch(result => {
-            reject()
-          })
+            })
         } else {
           // baseCity为空时
           resolve()
         }
       })
     },
-    async onMapClick (e) {
+    async onMapClick(e) {
       const { lng: longitude, lat: latitude } = e.lnglat
       const [{ address, name }] = await waitFor(this.getAddress([e.lnglat.lng, e.lnglat.lat]))
       this.drawMarker({
@@ -944,23 +881,23 @@ export default {
         name
       })
     },
-    fetchSuggestions (queryString, cb) {
+    fetchSuggestions(queryString, cb) {
       return new Promise((resolve, reject) => {
         this.useAMapAPI('AutoComplete.search', this.keyword)
-        .then(result => {
-          resolve(result.tips || [])
-        })
-        .catch((result, status) => {
-          if (status === 'no_data') {
-            resolve([])
-          } else {
-            error(result)
-            reject()
-          }
-        })
+          .then(result => {
+            resolve(result.tips || [])
+          })
+          .catch((result, status) => {
+            if (status === 'no_data') {
+              resolve([])
+            } else {
+              error(result)
+              reject()
+            }
+          })
       })
     },
-    roundOff (value) {
+    roundOff(value) {
       if (isEmpty(value)) {
         return ''
       } else {
@@ -970,7 +907,7 @@ export default {
         }[typeOf(value)]()
       }
     },
-    confirm () {
+    confirm() {
       if (this.markerCount > 1) {
         const { lng, lat } = this.map.getCenter()
         this.$emit('update:lng', this.roundOff(lng))
@@ -1000,7 +937,7 @@ export default {
       this.$emit('update:show', false)
       this.$emit('confirm')
     },
-    drawMarker (markerOptions, isInit = false) {
+    drawMarker(markerOptions, isInit = false) {
       if (this.MarkerMaxCount > 1 && this.overlay.markerInstance.length >= this.MarkerMaxCount && !isInit) {
         warning(`最多标记${this.MarkerMaxCount}个点位`)
       } else {
@@ -1056,7 +993,7 @@ export default {
         this.drawMarkerList(this.overlay.markerInstance)
       }
     },
-    drawMarkerList (marker) {
+    drawMarkerList(marker) {
       this.plugins.MarkerList?.clearData()
 
       if (isEmpty(marker)) {
@@ -1276,44 +1213,45 @@ export default {
         )
       }
 
-      function scrollListElementIntoView ($listEle) {
+      function scrollListElementIntoView($listEle) {
         if (!isElementInViewport($listEle.get(0))) {
           $('#panel').scrollTop($listEle.offset().top - $listEle.parent().offset().top)
         }
         //闪动一下
         $listEle
-        .one('webkitAnimationEnd oanimationend msAnimationEnd animationend',
-          function (e) {
-            $(this).removeClass('flash animated')
-          }).addClass('flash animated')
+          .one('webkitAnimationEnd oanimationend msAnimationEnd animationend',
+            function (e) {
+              $(this).removeClass('flash animated')
+            }).addClass('flash animated')
       }
     },
-    drawDistrict (districtName) {
+    drawDistrict(districtName) {
       if (districtName && this.PolygonStatus === 'editable') {
         this.useAMapAPI('DistrictSearch.search', districtName)
-        .then(result => {
-          const bounds = result.districtList?.[0]?.boundaries
-          if (bounds?.length) {
-            confirm(`是否绘制${districtName}轮廓？`)
-            .then(() => {
-              this.drawPolygon({
-                polygon: Array.from(bounds, v => ({ path: v })),
-                editable: false
-              })
-            })
-          }
-        })
-        .catch((result, status) => {
-        })
+          .then(result => {
+            const bounds = result.districtList?.[0]?.boundaries
+            if (bounds?.length) {
+              confirm(`是否绘制${districtName}轮廓？`)
+                .then(() => {
+                  this.drawPolygon({
+                    polygon: Array.from(bounds, v => ({ path: v })),
+                    editable: false
+                  })
+                })
+            }
+          })
+          .catch((result, status) => {
+          })
       }
     },
-    async initOverlays (arr) {
+    async initOverlays(arr) {
       let centerDesignated = false, hasOverlay = false
 
       if (!arr || arr.includes('rectangle')) {
         if (this.RectangleImage.length === 1) {
           this.curImage = this.RectangleImage[0]
         }
+
 
         if (this.Rectangle?.length > 0) {
           this.Rectangle.map(v => {
@@ -1406,12 +1344,12 @@ export default {
         hasOverlay,
       }
     },
-    watchZoom () {
+    watchZoom() {
       this.map.on('zoomchange', e => {
         this.MapOptions.zoom = this.map.getZoom()
       })
     },
-    async locate (selectedLocation) {
+    async locate(selectedLocation) {
       if (this.show) {
         // 选中搜索项
         if (selectedLocation) {
@@ -1486,9 +1424,9 @@ export default {
         }
       }
     },
-    getBaseCity () {
+    getBaseCity() {
       // 直辖市：['110100', '120100', '310100', '500100']
-      let result = getFinalProp([this.city, globalProps.city, ''], {
+      let result = conclude([this.city, globalProps.city, ''], {
         name: 'city',
         type: 'string'
       })
@@ -1506,16 +1444,16 @@ export default {
         } else {
           this.plugins.CitySearch = new AMap.CitySearch()
           this.useAMapAPI('CitySearch.getLocalCity')
-          .then(result => {
-            resolve(result.city)
-          })
-          .catch(result => {
-            reject()
-          })
+            .then(result => {
+              resolve(result.city)
+            })
+            .catch(result => {
+              reject()
+            })
         }
       })
     },
-    search () {
+    search() {
       if (!this.keyword) {
         this.searchResult = []
         return
@@ -1524,20 +1462,20 @@ export default {
       this.throttle('search', () => {
 
         this.useAMapAPI('PlaceSearch.search', this.keyword)
-        .then(result => {
-          this.searchResult = result.poiList?.pois || []
-        })
-        .catch(result => {
-          if (result.info === 'TIP_CITIES') {
-            this.$message.info('未找到相关结果，尝试输入更精确的关键字，或切换城市哦')
-          }
-        })
-        .finally(() => {
-          this.searching = false
-        })
+          .then(result => {
+            this.searchResult = result.poiList?.pois || []
+          })
+          .catch(result => {
+            if (result.info === 'TIP_CITIES') {
+              this.$message.info('未找到相关结果，尝试输入更精确的关键字，或切换城市哦')
+            }
+          })
+          .finally(() => {
+            this.searching = false
+          })
       }, null, 500)
     },
-    useAMapAPI () {
+    useAMapAPI() {
       this.loading = true
       const apiName = arguments[0]
       const [plugin, fn] = apiName.split('.')
@@ -1567,11 +1505,11 @@ export default {
   cursor: crosshair !important;
 }
 
-::v-deep .coord-picker > .el-dialog.is-fullscreen {
+::v-deep .coord-picker>.el-dialog.is-fullscreen {
   overflow: hidden;
 }
 
-::v-deep .coord-picker > .el-dialog__header {
+::v-deep .coord-picker>.el-dialog__header {
   display: none; // flex
   box-sizing: border-box;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -1611,7 +1549,7 @@ export default {
   }
 }
 
-::v-deep .coord-picker > .el-dialog__body {
+::v-deep .coord-picker>.el-dialog__body {
   height: 100%;
   padding: 0;
 
@@ -1625,7 +1563,8 @@ export default {
       background-color: rgba(255, 255, 255, 0.9);
       border-color: rgba(64, 158, 255, 0.2) !important;
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         box-shadow: rgba(0, 51, 113, 0.1) 0 0 20px 5px;
       }
     }
@@ -1644,15 +1583,15 @@ export default {
     backdrop-filter: blur(2px);
     background-color: #f7f7f7ab;
 
-    & > .item {
+    &>.item {
       padding: 10px;
       cursor: pointer;
 
-      & > :first-child {
+      &> :first-child {
         font-weight: bold;
       }
 
-      & > :nth-child(2) {
+      &> :nth-child(2) {
         margin-top: 5px;
       }
 
@@ -1670,16 +1609,14 @@ export default {
     &::-webkit-scrollbar-thumb {
       border-radius: 10px;
       background-color: skyblue;
-      background-image: -webkit-linear-gradient(
-          45deg,
+      background-image: -webkit-linear-gradient(45deg,
           rgba(255, 255, 255, 0.2) 25%,
           transparent 25%,
           transparent 50%,
           rgba(255, 255, 255, 0.2) 50%,
           rgba(255, 255, 255, 0.2) 75%,
           transparent 75%,
-          transparent
-      );
+          transparent);
     }
 
     &::-webkit-scrollbar-track {
@@ -1700,6 +1637,10 @@ export default {
 
   .footer {
     padding: 10px 0 0 0;
+  }
+
+  .el-upload-list {
+    display: none;
   }
 }
 </style>

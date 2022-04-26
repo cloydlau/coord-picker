@@ -13,9 +13,6 @@
       @confirm="console.log('confirm')"
     />
     <JsonEditorVue v-model="props"/>
-    <div slot="footer">
-      <el-button @click="props.show=true" type="primary">open</el-button>
-    </div>
   </el-dialog>
 </template>
 
