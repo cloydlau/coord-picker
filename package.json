@@ -31,7 +31,7 @@
     "./dist/style.css": "./dist/style.css"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --open",
     "build": "vite build",
     "serve": "vite preview",
     "clean": "rd /s /q .\\node_modules",
@@ -69,7 +69,7 @@
     "sass": "latest",
     "semver": "latest",
     "typescript": "latest",
-    "unocss": "latest",
+    "unocss": "~0.32.13",
     "unplugin-icons": "latest",
     "vite": "latest",
     "vite-plugin-vue2": "latest",

@@ -1426,21 +1426,21 @@ export default {
     },
     getBaseCity() {
       // 直辖市：['110100', '120100', '310100', '500100']
-      let result = conclude([this.city, globalProps.city, ''], {
+      let City = conclude([this.city, globalProps.city, ''], {
         name: 'city',
         type: 'string'
       })
       // 兼容非6位的行政区编码
-      if (!isNaN(result)) {
-        if (result.length < 6) {
-          result = result.padEnd(6, '0')
-        } else if (result.length > 6) {
-          result = result.substring(0, 6)
+      if (City && !isNaN(City)) {
+        if (City.length < 6) {
+          City = City.padEnd(6, '0')
+        } else if (City.length > 6) {
+          City = City.substring(0, 6)
         }
       }
       return new Promise((resolve, reject) => {
-        if (result) {
-          resolve(result)
+        if (City) {
+          resolve(City)
         } else {
           this.plugins.CitySearch = new AMap.CitySearch()
           this.useAMapAPI('CitySearch.getLocalCity')
