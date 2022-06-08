@@ -73,7 +73,7 @@
     "unplugin-icons": "latest",
     "vite": "latest",
     "vite-plugin-vue2": "latest",
-    "vue": "latest",
+    "vue": "2",
     "vue-template-compiler": "latest"
   }
 }

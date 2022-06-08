@@ -47,9 +47,8 @@
       <el-tooltip effect="dark" content="使用帮助" placement="bottom">
         <a @click.stop="help">
           <svg viewBox="0 0 24 24">
-            <path
-              d="M11 18h2v-2h-2v2m1-16A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m0-14a4 4 0 0 0-4 4h2a2 2 0 0 1 2-2a2 2 0 0 1 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5a4 4 0 0 0-4-4z"
-              fill="currentColor" />
+            <path fill="currentColor"
+              d="M11 16h2v2h-2zm1-14C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5c0-2.21-1.79-4-4-4z" />
           </svg>
         </a>
       </el-tooltip>
@@ -57,9 +56,8 @@
         :class="{ active: active === 'marker' }">
         <a @click.stop="active = 'marker'">
           <svg viewBox="0 0 24 24">
-            <path
-              d="M15 17h3v-3h2v3h3v2h-3v3h-2v-3h-3v-2M9 6.5c1.4 0 2.5 1.1 2.5 2.5s-1.1 2.5-2.5 2.5S6.5 10.4 6.5 9S7.6 6.5 9 6.5M9 2c3.9 0 7 3.1 7 7c0 5.2-7 13-7 13S2 14.2 2 9c0-3.9 3.1-7 7-7m0 2C6.2 4 4 6.2 4 9c0 1 0 3 5 9.7C14 12 14 10 14 9c0-2.8-2.2-5-5-5z"
-              fill="currentColor" />
+            <path fill="currentColor"
+              d="M12 6.5A2.5 2.5 0 0 1 14.5 9a2.5 2.5 0 0 1-2.5 2.5A2.5 2.5 0 0 1 9.5 9A2.5 2.5 0 0 1 12 6.5M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7m0 2a5 5 0 0 0-5 5c0 1 0 3 5 9.71C17 12 17 10 17 9a5 5 0 0 0-5-5Z" />
           </svg>
         </a>
         <el-dropdown-menu slot="dropdown">
@@ -71,10 +69,9 @@
         @command="command => { this[command](['polyline']) }"
         :class="{ active: active === 'polyline' }">
         <a @click.stop="onPolylineBtnClick">
-          <svg viewBox="0 0 100 100">
+          <svg viewBox="0 0 24 24">
             <path fill="currentColor"
-              d="M32.55 11C25.662 11 20 16.661 20 23.55c0 3.887 1.802 7.38 4.61 9.688L14.481 54.166a12.33 12.33 0 0 0-1.93-.166C5.66 54 0 59.661 0 66.55C0 73.44 5.661 79.1 12.55 79.1c6.652 0 12.106-5.288 12.48-11.852a3.5 3.5 0 0 0 .07-.697a3.5 3.5 0 0 0-.07-.697c-.196-3.441-1.797-6.522-4.225-8.684L31.049 36c.494.06.993.1 1.502.1c4.613 0 8.647-2.546 10.812-6.295l17.807 4.707c.934 5.845 5.95 10.384 12.002 10.568l7.006 21.356C77.052 68.726 75 72.412 75 76.55c0 6.89 5.661 12.55 12.55 12.55c6.652 0 12.106-5.288 12.48-11.852a3.5 3.5 0 0 0 .07-.697a3.5 3.5 0 0 0-.07-.697C99.655 69.29 94.201 64 87.55 64c-.266 0-.527.022-.79.04l-6.805-20.743c3.451-2.09 5.832-5.797 6.074-10.049a3.5 3.5 0 0 0 .07-.697a3.5 3.5 0 0 0-.07-.697C85.656 25.29 80.202 20 73.551 20c-5.1 0-9.519 3.106-11.475 7.512l-17.02-4.5a3.5 3.5 0 0 0-.027-.158C44.656 16.29 39.202 11 32.551 11zm0 7c3.107 0 5.55 2.444 5.55 5.55c0 3.107-2.443 5.55-5.55 5.55c-3.106 0-5.55-2.443-5.55-5.55c0-3.106 2.444-5.55 5.55-5.55zm41 9c3.107 0 5.55 2.444 5.55 5.55c0 3.107-2.443 5.55-5.55 5.55c-3.106 0-5.55-2.443-5.55-5.55c0-3.106 2.444-5.55 5.55-5.55zm-61 34c3.107 0 5.55 2.444 5.55 5.55c0 3.107-2.443 5.55-5.55 5.55C9.445 72.1 7 69.657 7 66.55C7 63.445 9.444 61 12.55 61zm75 10c3.107 0 5.55 2.444 5.55 5.55c0 3.107-2.443 5.55-5.55 5.55c-3.106 0-5.55-2.443-5.55-5.55c0-3.106 2.444-5.55 5.55-5.55z"
-              color="currentColor" />
+              d="M17 22q-.825 0-1.412-.587Q15 20.825 15 20v-.5l-7.275-3.625l-.35.087Q7.225 16 7 16H5q-.825 0-1.413-.588Q3 14.825 3 14v-2q0-.825.587-1.413Q4.175 10 5 10h2.138q.062 0 .137.025l2.875-3.3q-.075-.15-.112-.338Q10 6.2 10 6V4q0-.825.588-1.413Q11.175 2 12 2h2q.825 0 1.413.587Q16 3.175 16 4v2q0 .825-.587 1.412Q14.825 8 14 8h-2.162q-.063 0-.113-.025l-2.85 3.275q.05.2.088.362Q9 11.775 9 12v2.112q0 .063-.025.113l6.15 3.075q.2-.55.7-.925Q16.325 16 17 16h2q.825 0 1.413.587Q21 17.175 21 18v2q0 .825-.587 1.413Q19.825 22 19 22ZM12 6h2V4h-2Zm-7 8h2v-2H5Zm12 6h2v-2h-2ZM13 5Zm-7 8Zm12 6Z" />
           </svg>
         </a>
         <el-dropdown-menu slot="dropdown">
@@ -87,10 +84,10 @@
         @command="command => { this[command](['rectangle']) }"
         :class="{ active: active === 'rectangle' }">
         <a @click.stop="onRectangleBtnClick">
-          <svg viewBox="0 0 24 24" :class="!RectangleMaxCount && 'disabled'">
-            <path
-              d="M19 6h3v2h-3v3h-2V8h-3V6h3V3h2v3m-2 11v-3h2v5H3V6h8v2H5v9h12z"
-              fill="currentColor"></path>
+          <svg viewBox="0 0 100 100" :class="!RectangleMaxCount && 'disabled'">
+            <path fill="currentColor"
+              d="M12.55 15C5.662 15 0 20.661 0 27.55c0 6.017 4.317 11.096 10 12.286v20.428c-5.683 1.19-10 6.27-10 12.287C0 79.44 5.661 85.1 12.55 85.1c6.047 0 11.09-4.374 12.241-10.1h50.455c1.152 5.732 6.253 10.1 12.305 10.1c6.65 0 12.105-5.288 12.478-11.852a3.5 3.5 0 0 0 .07-.697a3.5 3.5 0 0 0-.07-.697C99.703 66.117 95.495 61.356 90 60.246V39.854c5.495-1.11 9.703-5.87 10.03-11.606a3.5 3.5 0 0 0 .07-.697a3.5 3.5 0 0 0-.07-.697C99.655 20.29 94.201 15 87.55 15c-6.016 0-11.096 4.317-12.286 10H24.77c-1.19-5.676-6.209-10-12.22-10zm0 7c3.107 0 5.55 2.444 5.55 5.55c0 3.107-2.443 5.55-5.55 5.55C9.445 33.1 7 30.657 7 27.55C7 24.445 9.444 22 12.55 22zm75 0c3.107 0 5.55 2.444 5.55 5.55c0 3.107-2.443 5.55-5.55 5.55c-3.106 0-5.55-2.443-5.55-5.55c0-3.106 2.444-5.55 5.55-5.55zM24.218 32h51.62A12.678 12.678 0 0 0 83 39.225v21.65A12.684 12.684 0 0 0 75.875 68h-51.7A12.64 12.64 0 0 0 17 60.838V39.262A12.638 12.638 0 0 0 24.217 32zM12.55 67c3.106 0 5.549 2.444 5.549 5.55c0 3.107-2.443 5.55-5.55 5.55C9.445 78.1 7 75.657 7 72.55C7 69.445 9.444 67 12.55 67zm75 0c3.106 0 5.549 2.444 5.549 5.55c0 3.107-2.443 5.55-5.55 5.55c-3.106 0-5.55-2.443-5.55-5.55c0-3.106 2.444-5.55 5.55-5.55z"
+              color="currentColor" />
           </svg>
         </a>
         <el-dropdown-menu slot="dropdown">
@@ -105,10 +102,9 @@
         @command="command => { this[command](['polygon']) }"
         :class="{ active: active === 'polygon' }">
         <a @click.stop="onPolygonBtnClick">
-          <svg :class="!PolygonMaxCount && 'disabled'" viewBox="0 0 24 24">
-            <path
-              d="M17 15.7V13h2v4l-9 4l-7-7l4-9h4v2H8.3l-2.9 6.6l5 5l6.6-2.9M22 5v2h-3v3h-2V7h-3V5h3V2h2v3h3z"
-              fill="currentColor" />
+          <svg viewBox="0 0 256 256" :class="!PolygonMaxCount && 'disabled'">
+            <path fill="currentColor"
+              d="M230.6 49.4a31.9 31.9 0 0 0-45.2 0a30.2 30.2 0 0 0-5.2 6.7L152 48.4a32 32 0 0 0-54.6-23a32 32 0 0 0-5.8 37.4L57.7 93.3a32 32 0 0 0-40.3 4.1a31.9 31.9 0 0 0 0 45.2A31.6 31.6 0 0 0 40 152a32.1 32.1 0 0 0 20.3-7.2l70 51.3a32 32 0 0 0 7.1 34.5a31.9 31.9 0 0 0 45.2 0a31.9 31.9 0 0 0 0-45.2a43.3 43.3 0 0 0-4.7-4l27.3-77.5h2.8a31.6 31.6 0 0 0 22.6-9.4a31.9 31.9 0 0 0 0-45.1ZM108.7 36.7a16 16 0 1 1 0 22.6a15.9 15.9 0 0 1 0-22.6Zm-80 94.6a15.9 15.9 0 0 1 0-22.6a16 16 0 1 1 0 22.6Zm142.6 88a16 16 0 0 1-22.6-22.6a16 16 0 0 1 22.6 22.6Zm-8.5-43.2a32.4 32.4 0 0 0-23.1 7.1l-70-51.3a32.4 32.4 0 0 0-1.3-26.7l33.9-30.5A32.4 32.4 0 0 0 120 80a31.6 31.6 0 0 0 22.6-9.4a30.2 30.2 0 0 0 5.2-6.7l28.2 7.7a31.6 31.6 0 0 0 9.4 23a43.3 43.3 0 0 0 4.7 4Zm56.5-92.8a16 16 0 0 1-22.6-22.6a16 16 0 1 1 22.6 22.6Z" />
           </svg>
         </a>
         <el-dropdown-menu slot="dropdown">
@@ -117,29 +113,40 @@
         </el-dropdown-menu>
       </el-dropdown>
       <el-tooltip effect="dark" content="取消" placement="bottom">
-        <a @click.stop="cancel">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10zm0-2a8 8 0 1 0 0-16a8 8 0 0 0 0 16zm0-9.414l2.828-2.829l1.415 1.415L13.414 12l2.829 2.828l-1.415 1.415L12 13.414l-2.828 2.829l-1.415-1.415L10.586 12L7.757 9.172l1.415-1.415L12 10.586z"
-              fill="currentColor" />
-          </svg>
-        </a>
+        <el-popconfirm @confirm="cancel" title="不保存并退出" @onConfirm="cancel">
+          <a slot="reference">
+            <svg viewBox="0 0 24 24">
+              <path fill="currentColor"
+                d="M12 20c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m0-18C6.47 2 2 6.47 2 12s4.47 10 10 10s10-4.47 10-10S17.53 2 12 2m2.59 6L12 10.59L9.41 8L8 9.41L10.59 12L8 14.59L9.41 16L12 13.41L14.59 16L16 14.59L13.41 12L16 9.41L14.59 8Z" />
+            </svg>
+          </a>
+        </el-popconfirm>
       </el-tooltip>
       <el-tooltip :class="Loading && 'invisible'" effect="dark" content="确定"
         placement="bottom">
         <a @click.stop="confirm">
           <svg viewBox="0 0 24 24">
-            <path
-              d="M7 19v-6h10v6h2V7.828L16.172 5H5v14h2zM4 3h13l4 4v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm5 12v4h6v-4H9z"
-              fill="currentColor" />
+            <g fill="none" stroke="currentColor" stroke-linecap="round"
+              stroke-linejoin="round" stroke-width="2">
+              <path stroke-dasharray="60" stroke-dashoffset="60"
+                d="M3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z">
+                <animate fill="freeze" attributeName="stroke-dashoffset"
+                  dur="0.5s" values="60;0"></animate>
+              </path>
+              <path stroke-dasharray="14" stroke-dashoffset="14"
+                d="M8 12L11 15L16 10">
+                <animate fill="freeze" attributeName="stroke-dashoffset"
+                  begin="0.6s" dur="0.2s" values="14;0"></animate>
+              </path>
+            </g>
           </svg>
         </a>
       </el-tooltip>
     </Toolbar>
 
     <div v-show="!Loading" class="absolute left-3px bottom-40px"
-      style="position:absolute;left:3px;bottom:40px;" id="zoom">
-      <span class="text-45px" style="color:#3297FD;font-size:35px;">{{
+      style="color:#3297FD;position:absolute;left:3px;bottom:40px;" id="zoom">
+      <span class="text-45px" style="font-size:35px;">{{
           MapOptions.zoom
       }}</span>
       <span class="text-10px" style="font-size:10px;"> 缩放级别</span>
@@ -242,6 +249,7 @@ export default {
         MarkerList: null,
         DistrictSearch: null,
         CitySearch: null,
+        LabelsLayer: null
       }
     }
   },
@@ -315,9 +323,13 @@ export default {
           ...this.PolylineStatus === 'editable' ? [
             'AMap.PolyEditor',  // 2.x为 AMap.PolylineEditor
             'AMap.MouseTool',
+            'AMap.LabelsLayer',
+            'AMap.LabelMarker',
           ] : [],
           ...this.PolylineStatus === 'readonly' ? [
             'AMap.Polyline',
+            'AMap.LabelsLayer',
+            'AMap.LabelMarker',
           ] : [],
           ...this.PolygonStatus === 'editable' ? [
             'AMap.Polygon',
@@ -589,10 +601,8 @@ export default {
       })
     },*/
     cancel() {
-      confirm(`不保存并退出`).then(() => {
-        this.$emit('update:show', false)
-        this.$emit('cancel')
-      })
+      this.$emit('update:show', false)
+      this.$emit('cancel')
     },
     changeCurImage(src) {
       this.imagePicker.data = this.imagePicker.data === src ? '' : src
@@ -687,6 +697,14 @@ export default {
           subdistrict: 0,   //获取边界不需要返回下级行政区
           extensions: 'all',  //返回行政区边界坐标组等具体信息
           level: 'district'  //行政级别
+        })
+      }
+      if (this.polyline?.length || this.PolylineMaxCount > 0) {
+        this.plugins.LabelsLayer = new AMap.LabelsLayer({
+          //zooms: [10, 18],
+          zIndex: 100,
+          collision: true, // 开启标注避让，默认为开启，v1.4.15 新增属性
+          animation: true, // 开启标注淡入动画，默认为开启，v1.4.15 新增属性
         })
       }
     },
@@ -1435,18 +1453,18 @@ export default {
             }
           }
           if (!centerDesignated) {
-            // 存在覆盖物 将视图适配覆盖物
+            // 存在覆盖物，将视图适配覆盖物
             if (hasOverlay) {
               this.map.setFitView()
             }
-            // 定位至baseCity
+            // 定位至 baseCity
             else if (this.baseCity) {
               this.map.setCity(this.baseCity)
             }
-            // setCity和setZoom同步调用时后者无效
+            // setCity 和 setZoom 同步调用时后者无效
             setTimeout(() => {
               this.map.setZoom(this.MapOptions.zoom)
-              // setZoom和setCity会立即触发zoomchange
+              // setZoom 和 setCity 会立即触发 zoomchange
               setTimeout(() => {
                 this.watchZoom()
               }, 500)
@@ -1516,7 +1534,7 @@ export default {
       args.shift()
       return new Promise((resolve, reject) => {
         this.plugins[plugin][fn](...args, (status, result) => {
-          console.log(prefix, `高德Web服务API ${apiName} 参数：`, args, '，返回值：\n', result, status)
+          console.log(prefix, `高德 Web 服务 API ${apiName} 参数：`, args, '，返回值：\n', result, status)
           if (status === 'complete' && result.info === 'OK') {
             resolve(result, status)
           } else {

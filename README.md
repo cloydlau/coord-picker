@@ -5,9 +5,10 @@
 ## 特性
 
 - 坐标拾取、绘制点位（双向绑定）
+- 拖拉拽绘制折线（双向绑定折线坐标）
 - 拖拉拽绘制矩形、内嵌贴图的矩形（双向绑定角坐标）
 - 拖拉拽绘制多边形（双向绑定多边形坐标）
-- POI搜索、搜索关键字自动补全
+- POI 搜索、搜索关键字自动补全
 - 根据传参情况智能初始化至合适的位置
 - 全局或局部引入，参数支持全局或局部配置（[vue-global-config](https://github.com/cloydlau/vue-global-config.git) 提供技术支持）
 
@@ -55,18 +56,18 @@ export default {
 
 ### 基础参数
 
-| Attribute | Description | Type | Accepted Values | Default |
+| 名称 | 说明 | 类型 | 可选值 | 默认值 |
 | --- | --- | --- | --- | --- |
 | show.sync | 开关 | boolean | | false |
-| loadOptions | [AMapLoader.load的参数](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) ，其中 `loadOptions.key` 必传 | object | | |
-| mapOptions[.sync] | [AMap.Map的参数2](https://lbs.amap.com/api/javascript-api/reference/map) | object | | |
+| loadOptions | [AMapLoader.load 的参数](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) ，其中 `loadOptions.key` 必传 | object | | |
+| mapOptions[.sync] | [AMap.Map 的参数2](https://lbs.amap.com/api/javascript-api/reference/map) | object | | |
 | city | 初始行政区 | string | | |
 | precision | 坐标精度（保留几位小数） | number | | 6 |
 | addressComponent* | 地址成分 | object, function | | |
 
 ### 中心点相关
 
-| Attribute | Description | Type | Accepted Values | Default |
+| 名称 | 说明 | 类型 | 可选值 | 默认值 |
 | --- | --- | --- | --- | --- |
 | lng.sync | 经度 | number, string | | |
 | lat.sync | 纬度 | number, string | | |
@@ -74,14 +75,21 @@ export default {
 
 ### 点位相关
 
-| Attribute | Description | Type | Accepted Values | Default |
+| 名称 | 说明 | 类型 | 可选值 | 默认值 |
 | --- | --- | --- | --- | --- |
 | marker.sync | 点位列表 | object[] | | |
 | markerCount | 点位数量限制 | number, number[] | | 1 |
 
+### 折线相关
+
+| 名称 | 说明 | 类型 | 可选值 | 默认值 |
+| --- | --- | --- | --- | --- |
+| polyline.sync | 折线列表 | object[] | | |
+| polylineCount | 折线数量限制 | number, number[] | | 0 |
+
 ### 矩形相关
 
-| Attribute | Description | Type | Accepted Values | Default |
+| 名称 | 说明 | 类型 | 可选值 | 默认值 |
 | --- | --- | --- | --- | --- |
 | rectangle.sync | 矩形 | object[] | | |
 | rectangleCount | 矩形数量限制 | number, number[] | | 0 |
@@ -89,26 +97,26 @@ export default {
 
 ### 多边形相关
 
-| Attribute | Description | Type | Accepted Values | Default |
+| 名称 | 说明 | 类型 | 可选值 | 默认值 |
 | --- | --- | --- | --- | --- |
 | polygon.sync | 多边形列表 | object[] | | |
 | polygonCount | 多边形数量限制 | number, number[] | | 0 |
 
-::: warning 坐标值类型  
-number和string都能接收 但返回时 由于js的number类型存在精度丢失问题 故返回string
-:::
+坐标值类型：
+
+- number 和 string 都能接收，但返回时，由于 js 的 number 类型存在精度丢失问题，故返回 string
 
 ### city
 
-> 高德Web服务API的同名参数
+> 高德 Web 服务 API 的同名参数
 
 可选值：指定城市的中文（如北京）、指定城市的中文全拼（beijing）、citycode（010）、adcode（110000），不支持县级市。当指定城市查询内容为空时，会进行全国范围内的地址转换检索。
 
-adcode信息可参考[城市编码表](https://lbs.amap.com/api/webservice/download)获取
+adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/download) 获取
 
 长度超过6位数？
 
-组件内部做了处理，如果你传入的city超过6位数，也会以仅保留前6位的形式支持。
+组件内部做了处理，如果你传入的 city 超过6位数，也会以仅保留前6位的形式支持。
 
 ### markerCount, rectangleCount, polygonCount
 
@@ -123,15 +131,15 @@ adcode信息可参考[城市编码表](https://lbs.amap.com/api/webservice/downl
 
 ### addressComponent
 
-获取的address默认是包含省市区的完整地址，你可以用以下两种方式来自定义地址成分：
+获取的 address 默认是包含省市区的完整地址，你可以用以下两种方式来自定义地址成分：
 
 - object
 
 ```
 { 
-  province: true, // address中是否包含省
-  city: true,     // address中是否包含市
-  district: true  // address中是否包含区县
+  province: true, // address 中是否包含省
+  city: true,     // address 中是否包含市
+  district: true  // address 中是否包含区县
 }
 ```
 
@@ -145,15 +153,15 @@ adcode信息可参考[城市编码表](https://lbs.amap.com/api/webservice/downl
 
 ### mapOptions
 
-::: tip 为什么支持双向绑定？  
-mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
-:::
+为什么支持双向绑定？
+
+- mapOptions 包含可能发生变化的属性，如缩放比例（`zoom`）
 
 <br>
 
 ## Events
 
-| name | description | callback's arguments |
+| 名称 | 说明 | 回调参数 |
 | --- | --- | --- |
 | load | 高德地图加载完成时，即[AMapLoader.load().then](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) | AMap（同高德） |
 | error | 调用高德API报错时，含[AMapLoader.load().catch](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) | 同高德 |
@@ -171,7 +179,7 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
 权重：
 
 - 局部配置高于全局配置
-- 对于对象类型的参数 局部配置会与全局配置进行合并 同名属性会被局部配置覆盖
+- 对于对象类型的参数，局部配置会与全局配置进行合并，同名属性会被局部配置覆盖
 
 <br>
 
@@ -203,7 +211,7 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
 
 - `markerCount > 0` 时，开启编辑点位功能
 
-- `markerCount === 0` 时，也会依据marker参数渲染点位（只读）
+- `markerCount === 0` 时，也会依据 marker 参数渲染点位（只读）
 
 ### 数据格式
 
@@ -236,7 +244,7 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
 
 - `rectangleCount > 0` 时，开启编辑矩形功能
 
-- `rectangleCount === 0` 时，也会依据rectangle参数渲染矩形（只读）
+- `rectangleCount === 0` 时，也会依据 rectangle 参数渲染矩形（只读）
 
 ### 数据格式
 
@@ -265,7 +273,7 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
 
 - `polygonCount > 0` 时，开启编辑多边形功能
 
-- `polygonCount === 0` 时，也会依据polygon参数渲染多边形（只读）
+- `polygonCount === 0` 时，也会依据 polygon 参数渲染多边形（只读）
 
 ### 数据格式
 
@@ -296,7 +304,7 @@ mapOptions包含可能发生变化的属性，如缩放比例（`zoom`）
 
 为什么不使用全称 `longitude` 和 `latitude` ？
 
-- 高德自己的API也没有完全统一，有的用简称有的用全称，coord-picker为方便起见统一使用简称 `lng` 和 `lat`
+- 高德自己的 API 也没有完全统一，有的用简称有的用全称，coord-picker 为方便起见统一使用简称 `lng` 和 `lat`
 - 如果命名/格式与你所需不一致，可考虑二次封装
 
 <br>

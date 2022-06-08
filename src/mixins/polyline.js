@@ -43,6 +43,17 @@ export default {
         strokeWeight: 3,
         zIndex: 51,
       },
+      labelMarkerStyle: {
+        "direction": "top",
+        "offset": [0, 0],
+        "style": {
+          "fontSize": 12,
+          "fontWeight": "normal",
+          "fillColor": "black",
+          "backgroundColor": "#fff",
+          "padding": [2, 5, 2, 5],
+        }
+      }
     }
   },
   methods: {
@@ -91,12 +102,36 @@ export default {
         })
       }
     },
-    // 用途：
-    // 1. 初始化时开启对覆盖物的编辑
-    // 2. 
+    // 给折线的交点添加文本标记
+    addLabelsForPolylineNodes(i) {
+      const path = this.overlay.polylineInstance[i].w.path
+      path.map(({ R, Q }, index) => {
+        let content = String(index + 1)
+        if (index === 0) {
+          content = '起点'
+        } else if (index === path.length - 1) {
+          content = '终点'
+        }
+
+        this.plugins.LabelsLayer.add(new AMap.LabelMarker({
+          position: [R, Q],
+          text: {
+            ...this.labelMarkerStyle,
+            content,
+          },
+          extData: {
+            index
+          }
+        }))
+      })
+
+      this.map.add(this.plugins.LabelsLayer)
+    },
+    // 执行时机：绘制完成时
     editPolyline({ editable }) {
       const i = this.overlay.polylineInstance.length - 1
 
+      // 右键删除
       if (this.PolylineStatus === 'editable') {
         const polylineContextMenu = new AMap.ContextMenu()
         polylineContextMenu.addItem('删除', e => {
@@ -116,17 +151,24 @@ export default {
         })
       }
 
-      this.overlay.polylineInstance[i].on('click', this.onMapClick)
+      this.addLabelsForPolylineNodes(i)
 
+      // 形状改变时
+      this.overlay.polylineInstance[i].on('change', e => {
+        this.addLabelsForPolylineNodes(i)
+      })
+
+      // 初始化折线编辑器
       let polylineEditor = null
       if (editable) {
-        polylineEditor = AMap.PolylineEditor ?
-          new AMap.PolylineEditor(this.map, this.overlay.polylineInstance[i]) :
-          new AMap.PolyEditor(this.map, this.overlay.polylineInstance[i])
+        polylineEditor = new AMap.PolyEditor(this.map, this.overlay.polylineInstance[i])
         polylineEditor.open()
       }
       this.overlay.polylineEditor.push(polylineEditor)
       this.overlay.polylineInstance[i].setMap(this.map)
+
+      // 恢复点位绘制
+      this.overlay.polylineInstance[i].on('click', this.onMapClick)
     },
   }
 }
