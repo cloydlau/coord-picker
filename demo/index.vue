@@ -1,18 +1,10 @@
 <template>
-  <el-dialog
-    visible
-    :close-on-click-modal="false"
-    :show-close="false"
-    title="coord-picker"
-    @confirm="console.log('confirm')"
-    @cancel="console.log('cancel')"
-  >
-    <CoordPicker
-      v-bind.sync="props"
-      @cancel="console.log('cancel')"
-      @confirm="console.log('confirm')"
-    />
-    <JsonEditorVue v-model="props"/>
+  <el-dialog visible :close-on-click-modal="false" :show-close="false"
+    title="coord-picker" @confirm="console.log('confirm')"
+    @cancel="console.log('cancel')">
+    <CoordPicker v-bind.sync="props" @cancel="console.log('cancel')"
+      @confirm="console.log('confirm')" />
+    <JsonEditorVue v-model="props" />
   </el-dialog>
 </template>
 
@@ -21,7 +13,7 @@ import JsonEditorVue from 'json-editor-vue'
 
 export default {
   components: { JsonEditorVue },
-  data () {
+  data() {
     return {
       console,
       props: {
@@ -76,6 +68,16 @@ export default {
           }
         ],
         polygonCount: 3,
+        polyline: [
+          {
+            path: [
+              { "lng": "106.627636", "lat": "26.692251" },
+              { "lng": "106.604633", "lat": "26.647459" },
+              { "lng": "106.682224", "lat": "26.658505" }
+            ]
+          }
+        ],
+        polylineCount: 2,
         precision: 6,
         addressComponent: undefined,
         mapOptions: {
@@ -91,10 +93,10 @@ export default {
     }
   },
   watch: {
-    addressComponentType__ () {
+    addressComponentType__() {
       this.addressComponent = undefined
     },
-    addressComponentObject__ (n) {
+    addressComponentObject__(n) {
       this.addressComponent = n ? JSON.parse(n) : undefined
     }
   },

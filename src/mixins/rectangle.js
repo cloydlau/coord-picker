@@ -1,8 +1,49 @@
 import 'cozyalert/dist/style.css'
 import { warning } from 'cozyalert'
+import { conclude } from 'vue-global-config'
+import { globalProps } from '../index'
 
 export default {
-  data () {
+  props: {
+    rectangleImage: {},
+    rectangle: {},
+    rectangleCount: {},
+  },
+  computed: {
+    RectangleStatus() {
+      if (this.RectangleMaxCount > 0) {
+        return 'editable'
+      } else if (this.Rectangle?.length > 0) {
+        return 'readonly'
+      }
+    },
+    Rectangle() {
+      return conclude([this.rectangle, globalProps.rectangle], {
+        name: 'rectangle',
+        type: ['array', 'null']
+      })
+    },
+    RectangleImage() {
+      const temp = conclude([this.rectangleImage, globalProps.rectangleImage, []], {
+        name: 'rectangleImage',
+        type: ['string', 'array']
+      })
+      return (typeof temp === 'string') ? [temp] : temp
+    },
+    RectangleCount() {
+      return conclude([this.rectangleCount, globalProps.rectangleCount, 0], {
+        name: 'rectangleCount',
+        type: ['number', 'array']
+      })
+    },
+    RectangleMaxCount() {
+      return Array.isArray(this.RectangleCount) ? this.RectangleCount[1] : this.RectangleCount
+    },
+    RectangleMinCount() {
+      return Array.isArray(this.RectangleCount) ? this.RectangleCount[0] : undefined
+    },
+  },
+  data() {
     return {
       rectangleStyle: {
         strokeColor: '#00B2D5',
@@ -17,7 +58,7 @@ export default {
     }
   },
   methods: {
-    onRectangleBtnClick () {
+    onRectangleBtnClick() {
       // 只读模式点击无效果
       if (this.RectangleMaxCount > 0) {
         if (this.overlay.rectangleInstance.length >= this.RectangleMaxCount) {
@@ -29,7 +70,7 @@ export default {
         }
       }
     },
-    syncRectangleBounds ({ i, image, bounds }) {
+    syncRectangleBounds({ i, image, bounds }) {
       // 兼容1.x
       this.overlay.rectangle[i] = {
         ...this.overlay.rectangle[i],
@@ -46,7 +87,7 @@ export default {
       // 矩形可能不包含贴图 所以需要判空
       this.overlay.imageLayerInstance[i]?.setBounds(bounds)
     },
-    drawRectangle ({ image, bounds, editable = true }) {
+    drawRectangle({ image, bounds, editable = true }) {
       const rectangleInstance = new AMap.Rectangle({
         ...this.rectangleStyle,
         bounds,
@@ -99,7 +140,7 @@ export default {
         })
       }
     },
-    editRectangle ({ i, rectangleInstance }) {
+    editRectangle({ i, rectangleInstance }) {
       /*rectangleInstance.on('mousemove', e => {
         this.text.setText('拖拽角调整大小')
         this.setTextPosition(e)

@@ -1,10 +1,42 @@
 import 'cozyalert/dist/style.css'
 import { warning } from 'cozyalert'
-
 import { notEmpty } from 'kayran'
+import { conclude } from 'vue-global-config'
+import { globalProps } from '../index'
 
 export default {
-  data () {
+  props: {
+    polygon: {},
+    polygonCount: {},
+  },
+  computed: {
+    Polygon() {
+      return conclude([this.polygon, globalProps.polygon], {
+        name: 'polygon',
+        type: ['array', 'null']
+      })
+    },
+    PolygonStatus() {
+      if (this.PolygonMaxCount > 0) {
+        return 'editable'
+      } else if (this.Polygon?.length > 0) {
+        return 'readonly'
+      }
+    },
+    PolygonCount() {
+      return conclude([this.polygonCount, globalProps.polygonCount, 0], {
+        name: 'polygonCount',
+        type: ['number', 'array']
+      })
+    },
+    PolygonMaxCount() {
+      return Array.isArray(this.PolygonCount) ? this.PolygonCount[1] : this.PolygonCount
+    },
+    PolygonMinCount() {
+      return Array.isArray(this.PolygonCount) ? this.PolygonCount[0] : undefined
+    },
+  },
+  data() {
     return {
       polygonStyle: {
         strokeColor: '#00B2D5',
@@ -18,7 +50,7 @@ export default {
     }
   },
   methods: {
-    onPolygonBtnClick () {
+    onPolygonBtnClick() {
       // 只读模式点击无效果
       if (this.PolygonMaxCount > 0) {
         if (this.overlay.polygonInstance.length >= this.PolygonMaxCount) {
@@ -28,7 +60,7 @@ export default {
         }
       }
     },
-    syncPolygon () {
+    syncPolygon() {
       // 同步可能经过删除、节点变化的多边形
       this.overlay.polygon = []
       this.overlay.polygonInstance.map(v => {
@@ -40,7 +72,7 @@ export default {
         }
       })
     },
-    drawPolygon ({ polygon, editable }) {
+    drawPolygon({ polygon, editable }) {
       if (polygon) {
         for (let i = 0; i < polygon.length; i++) {
           const path = []
@@ -56,7 +88,7 @@ export default {
               map: this.map,
               path
             }))
-            this.editPolygon(editable)
+            this.editPolygon({ editable })
           }
         }
       } else {
@@ -66,7 +98,7 @@ export default {
         })
       }
     },
-    editPolygon (editable) {
+    editPolygon({ editable }) {
       const i = this.overlay.polygonInstance.length - 1
 
       if (this.PolygonStatus === 'editable') {

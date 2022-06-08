@@ -51,7 +51,7 @@
     "kikimore": "latest",
     "lodash-es": "latest",
     "pic-viewer": "latest",
-    "vue-global-config": "^0.0.2"
+    "vue-global-config": "latest"
   },
   "peerDependencies": {
     "element-ui": "2",
@@ -69,11 +69,11 @@
     "sass": "latest",
     "semver": "latest",
     "typescript": "latest",
-    "unocss": "~0.32.13",
+    "unocss": "latest",
     "unplugin-icons": "latest",
     "vite": "latest",
     "vite-plugin-vue2": "latest",
-    "vue": "2.6.12",
-    "vue-template-compiler": "2.6.12"
+    "vue": "latest",
+    "vue-template-compiler": "latest"
   }
 }

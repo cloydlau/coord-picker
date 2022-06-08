@@ -1,6 +1,7 @@
 <template>
-  <el-dialog :visible="show" :fullscreen="true" :append-to-body="true" :show-close="false"
-    @close="$emit('update:show', false)" destroy-on-close v-if="show" custom-class="coord-picker" v-on="$listeners">
+  <el-dialog :visible="show" :fullscreen="true" :append-to-body="true"
+    :show-close="false" @close="$emit('update:show', false)" destroy-on-close
+    v-if="show" custom-class="coord-picker" v-on="$listeners">
     <!--<div slot="title" class="title">
       <span v-text="title||'坐标拾取'" class="title-text"/>
     </div>-->
@@ -11,17 +12,20 @@
           search()
           e.currentTarget.blur()
         }">
-        <KiSelect class="region-selector" ref="regionKiSelect" placeholder="当前城市" :label.sync='baseCity' :props="{
-          value: 'id',
-          label: 'name',
-          groupLabel: 'name',
-          groupOptions: 'cities',
-        }" :options="cities" />
+        <KiSelect class="region-selector" ref="regionKiSelect"
+          placeholder="当前城市" :label.sync='baseCity' :props="{
+            value: 'id',
+            label: 'name',
+            groupLabel: 'name',
+            groupOptions: 'cities',
+          }" :options="cities" />
       </div>
       <transition enter-active-class="animate__animated animate__backInLeft"
         leave-active-class="animate__animated animate__backOutLeft">
-        <div v-loading="searching" class="drawer" v-show="searchResult.length > 0">
-          <div v-for="(v, i) of searchResult" :key="i" class="item" @click="locate(v)">
+        <div v-loading="searching" class="drawer"
+          v-show="searchResult.length > 0">
+          <div v-for="(v, i) of searchResult" :key="i" class="item"
+            @click="locate(v)">
             <div>{{ v.name }}</div>
             <div>{{ v.address }}</div>
           </div>
@@ -31,7 +35,8 @@
         <i class="el-icon-search"/>
         <span>搜索</span>
       </div>-->
-      <div ref="map-container" id="map-container" v-loading="Loading" element-loading-custom-class="map-container" />
+      <div ref="map-container" id="map-container" v-loading="Loading"
+        element-loading-custom-class="map-container" />
 
       <div id="panel" class="scrollbar1">
         <ul id="myList" />
@@ -41,17 +46,17 @@
     <Toolbar>
       <el-tooltip effect="dark" content="使用帮助" placement="bottom">
         <a @click.stop="help">
-          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"
-            role="img" width="32" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24">
+          <svg viewBox="0 0 24 24">
             <path
               d="M11 18h2v-2h-2v2m1-16A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m0-14a4 4 0 0 0-4 4h2a2 2 0 0 1 2-2a2 2 0 0 1 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5a4 4 0 0 0-4-4z"
               fill="currentColor" />
           </svg>
         </a>
       </el-tooltip>
-      <el-dropdown @command="command => { this[command](['marker']) }" :class="{ active: active === 'marker' }">
+      <el-dropdown @command="command => { this[command](['marker']) }"
+        :class="{ active: active === 'marker' }">
         <a @click.stop="active = 'marker'">
-          <svg width="1em" height="1em" viewBox="0 0 24 24">
+          <svg viewBox="0 0 24 24">
             <path
               d="M15 17h3v-3h2v3h3v2h-3v3h-2v-3h-3v-2M9 6.5c1.4 0 2.5 1.1 2.5 2.5s-1.1 2.5-2.5 2.5S6.5 10.4 6.5 9S7.6 6.5 9 6.5M9 2c3.9 0 7 3.1 7 7c0 5.2-7 13-7 13S2 14.2 2 9c0-3.9 3.1-7 7-7m0 2C6.2 4 4 6.2 4 9c0 1 0 3 5 9.7C14 12 14 10 14 9c0-2.8-2.2-5-5-5z"
               fill="currentColor" />
@@ -62,27 +67,47 @@
           <el-dropdown-item command="clear">清除点位</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
-      <el-dropdown v-if="(rectangle && rectangle.length) || RectangleMaxCount > 0"
-        @command="command => { this[command](['rectangle']) }" :class="{ active: active === 'rectangle' }">
-        <a @click.stop="onRectangleBtnClick">
-          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"
-            role="img" width="32" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"
-            :class="!RectangleMaxCount && 'disabled'">
-            <path d="M19 6h3v2h-3v3h-2V8h-3V6h3V3h2v3m-2 11v-3h2v5H3V6h8v2H5v9h12z" fill="currentColor"></path>
+      <el-dropdown v-if="(polyline && polyline.length) || PolylineMaxCount > 0"
+        @command="command => { this[command](['polyline']) }"
+        :class="{ active: active === 'polyline' }">
+        <a @click.stop="onPolylineBtnClick">
+          <svg viewBox="0 0 100 100">
+            <path fill="currentColor"
+              d="M32.55 11C25.662 11 20 16.661 20 23.55c0 3.887 1.802 7.38 4.61 9.688L14.481 54.166a12.33 12.33 0 0 0-1.93-.166C5.66 54 0 59.661 0 66.55C0 73.44 5.661 79.1 12.55 79.1c6.652 0 12.106-5.288 12.48-11.852a3.5 3.5 0 0 0 .07-.697a3.5 3.5 0 0 0-.07-.697c-.196-3.441-1.797-6.522-4.225-8.684L31.049 36c.494.06.993.1 1.502.1c4.613 0 8.647-2.546 10.812-6.295l17.807 4.707c.934 5.845 5.95 10.384 12.002 10.568l7.006 21.356C77.052 68.726 75 72.412 75 76.55c0 6.89 5.661 12.55 12.55 12.55c6.652 0 12.106-5.288 12.48-11.852a3.5 3.5 0 0 0 .07-.697a3.5 3.5 0 0 0-.07-.697C99.655 69.29 94.201 64 87.55 64c-.266 0-.527.022-.79.04l-6.805-20.743c3.451-2.09 5.832-5.797 6.074-10.049a3.5 3.5 0 0 0 .07-.697a3.5 3.5 0 0 0-.07-.697C85.656 25.29 80.202 20 73.551 20c-5.1 0-9.519 3.106-11.475 7.512l-17.02-4.5a3.5 3.5 0 0 0-.027-.158C44.656 16.29 39.202 11 32.551 11zm0 7c3.107 0 5.55 2.444 5.55 5.55c0 3.107-2.443 5.55-5.55 5.55c-3.106 0-5.55-2.443-5.55-5.55c0-3.106 2.444-5.55 5.55-5.55zm41 9c3.107 0 5.55 2.444 5.55 5.55c0 3.107-2.443 5.55-5.55 5.55c-3.106 0-5.55-2.443-5.55-5.55c0-3.106 2.444-5.55 5.55-5.55zm-61 34c3.107 0 5.55 2.444 5.55 5.55c0 3.107-2.443 5.55-5.55 5.55C9.445 72.1 7 69.657 7 66.55C7 63.445 9.444 61 12.55 61zm75 10c3.107 0 5.55 2.444 5.55 5.55c0 3.107-2.443 5.55-5.55 5.55c-3.106 0-5.55-2.443-5.55-5.55c0-3.106 2.444-5.55 5.55-5.55z"
+              color="currentColor" />
           </svg>
         </a>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="setCurImage" v-if="RectangleMaxCount > 0 && RectangleImage.length > 0">选择贴图
+          <el-dropdown-item command="reset">重置折线</el-dropdown-item>
+          <el-dropdown-item command="clear">清除折线</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+      <el-dropdown
+        v-if="(rectangle && rectangle.length) || RectangleMaxCount > 0"
+        @command="command => { this[command](['rectangle']) }"
+        :class="{ active: active === 'rectangle' }">
+        <a @click.stop="onRectangleBtnClick">
+          <svg viewBox="0 0 24 24" :class="!RectangleMaxCount && 'disabled'">
+            <path
+              d="M19 6h3v2h-3v3h-2V8h-3V6h3V3h2v3m-2 11v-3h2v5H3V6h8v2H5v9h12z"
+              fill="currentColor"></path>
+          </svg>
+        </a>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="setCurImage"
+            v-if="RectangleMaxCount > 0 && RectangleImage.length > 0">选择贴图
           </el-dropdown-item>
           <el-dropdown-item command="reset">重置矩形</el-dropdown-item>
           <el-dropdown-item command="clear">清除矩形</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
       <el-dropdown v-if="(polygon && polygon.length) || PolygonMaxCount > 0"
-        @command="command => { this[command](['polygon']) }" :class="{ active: active === 'polygon' }">
+        @command="command => { this[command](['polygon']) }"
+        :class="{ active: active === 'polygon' }">
         <a @click.stop="onPolygonBtnClick">
-          <svg :class="!PolygonMaxCount && 'disabled'" width="1em" height="1em" viewBox="0 0 24 24">
-            <path d="M17 15.7V13h2v4l-9 4l-7-7l4-9h4v2H8.3l-2.9 6.6l5 5l6.6-2.9M22 5v2h-3v3h-2V7h-3V5h3V2h2v3h3z"
+          <svg :class="!PolygonMaxCount && 'disabled'" viewBox="0 0 24 24">
+            <path
+              d="M17 15.7V13h2v4l-9 4l-7-7l4-9h4v2H8.3l-2.9 6.6l5 5l6.6-2.9M22 5v2h-3v3h-2V7h-3V5h3V2h2v3h3z"
               fill="currentColor" />
           </svg>
         </a>
@@ -93,16 +118,17 @@
       </el-dropdown>
       <el-tooltip effect="dark" content="取消" placement="bottom">
         <a @click.stop="cancel">
-          <svg width="1em" height="1em" viewBox="0 0 24 24">
+          <svg viewBox="0 0 24 24">
             <path
               d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10zm0-2a8 8 0 1 0 0-16a8 8 0 0 0 0 16zm0-9.414l2.828-2.829l1.415 1.415L13.414 12l2.829 2.828l-1.415 1.415L12 13.414l-2.828 2.829l-1.415-1.415L10.586 12L7.757 9.172l1.415-1.415L12 10.586z"
               fill="currentColor" />
           </svg>
         </a>
       </el-tooltip>
-      <el-tooltip :class="Loading && 'invisible'" effect="dark" content="确定" placement="bottom">
+      <el-tooltip :class="Loading && 'invisible'" effect="dark" content="确定"
+        placement="bottom">
         <a @click.stop="confirm">
-          <svg width="1em" height="1em" viewBox="0 0 24 24">
+          <svg viewBox="0 0 24 24">
             <path
               d="M7 19v-6h10v6h2V7.828L16.172 5H5v14h2zM4 3h13l4 4v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm5 12v4h6v-4H9z"
               fill="currentColor" />
@@ -111,22 +137,26 @@
       </el-tooltip>
     </Toolbar>
 
-    <div v-show="!Loading" class="absolute left-3px bottom-40px" style="position:absolute;left:3px;bottom:40px;"
-      id="zoom">
-      <span class="text-45px" style="color:#3297FD;font-size:35px;">{{ MapOptions.zoom }}</span>
+    <div v-show="!Loading" class="absolute left-3px bottom-40px"
+      style="position:absolute;left:3px;bottom:40px;" id="zoom">
+      <span class="text-45px" style="color:#3297FD;font-size:35px;">{{
+          MapOptions.zoom
+      }}</span>
       <span class="text-10px" style="font-size:10px;"> 缩放级别</span>
     </div>
 
-    <KiFormDialog :show.sync="imagePicker.show" v-model="imagePicker.data" append-to-body
-      :retrieve="imagePicker.retrieve" :submit="imagePicker.submit" title="选择嵌在矩形内的贴图" custom-class="imagePicker">
+    <KiFormDialog :show.sync="imagePicker.show" v-model="imagePicker.data"
+      append-to-body :retrieve="imagePicker.retrieve"
+      :submit="imagePicker.submit" title="选择嵌在矩形内的贴图"
+      custom-class="imagePicker">
       <div flex="~">
         <PicViewer :value="RectangleImage" :viewerjs="false">
           <template v-slot="{ src }">
             <div class="inline-block relative">
-              <img :src="src" class="h-148px cursor-pointer" alt="" @click="changeCurImage(src)">
-              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"
-                role="img" width="32" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"
-                class="absolute -right-3 -top-3 w-25px" v-show="imagePicker.data === src">
+              <img :src="src" class="h-148px cursor-pointer" alt=""
+                @click="changeCurImage(src)">
+              <svg viewBox="0 0 24 24" class="absolute -right-3 -top-3 w-25px"
+                v-show="imagePicker.data === src">
                 <path
                   d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10s10-4.5 10-10S17.5 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
                   fill="#409eff" />
@@ -154,6 +184,7 @@ import autoComplete from '@tarekraafat/autocomplete.js/dist/js/autoComplete'
 import './styles/autocomplete.scss'
 import './styles/marker-list.scss'
 import polygon from '@/mixins/polygon'
+import polyline from '@/mixins/polyline'
 import rectangle from '@/mixins/rectangle'
 import Toolbar from '@/components/Toolbar.vue'
 import { name } from '../package.json'
@@ -166,7 +197,7 @@ import { globalProps } from './index'
 
 export default {
   name: 'CoordPicker',
-  mixins: [polygon, rectangle],
+  mixins: [polygon, polyline, rectangle],
   components: { Toolbar, KiSelect, KiFormDialog, PicViewer },
   props: {
     show: {
@@ -182,18 +213,13 @@ export default {
     address: {
       validator: value => ['string', 'null'].includes(typeOf(value)),
     },
-    marker: {},
-    markerCount: {},
     city: {},
-    polygon: {},
     precision: {},
-    addressComponent: {},
-    polygonCount: {},
     mapOptions: {},
     loadOptions: {},
-    rectangleImage: {},
-    rectangle: {},
-    rectangleCount: {},
+    addressComponent: {},
+    marker: {},
+    markerCount: {},
   },
   data() {
     return {
@@ -227,68 +253,11 @@ export default {
         return 'readonly'
       }
     },
-    RectangleStatus() {
-      if (this.RectangleMaxCount > 0) {
-        return 'editable'
-      } else if (this.Rectangle?.length > 0) {
-        return 'readonly'
-      }
-    },
-    PolygonStatus() {
-      if (this.PolygonMaxCount > 0) {
-        return 'editable'
-      } else if (this.Polygon?.length > 0) {
-        return 'readonly'
-      }
-    },
     Marker() {
       return conclude([this.marker, globalProps.marker], {
         name: 'marker',
         type: ['object', 'array', 'null']
       })
-    },
-    Polygon() {
-      return conclude([this.polygon, globalProps.polygon], {
-        name: 'polygon',
-        type: ['array', 'null']
-      })
-    },
-    Rectangle() {
-      return conclude([this.rectangle, globalProps.rectangle], {
-        name: 'rectangle',
-        type: ['array', 'null']
-      })
-    },
-    RectangleImage() {
-      const temp = conclude([this.rectangleImage, globalProps.rectangleImage, []], {
-        name: 'rectangleImage',
-        type: ['string', 'array']
-      })
-      return (typeof temp === 'string') ? [temp] : temp
-    },
-    RectangleCount() {
-      return conclude([this.rectangleCount, globalProps.rectangleCount, 0], {
-        name: 'rectangleCount',
-        type: ['number', 'array']
-      })
-    },
-    RectangleMaxCount() {
-      return Array.isArray(this.RectangleCount) ? this.RectangleCount[1] : this.RectangleCount
-    },
-    RectangleMinCount() {
-      return Array.isArray(this.RectangleCount) ? this.RectangleCount[0] : undefined
-    },
-    PolygonCount() {
-      return conclude([this.polygonCount, globalProps.polygonCount, 0], {
-        name: 'polygonCount',
-        type: ['number', 'array']
-      })
-    },
-    PolygonMaxCount() {
-      return Array.isArray(this.PolygonCount) ? this.PolygonCount[1] : this.PolygonCount
-    },
-    PolygonMinCount() {
-      return Array.isArray(this.PolygonCount) ? this.PolygonCount[0] : undefined
     },
     MarkerCount() {
       return conclude([this.markerCount, globalProps.markerCount, 1], {
@@ -338,17 +307,24 @@ export default {
           'AMap.Geocoder',
           'AMap.CitySearch',
           'AMap.PlaceSearch',
-          'AMap.Autocomplete', // 2.x为AMap.AutoComplete
+          'AMap.Autocomplete', // 2.x为 AMap.AutoComplete
           ...this.RectangleStatus === 'editable' ? [
-            'AMap.MouseTool',
             'AMap.RectangleEditor',
+            'AMap.MouseTool',
+          ] : [],
+          ...this.PolylineStatus === 'editable' ? [
+            'AMap.PolyEditor',  // 2.x为 AMap.PolylineEditor
+            'AMap.MouseTool',
+          ] : [],
+          ...this.PolylineStatus === 'readonly' ? [
+            'AMap.Polyline',
           ] : [],
           ...this.PolygonStatus === 'editable' ? [
             'AMap.Polygon',
-            'AMap.MouseTool',
             'AMap.ContextMenu',
             'AMap.DistrictSearch',
-            'AMap.PolyEditor', // 2.x为AMap.PolygonEditor
+            'AMap.PolyEditor', // 2.x为 AMap.PolygonEditor
+            'AMap.MouseTool',
           ] : [],
           ...this.PolygonStatus === 'readonly' ? [
             'AMap.Polygon',
@@ -517,6 +493,13 @@ export default {
                   })
                   this.overlay.polygonInstance.push(e.obj)
                   this.editPolygon({ editable: true })
+                } else if (this.active === 'polyline') {
+                  this.active = 'polyline'
+                  e.obj.setOptions({
+                    ...this.polylineStyle,
+                  })
+                  this.overlay.polylineInstance.push(e.obj)
+                  this.editPolyline({ editable: true })
                 }
                 this.mouseTool.close()
               })
@@ -568,6 +551,10 @@ export default {
           this.map.off('click', this.onMapClick)
           //this.overlay.rectangleInstance?.off('click', this.onMapClick)
           this.mouseTool.rectangle(this.rectangleStyle)
+        },
+        'polyline': () => {
+          this.map.off('click', this.onMapClick)
+          this.drawPolyline({ editable: true })
         },
         'polygon': () => {
           //this.text.setText('单击确定多边形起点，双击结束绘制')
@@ -625,6 +612,15 @@ export default {
       <li>删除：右键点位 → 点击[删除]；点位列表 → 点击右上角[×]</li>
       <li>重置：点位工具下拉菜单 → 重置点位</li>
       <li>清除：点位工具下拉菜单 → 清除点位</li>
+    </ul>` : ''}
+  ${this.PolylineStatus === 'editable' ? `
+  <li>折线</li>
+    <ul style="margin-bottom:1rem">
+      <li>添加：选中折线工具 → 单击地图确定起点，双击结束绘制</li>
+      <li>调整形状：拖动折线上的圆点处</li>
+      <li>删除：右键折线（线上，点上不行） → 点击[删除]</li>
+      <li>重置：折线工具下拉菜单 → 重置折线</li>
+      <li>清除：折线工具下拉菜单 → 清除折线</li>
     </ul>` : ''}
   ${this.RectangleStatus === 'editable' ? `
   <li>矩形</li>
@@ -738,7 +734,12 @@ export default {
           polygonInstance: [],
           polygonEditor: [],
           polygon: [],
-        }
+        },
+        polyline: {
+          polylineInstance: [],
+          polylineEditor: [],
+          polyline: [],
+        },
       }
       if (!arr) {
         result = {
@@ -760,7 +761,7 @@ export default {
       this.clear(arr)
       this.initOverlays(arr)
     },
-    isClearable(overlays = ['marker', 'rectangle', 'polygon']) {
+    isClearable(overlays = ['marker', 'rectangle', 'polygon', 'polyline']) {
       for (let v of overlays) {
         switch (v) {
           case 'marker': {
@@ -780,6 +781,12 @@ export default {
           case 'polygon':
             if (this.PolygonMinCount > 0 && this.overlay.polygonInstance.length > 0) {
               warning(`至少绘制${this.PolygonMinCount}个多边形`)
+              return false
+            }
+            break
+          case 'polyline':
+            if (this.PolylineMinCount > 0 && this.overlay.polylineInstance.length > 0) {
+              warning(`至少绘制${this.PolylineMinCount}条折线`)
               return false
             }
         }
@@ -819,6 +826,17 @@ export default {
           for (let i = 0; i < this.overlay.polygonInstance.length; i++) {
             this.overlay.polygonInstance[i].setMap(null)
             this.overlay.polygonEditor[i]?.close()
+          }
+        }
+
+        if (arr.includes('polyline')) {
+          if (!this.isClearable(arr)) {
+            return
+          }
+
+          for (let i = 0; i < this.overlay.polylineInstance.length; i++) {
+            this.overlay.polylineInstance[i].setMap(null)
+            this.overlay.polylineEditor[i]?.close()
           }
         }
 
@@ -933,6 +951,11 @@ export default {
       if (this.PolygonStatus === 'editable') {
         this.syncPolygon()
         this.$emit('update:polygon', this.overlay.polygon)
+      }
+      if (this.PolylineStatus === 'editable') {
+        this.syncPolyline()
+        console.log(this.overlay.polyline)
+        this.$emit('update:polyline', this.overlay.polyline)
       }
       this.$emit('update:show', false)
       this.$emit('confirm')
@@ -1294,6 +1317,16 @@ export default {
           this.drawPolygon({
             polygon: this.Polygon,
             editable: this.PolygonStatus === 'editable'
+          })
+          hasOverlay = true
+        }
+      }
+
+      if (!arr || arr.includes('polyline')) {
+        if (this.Polyline?.length > 0) {
+          this.drawPolyline({
+            polyline: this.Polyline,
+            editable: this.PolylineStatus === 'editable'
           })
           hasOverlay = true
         }
