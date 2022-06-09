@@ -1,11 +1,9 @@
 <template>
-  <el-dialog visible :close-on-click-modal="false" :show-close="false"
-    title="coord-picker" @confirm="console.log('confirm')"
-    @cancel="console.log('cancel')">
+  <div>
     <CoordPicker v-bind.sync="props" @cancel="console.log('cancel')"
       @confirm="console.log('confirm')" />
     <JsonEditorVue v-model="props" />
-  </el-dialog>
+  </div>
 </template>
 
 <script>

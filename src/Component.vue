@@ -183,7 +183,7 @@ import 'kikimore/dist/style.css'
 import { Select as KiSelect, FormDialog as KiFormDialog } from 'kikimore'
 import 'cozyalert/dist/style.css'
 import { error, warning, confirm } from 'cozyalert'
-import { throttle as throttling, cloneDeep } from 'lodash-es'
+import { debounce, cloneDeep } from 'lodash-es'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
 import autoComplete from '@tarekraafat/autocomplete.js/dist/js/autoComplete'
@@ -278,6 +278,9 @@ export default {
     },
     MarkerMinCount() {
       return Array.isArray(this.MarkerCount) ? this.MarkerCount[0] : undefined
+    },
+    CurrentMarkerCount() {
+      return this.overlay.markerInstance.filter(v => v).length
     },
     /*title () {
       return this.curSpot.address + ((isEmpty(this.curSpot.lng) || isEmpty(this.curSpot.lat)) ? '' : `（${this.curSpot.lng}，${this.curSpot.lat}）`)
@@ -472,6 +475,7 @@ export default {
                 //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
                 //2.x：e.obj.className==='Overlay.Rectangle'
                 if (this.active === 'rectangle') {
+                  // 绘制完毕后，恢复至初始选中的工具
                   this.active = 'marker'
                   // 如果矩形只允许有一个 清除之前绘制的
                   /*if (
@@ -498,6 +502,7 @@ export default {
                 // 1.x：e.obj.CLASS_NAME==='AMap.Polygon'
                 // 2.x：e.obj.className==='Overlay.Polygon'
                 else if (this.active === 'polygon') {
+                  // 绘制完毕后，恢复至初始选中的工具
                   this.active = 'marker'
                   e.obj.setOptions({
                     ...this.polygonStyle,
@@ -506,7 +511,8 @@ export default {
                   this.overlay.polygonInstance.push(e.obj)
                   this.editPolygon({ editable: true })
                 } else if (this.active === 'polyline') {
-                  this.active = 'polyline'
+                  // 绘制完毕后，恢复至初始选中的工具
+                  this.active = 'marker'
                   e.obj.setOptions({
                     ...this.polylineStyle,
                   })
@@ -628,7 +634,8 @@ export default {
     <ul style="margin-bottom:1rem">
       <li>添加：选中折线工具 → 单击地图确定起点，双击结束绘制</li>
       <li>调整形状：拖动折线上的圆点处</li>
-      <li>删除：右键折线（线上，点上不行） → 点击[删除]</li>
+      <li>删除某个点：双击这个点</li>
+      <li>删除折线：右键折线（线上，点上不行） → 点击[删除]</li>
       <li>重置：折线工具下拉菜单 → 重置折线</li>
       <li>清除：折线工具下拉菜单 → 清除折线</li>
     </ul>` : ''}
@@ -638,7 +645,8 @@ export default {
       <li>添加：选中矩形工具 → 长按左键并拖动，松开完成绘制</li>
       <li>选择贴图：矩形工具下拉菜单 → 选择贴图</li>
       <li>调整形状：拖动矩形角上的圆点处</li>
-      <li>删除：右键矩形 → 点击[删除]</li>
+      <li>删除某个点：双击这个点（三个点以上时有效）</li>
+      <li>删除矩形：右键矩形 → 点击[删除]</li>
       <li>重置：矩形工具下拉菜单 → 重置矩形</li>
       <li>清除：矩形工具下拉菜单 → 清除矩形</li>
     </ul>` : ''}
@@ -666,16 +674,16 @@ export default {
         this.map.setZoomAndCenter(this.MapOptions.zoom, args)
       }
     },
-    throttle(fnName, fn, param, delay) {
+    debounce(fnName, fn, param, delay) {
       //const functionName = /function\s*(\w*)/i.exec(fn.toString())[1]
-      fnName += 'Throttle'
+      fnName += 'Debounce'
       if (!this[fnName]) {
-        this[fnName] = throttling(fn, delay)
+        this[fnName] = debounce(fn, delay)
       }
       this[fnName](param)
     },
     /*setTextPosition (e) {
-      this.throttle('setTextPosition', e => {
+      this.debounce('setTextPosition', e => {
         this.text.setPosition([e.lnglat.lng, e.lnglat.lat])
       }, e, 30)
     },*/
@@ -699,14 +707,14 @@ export default {
           level: 'district'  //行政级别
         })
       }
-      if (this.polyline?.length || this.PolylineMaxCount > 0) {
+      /* if (this.polyline?.length || this.PolylineMaxCount > 0) {
         this.plugins.LabelsLayer = new AMap.LabelsLayer({
           //zooms: [10, 18],
           zIndex: 100,
           collision: true, // 开启标注避让，默认为开启，v1.4.15 新增属性
           animation: true, // 开启标注淡入动画，默认为开启，v1.4.15 新增属性
         })
-      }
+      } */
     },
     getInitData(arr) {
       let result = {
@@ -757,6 +765,7 @@ export default {
           polylineInstance: [],
           polylineEditor: [],
           polyline: [],
+          labelsLayer: [],
         },
       }
       if (!arr) {
@@ -783,27 +792,27 @@ export default {
       for (let v of overlays) {
         switch (v) {
           case 'marker': {
-            if (this.MarkerMinCount > 0 && this.overlay.markerInstance.length > 0) {
+            if (this.MarkerMinCount > 0 && this.CurrentMarkerCount > 0) {
               warning(`至少绘制${this.MarkerMinCount}个点位`)
               return false
             }
             break
           }
           case 'rectangle': {
-            if (this.RectangleMinCount > 0 && this.overlay.rectangleInstance.length > 0) {
+            if (this.RectangleMinCount > 0 && this.CurrentRectangleCount > 0) {
               warning(`至少绘制${this.RectangleMinCount}个矩形`)
               return false
             }
             break
           }
           case 'polygon':
-            if (this.PolygonMinCount > 0 && this.overlay.polygonInstance.length > 0) {
+            if (this.PolygonMinCount > 0 && this.CurrentPolygonCount > 0) {
               warning(`至少绘制${this.PolygonMinCount}个多边形`)
               return false
             }
             break
           case 'polyline':
-            if (this.PolylineMinCount > 0 && this.overlay.polylineInstance.length > 0) {
+            if (this.PolylineMinCount > 0 && this.CurrentPolylineCount > 0) {
               warning(`至少绘制${this.PolylineMinCount}条折线`)
               return false
             }
@@ -829,11 +838,12 @@ export default {
 
         if (arr.includes('rectangle')) {
           for (let i = 0; i < this.overlay.rectangle.length; i++) {
-            this.overlay.imageLayerInstance[i]?.setMap(null)
-            this.overlay.rectangleInstance[i].setMap(null)
-            this.overlay.rectangleEditor[i]?.close() // 只读模式 rectangleEditor 为空
+            if (this.overlay.rectangle[i]) {
+              this.overlay.imageLayerInstance[i]?.setMap(null)
+              this.overlay.rectangleInstance[i].setMap(null)
+              this.overlay.rectangleEditor[i]?.close() // 只读模式 rectangleEditor 为空
+            }
           }
-          this.overlay.rectangle.length = 0
         }
 
         if (arr.includes('polygon')) {
@@ -842,8 +852,10 @@ export default {
           }
 
           for (let i = 0; i < this.overlay.polygonInstance.length; i++) {
-            this.overlay.polygonInstance[i].setMap(null)
-            this.overlay.polygonEditor[i]?.close()
+            if (this.overlay.polygonInstance[i]) {
+              this.overlay.polygonInstance[i].setMap(null)
+              this.overlay.polygonEditor[i]?.close() // 只读模式 polygonEditor 为空
+            }
           }
         }
 
@@ -853,8 +865,11 @@ export default {
           }
 
           for (let i = 0; i < this.overlay.polylineInstance.length; i++) {
-            this.overlay.polylineInstance[i].setMap(null)
-            this.overlay.polylineEditor[i]?.close()
+            if (this.overlay.polylineInstance[i]) {
+              this.overlay.polylineInstance[i].setMap(null)
+              this.overlay.polylineEditor[i]?.close() // 只读模式 polylineEditor 为空
+              this.overlay.labelsLayer[i].setMap(null)
+            }
           }
         }
 
@@ -972,14 +987,13 @@ export default {
       }
       if (this.PolylineStatus === 'editable') {
         this.syncPolyline()
-        console.log(this.overlay.polyline)
         this.$emit('update:polyline', this.overlay.polyline)
       }
       this.$emit('update:show', false)
       this.$emit('confirm')
     },
     drawMarker(markerOptions, isInit = false) {
-      if (this.MarkerMaxCount > 1 && this.overlay.markerInstance.length >= this.MarkerMaxCount && !isInit) {
+      if (this.MarkerMaxCount > 1 && this.CurrentMarkerCount >= this.MarkerMaxCount && !isInit) {
         warning(`最多标记${this.MarkerMaxCount}个点位`)
       } else {
         /*const position = [lng, lat]
@@ -1042,12 +1056,12 @@ export default {
       }
 
       const { MarkerList, SimpleMarker, SimpleInfoWindow } = window.AMapUI
-      // 即jQuery/Zepto
+      // 即 jQuery / Zepto
       const $ = MarkerList.utils.$
 
-      const defaultIconStyle = 'red', //默认的图标样式
-        hoverIconStyle = 'blue', //鼠标hover时的样式
-        selectedIconStyle = 'darkblue' //选中时的图标样式
+      const defaultIconStyle = 'red', // 默认的图标样式
+        hoverIconStyle = 'blue', // 鼠标 hover 时的样式
+        selectedIconStyle = 'darkblue' // 选中时的图标样式
 
       window.__CoordPicker__deleteMarker = index => {
         this.overlay.markerInstance.splice(index, 1)
@@ -1084,7 +1098,7 @@ export default {
             offset: new AMap.Pixel(0, -37)
           })
         },
-        // 构造marker用的options对象, content和title支持模板，也可以是函数，返回marker实例，或者返回options对象
+        // 构造 marker 用的 options 对象, content 和 title 支持模板，也可以是函数，返回 marker 实例，或者返回 options 对象
         getMarker: (data, context, recycledMarker) => {
           let label = String.fromCharCode('A'.charCodeAt(0) + context.index)
           if (recycledMarker) {
@@ -1099,7 +1113,7 @@ export default {
 
           const contextMenu = new AMap.ContextMenu()
           contextMenu.addItem('删除', e => {
-            if (this.overlay.markerInstance.length <= this.MarkerMinCount) {
+            if (this.CurrentMarkerCount <= this.MarkerMinCount) {
               warning(`至少绘制${this.MarkerMinCount}个点位`)
             } else {
               this.overlay.markerInstance.splice(context.index, 1)
@@ -1510,8 +1524,7 @@ export default {
         return
       }
       this.searching = true
-      this.throttle('search', () => {
-
+      this.debounce('search', () => {
         this.useAMapAPI('PlaceSearch.search', this.keyword)
           .then(result => {
             this.searchResult = result.poiList?.pois || []

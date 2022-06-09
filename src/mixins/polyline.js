@@ -35,6 +35,9 @@ export default {
     PolylineMinCount() {
       return Array.isArray(this.PolylineCount) ? this.PolylineCount[0] : undefined
     },
+    CurrentPolylineCount() {
+      return this.overlay.polylineInstance.filter(v => v).length
+    },
   },
   data() {
     return {
@@ -60,7 +63,7 @@ export default {
     onPolylineBtnClick() {
       // 只读模式点击无效果
       if (this.PolylineMaxCount > 0) {
-        if (this.overlay.polylineInstance.length >= this.PolylineMaxCount) {
+        if (this.CurrentPolylineCount >= this.PolylineMaxCount) {
           warning(`最多绘制${this.PolylineMaxCount}条折线`)
         } else {
           this.active = 'polyline'
@@ -103,7 +106,22 @@ export default {
       }
     },
     // 给折线的交点添加文本标记
-    addLabelsForPolylineNodes(i) {
+    addLabelsForPolylineNodes() {
+      const i = this.overlay.polylineInstance.length - 1
+
+      // 删除之前的文本标记
+      if (this.overlay.labelsLayer[i]) {
+        this.overlay.labelsLayer[i].setMap(null)
+        this.$set(this.overlay.labelsLayer, i, undefined)
+      }
+
+      const labelsLayer = new AMap.LabelsLayer({
+        //zooms: [10, 18],
+        zIndex: 100,
+        collision: true, // 开启标注避让，默认为开启，v1.4.15 新增属性
+        animation: true, // 开启标注淡入动画，默认为开启，v1.4.15 新增属性
+      })
+
       const path = this.overlay.polylineInstance[i].w.path
       path.map(({ R, Q }, index) => {
         let content = String(index + 1)
@@ -113,7 +131,7 @@ export default {
           content = '终点'
         }
 
-        this.plugins.LabelsLayer.add(new AMap.LabelMarker({
+        labelsLayer.add(new AMap.LabelMarker({
           position: [R, Q],
           text: {
             ...this.labelMarkerStyle,
@@ -125,7 +143,8 @@ export default {
         }))
       })
 
-      this.map.add(this.plugins.LabelsLayer)
+      this.overlay.labelsLayer.push(labelsLayer)
+      this.map.add(labelsLayer)
     },
     // 执行时机：绘制完成时
     editPolyline({ editable }) {
@@ -135,15 +154,21 @@ export default {
       if (this.PolylineStatus === 'editable') {
         const polylineContextMenu = new AMap.ContextMenu()
         polylineContextMenu.addItem('删除', e => {
-          if (this.overlay.polylineInstance.length <= this.PolylineMinCount) {
+          if (this.CurrentPolylineCount <= this.PolylineMinCount) {
             warning(`至少绘制${this.PolylineMinCount}条折线`)
           } else {
             if (editable) {
+              // 删除折线编辑器
               this.overlay.polylineEditor[i].close()
-              this.overlay.polylineEditor.splice(i, 1)
+              this.$set(this.overlay.polylineEditor, i, undefined)
             }
+            // 删除折线实例
             this.overlay.polylineInstance[i].setMap(null)
-            this.overlay.polylineInstance.splice(i, 1)
+            this.$set(this.overlay.polylineInstance, i, undefined)
+
+            // 删除文本标记
+            this.overlay.labelsLayer[i].setMap(null)
+            this.$set(this.overlay.labelsLayer, i, undefined)
           }
         }, 0)
         this.overlay.polylineInstance[i].on('rightclick', e => {
@@ -154,8 +179,10 @@ export default {
       this.addLabelsForPolylineNodes(i)
 
       // 形状改变时
-      this.overlay.polylineInstance[i].on('change', e => {
-        this.addLabelsForPolylineNodes(i)
+      this.overlay.polylineInstance[i].on('change', () => {
+        this.debounce('onPolylineChange', () => {
+          this.addLabelsForPolylineNodes()
+        }, null, 100)
       })
 
       // 初始化折线编辑器
@@ -170,5 +197,5 @@ export default {
       // 恢复点位绘制
       this.overlay.polylineInstance[i].on('click', this.onMapClick)
     },
-  }
+  },
 }

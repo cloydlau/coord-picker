@@ -42,6 +42,9 @@ export default {
     RectangleMinCount() {
       return Array.isArray(this.RectangleCount) ? this.RectangleCount[0] : undefined
     },
+    CurrentRectangleCount() {
+      return this.overlay.rectangleInstance.filter(v => v).length
+    },
   },
   data() {
     return {
@@ -61,7 +64,7 @@ export default {
     onRectangleBtnClick() {
       // 只读模式点击无效果
       if (this.RectangleMaxCount > 0) {
-        if (this.overlay.rectangleInstance.length >= this.RectangleMaxCount) {
+        if (this.CurrentRectangleCount >= this.RectangleMaxCount) {
           warning(`最多绘制${this.RectangleMaxCount}个矩形`)
         } else if (!this.curImage && this.RectangleImage.length > 1) {
           this.imagePicker.show = true
@@ -99,20 +102,20 @@ export default {
       if (this.RectangleStatus === 'editable') {
         const contextMenu = new AMap.ContextMenu()
         contextMenu.addItem('删除', e => {
-          if (this.overlay.rectangleEditor.length <= this.RectangleMinCount) {
+          if (this.CurrentRectangleCount <= this.RectangleMinCount) {
             warning(`至少绘制${this.RectangleMinCount}个矩形`)
           } else {
-            this.overlay.rectangle.splice(i, 1)
-            if (editable) {
-              // 矩形可能是空心的 需要判空
-              this.overlay.rectangleEditor[i]?.close()
-              this.overlay.rectangleEditor.splice(i, 1)
+            this.$set(this.overlay.rectangle, i, undefined)
+            // 矩形可能是空心的 需要判空
+            if (editable && this.overlay.rectangleEditor[i]) {
+              this.overlay.rectangleEditor[i].close()
+              this.$set(this.overlay.rectangleEditor, i, undefined)
             }
             this.overlay.rectangleInstance[i].setMap(null)
-            this.overlay.rectangleInstance.splice(i, 1)
+            this.$set(this.overlay.rectangleInstance, i, undefined)
             if (this.overlay.imageLayerInstance[i]) {
               this.overlay.imageLayerInstance[i].setMap(null)
-              this.overlay.imageLayerInstance.splice(i, 1)
+              this.$set(this.overlay.imageLayerInstance, i, undefined)
             }
           }
         }, 0)

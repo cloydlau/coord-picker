@@ -35,6 +35,9 @@ export default {
     PolygonMinCount() {
       return Array.isArray(this.PolygonCount) ? this.PolygonCount[0] : undefined
     },
+    CurrentPolygonCount() {
+      return this.overlay.polygonInstance.filter(v => v).length
+    },
   },
   data() {
     return {
@@ -53,7 +56,7 @@ export default {
     onPolygonBtnClick() {
       // 只读模式点击无效果
       if (this.PolygonMaxCount > 0) {
-        if (this.overlay.polygonInstance.length >= this.PolygonMaxCount) {
+        if (this.CurrentPolygonCount >= this.PolygonMaxCount) {
           warning(`最多绘制${this.PolygonMaxCount}个多边形`)
         } else {
           this.active = 'polygon'
@@ -104,15 +107,16 @@ export default {
       if (this.PolygonStatus === 'editable') {
         const polygonContextMenu = new AMap.ContextMenu()
         polygonContextMenu.addItem('删除', e => {
-          if (this.overlay.polygonInstance.length <= this.PolygonMinCount) {
+          if (this.CurrentPolygonCount <= this.PolygonMinCount) {
             warning(`至少绘制${this.PolygonMinCount}个多边形`)
           } else {
             if (editable) {
               this.overlay.polygonEditor[i].close()
-              this.overlay.polygonEditor.splice(i, 1)
+              this.$set(this.overlay.polygonEditor, i, undefined)
+
             }
             this.overlay.polygonInstance[i].setMap(null)
-            this.overlay.polygonInstance.splice(i, 1)
+            this.$set(this.overlay.polygonInstance, i, undefined)
           }
         }, 0)
         this.overlay.polygonInstance[i].on('rightclick', e => {
