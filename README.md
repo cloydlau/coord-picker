@@ -1,6 +1,10 @@
 # coord-picker
 
-![图片](./preview.png)
+坐标拾取工具
+
+![图片](https://raw.githubusercontent.com/cloydlau/coord-picker/master/preview.png)
+
+<br>
 
 ## 特性
 
@@ -65,7 +69,7 @@ export default {
 | mapOptions[.sync] | [AMap.Map 的参数2](https://lbs.amap.com/api/javascript-api/reference/map) | object | | |
 | city | 初始行政区 | string | | |
 | precision | 坐标精度（保留几位小数） | number | | 6 |
-| addressComponent* | 地址成分 | object, function | | |
+| addressComponent | 地址成分 | object, function | | |
 
 ### 中心点相关
 
@@ -95,7 +99,7 @@ export default {
 | --- | --- | --- | --- | --- |
 | rectangle.sync | 矩形 | object[] | | |
 | rectangleCount | 矩形数量限制 | number, number[] | | 0 |
-| rectangleImage | 嵌在矩形内的贴图url | string, string[] | | |
+| rectangleImage | 嵌在矩形内的贴图链接 | string, string[] | | |
 
 ### 多边形相关
 
@@ -106,7 +110,7 @@ export default {
 
 坐标值类型：
 
-- number 和 string 都能接收，但返回时，由于 js 的 number 类型存在精度丢失问题，故返回 string
+- number 和 string 都能接收，但返回时，由于 JS 的 number 类型存在精度丢失问题，故返回 string
 
 ### city
 
@@ -165,8 +169,8 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
 
 | 名称 | 说明 | 回调参数 |
 | --- | --- | --- |
-| load | 高德地图加载完成时，即[AMapLoader.load().then](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) | AMap（同高德） |
-| error | 调用高德API报错时，含[AMapLoader.load().catch](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) | 同高德 |
+| load | 高德地图加载完成时，即 [AMapLoader.load().then](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) | AMap（同高德） |
+| error | 调用高德 API 报错时，含 [AMapLoader.load().catch](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) | 同高德 |
 | confirm | 点击确认按钮时 | |
 | cancel | 点击取消按钮时 | |
 | ...el-dialog事件 |
