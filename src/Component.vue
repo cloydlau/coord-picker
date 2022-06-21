@@ -1,7 +1,7 @@
 <template>
-  <el-dialog :visible="show" :fullscreen="true" :append-to-body="true"
-    :show-close="false" @close="$emit('update:show', false)" destroy-on-close
-    v-if="show" custom-class="coord-picker" v-on="$listeners">
+  <el-dialog :visible="show" :fullscreen="true" :append-to-body="true" :show-close="false"
+    @close="$emit('update:show', false)" destroy-on-close v-if="show"
+    custom-class="coord-picker" v-on="$listeners">
     <!--<div slot="title" class="title">
       <span v-text="title||'坐标拾取'" class="title-text"/>
     </div>-->
@@ -12,8 +12,8 @@
           search()
           e.currentTarget.blur()
         }">
-        <KiSelect class="region-selector" ref="regionKiSelect"
-          placeholder="当前城市" :label.sync='baseCity' :props="{
+        <KiSelect class="region-selector" ref="regionKiSelect" placeholder="当前城市"
+          :label.sync='baseCity' :props="{
             value: 'id',
             label: 'name',
             groupLabel: 'name',
@@ -22,10 +22,8 @@
       </div>
       <transition enter-active-class="animate__animated animate__backInLeft"
         leave-active-class="animate__animated animate__backOutLeft">
-        <div v-loading="searching" class="drawer"
-          v-show="searchResult.length > 0">
-          <div v-for="(v, i) of searchResult" :key="i" class="item"
-            @click="locate(v)">
+        <div v-loading="searching" class="drawer" v-show="searchResult.length > 0">
+          <div v-for="(v, i) of searchResult" :key="i" class="item" @click="locate(v)">
             <div>{{ v.name }}</div>
             <div>{{ v.address }}</div>
           </div>
@@ -79,8 +77,7 @@
           <el-dropdown-item command="clear">清除折线</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
-      <el-dropdown
-        v-if="(rectangle && rectangle.length) || RectangleMaxCount > 0"
+      <el-dropdown v-if="(rectangle && rectangle.length) || RectangleMaxCount > 0"
         @command="command => { this[command](['rectangle']) }"
         :class="{ active: active === 'rectangle' }">
         <a @click.stop="onRectangleBtnClick">
@@ -130,13 +127,12 @@
               stroke-linejoin="round" stroke-width="2">
               <path stroke-dasharray="60" stroke-dashoffset="60"
                 d="M3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z">
-                <animate fill="freeze" attributeName="stroke-dashoffset"
-                  dur="0.5s" values="60;0"></animate>
+                <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s"
+                  values="60;0"></animate>
               </path>
-              <path stroke-dasharray="14" stroke-dashoffset="14"
-                d="M8 12L11 15L16 10">
-                <animate fill="freeze" attributeName="stroke-dashoffset"
-                  begin="0.6s" dur="0.2s" values="14;0"></animate>
+              <path stroke-dasharray="14" stroke-dashoffset="14" d="M8 12L11 15L16 10">
+                <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s"
+                  dur="0.2s" values="14;0"></animate>
               </path>
             </g>
           </svg>
@@ -152,9 +148,8 @@
       <span class="text-10px" style="font-size:10px;"> 缩放级别</span>
     </div>
 
-    <KiFormDialog :show.sync="imagePicker.show" v-model="imagePicker.data"
-      append-to-body :retrieve="imagePicker.retrieve"
-      :submit="imagePicker.submit" title="选择嵌在矩形内的贴图"
+    <KiFormDialog :show.sync="imagePicker.show" v-model="imagePicker.data" append-to-body
+      :retrieve="imagePicker.retrieve" :submit="imagePicker.submit" title="选择嵌在矩形内的贴图"
       custom-class="imagePicker">
       <div flex="~">
         <PicViewer :value="RectangleImage" :viewerjs="false">
@@ -311,7 +306,7 @@ export default {
           plugins: ['misc/MarkerList', 'overlay/SimpleMarker', 'overlay/SimpleInfoWindow']
         },
         //version: '1.4.15', // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
-        plugins: [
+        plugins: [...new Set([
           'AMap.Scale',
           'AMap.MapType',
           //'AMap.ControlBar',
@@ -320,12 +315,14 @@ export default {
           'AMap.PlaceSearch',
           'AMap.Autocomplete', // 2.x为 AMap.AutoComplete
           ...this.RectangleStatus === 'editable' ? [
-            'AMap.RectangleEditor',
             'AMap.MouseTool',
+            'AMap.ContextMenu',
+            'AMap.RectangleEditor',
           ] : [],
           ...this.PolylineStatus === 'editable' ? [
-            'AMap.PolyEditor',  // 2.x为 AMap.PolylineEditor
             'AMap.MouseTool',
+            'AMap.ContextMenu',
+            'AMap.PolyEditor',  // 2.x为 AMap.PolylineEditor
             'AMap.LabelsLayer',
             'AMap.LabelMarker',
           ] : [],
@@ -335,16 +332,16 @@ export default {
             'AMap.LabelMarker',
           ] : [],
           ...this.PolygonStatus === 'editable' ? [
-            'AMap.Polygon',
+            'AMap.MouseTool',
             'AMap.ContextMenu',
+            'AMap.Polygon',
             'AMap.DistrictSearch',
             'AMap.PolyEditor', // 2.x为 AMap.PolygonEditor
-            'AMap.MouseTool',
           ] : [],
           ...this.PolygonStatus === 'readonly' ? [
             'AMap.Polygon',
           ] : [],
-        ]
+        ])]
       }], {
         name: 'loadOptions',
         required: true,
@@ -469,7 +466,7 @@ export default {
               this.MapOptions.zoom = Number(this.MapOptions.zoom)
             }
 
-            if (this.RectangleStatus === 'editable' || this.PolygonStatus === 'editable') {
+            if (this.LoadOptions.plugins.includes('AMap.MouseTool')) {
               this.mouseTool = new AMap.MouseTool(this.map)
               this.mouseTool.on('draw', e => {
                 //1.x：e.obj.CLASS_NAME==='AMap.Polygon'
