@@ -22,10 +22,10 @@
     "url": "https://github.com/cloydlau/coord-picker"
   },
   "main": "dist/coord-picker.umd.js",
-  "module": "./dist/coord-picker.es.js",
+  "module": "./dist/coord-picker.mjs",
   "exports": {
     ".": {
-      "import": "./dist/coord-picker.es.js",
+      "import": "./dist/coord-picker.mjs",
       "require": "./dist/coord-picker.umd.js"
     },
     "./dist/style.css": "./dist/style.css"
