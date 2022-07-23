@@ -1205,7 +1205,7 @@ export default {
 
       this.plugins.MarkerList.on('markerMouseover', function (event, record) {
         if (record && record.marker) {
-          forcusMarker(record.marker)
+          focusMarker(record.marker)
           //this.openInfoWindowOnRecord(record);
           //非选中的id
 
@@ -1243,7 +1243,7 @@ export default {
       //渲染数据
       this.plugins.MarkerList.render(marker)
 
-      const forcusMarker = marker => {
+      const focusMarker = marker => {
         marker.setTop(true)
 
         //不在地图视野内
