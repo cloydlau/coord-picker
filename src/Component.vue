@@ -365,12 +365,6 @@ export default {
           .then(async AMap => {
             this.map = new AMap.Map('map-container', this.MapOptions)
 
-            // 在图面添加比例尺控件，展示地图在当前层级和纬度下的比例尺
-            this.map.addControl(new AMap.Scale())
-
-            // 在图面添加类别切换控件，实现默认图层与卫星图、实施交通图层之间切换的控制
-            this.map.addControl(new AMap.MapType())
-
             this.map.on('complete', () => {
               this.$nextTick(() => {
                 /*this.meny = Meny.create({
@@ -442,6 +436,12 @@ export default {
                 this.initializing = false
               })
             })
+
+            // 在图面添加比例尺控件，展示地图在当前层级和纬度下的比例尺
+            this.map.addControl(new AMap.Scale())
+
+            // 在图面添加类别切换控件，实现默认图层与卫星图、实施交通图层之间切换的控制
+            this.map.addControl(new AMap.MapType())
 
             this.active = 'marker'
 
