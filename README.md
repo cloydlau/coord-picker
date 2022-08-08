@@ -24,7 +24,7 @@
 
 ![NPM](https://nodei.co/npm/coord-picker.png)
 
-```bash
+```sh
 npm add coord-picker element-ui
 ```
 
