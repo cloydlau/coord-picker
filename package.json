@@ -1,6 +1,6 @@
 {
   "name": "coord-picker",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "author": "cloydlau",
   "license": "MIT",
   "description": "Coordinates picker for AMap & TMap / 高德 & 腾讯地图坐标拾取工具",
@@ -17,16 +17,14 @@
     "tmap"
   ],
   "private": false,
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/cloydlau/coord-picker"
-  },
+  "repository": "https://github.com/cloydlau/coord-picker",
   "main": "dist/coord-picker.umd.js",
   "module": "./dist/coord-picker.mjs",
   "exports": {
     ".": {
+      "require": "./dist/coord-picker.umd.js",
       "import": "./dist/coord-picker.mjs",
-      "require": "./dist/coord-picker.umd.js"
+      "browser": "./dist/coord-picker.mjs"
     },
     "./dist/style.css": "./dist/style.css"
   },
@@ -34,11 +32,6 @@
     "dev": "vite --open",
     "build": "vite build",
     "serve": "vite preview",
-    "clean": "rd /s /q .\\node_modules",
-    "ri": "npm run clean && pnpm i",
-    "u": "node scripts/upgrade.js",
-    "r": "node scripts/release.js",
-    "rs": "node scripts/release.js --straightforward",
     "test": "vitest --config ./vitest.config.ts",
     "test2": "vitest --config ./vitest.vue2.config.ts",
     "coverage": "vitest run --coverage"
@@ -58,18 +51,13 @@
     "vue": "2"
   },
   "devDependencies": {
+    "@cloydlau/scripts": "latest",
     "@iconify/json": "latest",
-    "@vue/composition-api": "latest",
-    "chalk": "^4.1.2",
     "element-ui": "latest",
-    "enquirer": "latest",
-    "execa": "^4.1.0",
     "json-editor-vue": "latest",
-    "minimist": "latest",
     "sass": "latest",
-    "semver": "latest",
     "typescript": "latest",
-    "unocss": "latest",
+    "unocss": "0.43.1",
     "unplugin-icons": "latest",
     "vite": "latest",
     "vite-plugin-vue2": "latest",
