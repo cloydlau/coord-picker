@@ -13,7 +13,7 @@
           e.currentTarget.blur()
         }">
         <KiSelect class="region-selector" ref="regionKiSelect" placeholder="当前城市"
-          :label.sync='baseCity' :props="{
+          :props="{
             value: 'id',
             label: 'name',
             groupLabel: 'name',
