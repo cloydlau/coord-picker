@@ -143,7 +143,7 @@ export default {
         }))
       })
 
-      this.overlay.labelsLayer.push(labelsLayer)
+      this.overlay.labelsLayer[i] = labelsLayer
       this.map.add(labelsLayer)
     },
     // 执行时机：绘制完成时
