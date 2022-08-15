@@ -20,6 +20,9 @@
   "repository": "https://github.com/cloydlau/coord-picker",
   "main": "dist/coord-picker.umd.js",
   "module": "./dist/coord-picker.mjs",
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "require": "./dist/coord-picker.umd.js",

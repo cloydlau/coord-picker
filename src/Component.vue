@@ -258,14 +258,12 @@ export default {
     },
     Marker() {
       return conclude([this.marker, globalProps.marker], {
-        name: 'marker',
-        type: ['object', 'array', 'null']
+        type: [Object, Array]
       })
     },
     MarkerCount() {
       return conclude([this.markerCount, globalProps.markerCount, 1], {
-        name: 'markerCount',
-        type: ['number', 'array']
+        type: [Number, Array]
       })
     },
     MarkerMaxCount() {
@@ -282,8 +280,7 @@ export default {
     },*/
     Precision() {
       return conclude([this.precision, globalProps.precision, 6], {
-        name: 'precision',
-        type: 'number'
+        type: Number
       })
     },
     AddressComponent() {
@@ -292,8 +289,7 @@ export default {
         city: true,
         district: true
       }], {
-        name: 'addressComponent',
-        type: ['object', 'function']
+        type: [Object, Function]
       })
     },
     Loading() {
@@ -343,9 +339,8 @@ export default {
           ] : [],
         ])]
       }], {
-        name: 'loadOptions',
         required: true,
-        type: 'object',
+        type: Object,
         camelCase: false,
       })
     }
@@ -356,8 +351,7 @@ export default {
         this.MapOptions = conclude([this.mapOptions, globalProps.mapOptions, {
           //viewMode: '3D',
         }], {
-          name: 'mapOptions',
-          type: 'object'
+          type: Object
         })
 
         //this.customClass = 'animate__animated animate__zoomIn'
@@ -1489,8 +1483,7 @@ export default {
     getBaseCity() {
       // 直辖市：['110100', '120100', '310100', '500100']
       let City = conclude([this.city, globalProps.city, ''], {
-        name: 'city',
-        type: 'string'
+        type: String
       })
       // 兼容非6位的行政区编码
       if (City && !isNaN(City)) {

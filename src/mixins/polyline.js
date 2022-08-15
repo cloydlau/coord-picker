@@ -12,8 +12,7 @@ export default {
   computed: {
     Polyline() {
       return conclude([this.polyline, globalProps.polyline], {
-        name: 'polyline',
-        type: ['array', 'null']
+        type: Array
       })
     },
     PolylineStatus() {
@@ -25,8 +24,7 @@ export default {
     },
     PolylineCount() {
       return conclude([this.polylineCount, globalProps.polylineCount, 0], {
-        name: 'polylineCount',
-        type: ['number', 'array']
+        type: [Number, Array]
       })
     },
     PolylineMaxCount() {

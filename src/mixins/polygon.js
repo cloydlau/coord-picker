@@ -12,8 +12,7 @@ export default {
   computed: {
     Polygon() {
       return conclude([this.polygon, globalProps.polygon], {
-        name: 'polygon',
-        type: ['array', 'null']
+        type: Array
       })
     },
     PolygonStatus() {
@@ -25,8 +24,7 @@ export default {
     },
     PolygonCount() {
       return conclude([this.polygonCount, globalProps.polygonCount, 0], {
-        name: 'polygonCount',
-        type: ['number', 'array']
+        type: [Number, Array]
       })
     },
     PolygonMaxCount() {

@@ -19,21 +19,18 @@ export default {
     },
     Rectangle() {
       return conclude([this.rectangle, globalProps.rectangle], {
-        name: 'rectangle',
-        type: ['array', 'null']
+        type: Array
       })
     },
     RectangleImage() {
       const temp = conclude([this.rectangleImage, globalProps.rectangleImage, []], {
-        name: 'rectangleImage',
-        type: ['string', 'array']
+        type: [String, Array]
       })
       return (typeof temp === 'string') ? [temp] : temp
     },
     RectangleCount() {
       return conclude([this.rectangleCount, globalProps.rectangleCount, 0], {
-        name: 'rectangleCount',
-        type: ['number', 'array']
+        type: [Number, Array]
       })
     },
     RectangleMaxCount() {
