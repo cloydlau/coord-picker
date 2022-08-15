@@ -13,7 +13,7 @@
           e.currentTarget.blur()
         }">
         <KiSelect class="region-selector" ref="regionKiSelect" placeholder="当前城市"
-          :props="{
+          v-model="baseCity" :props="{
             value: 'id',
             label: 'name',
             groupLabel: 'name',
@@ -581,9 +581,6 @@ export default {
           this.map.setCity(n)
           this.drawDistrict(n)
         } else {
-          if (n && isNaN(n)) {
-            this.$refs.regionKiSelect.$refs.elSelect.selectedLabel = n
-          }
           this.baseCityInitialized = true
         }
       }
