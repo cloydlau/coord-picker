@@ -13,12 +13,12 @@
           e.currentTarget.blur()
         }">
         <KiSelect class="region-selector" ref="regionKiSelect" placeholder="当前城市"
-          v-model="baseCity" :props="{
-            value: 'id',
-            label: 'name',
-            groupLabel: 'name',
-            groupOptions: 'cities',
-          }" :options="cities" />
+          v-model="baseCity" :options="cities"
+          :props="{ value: 'id', label: 'name', groupLabel: 'name', groupOptions: 'cities', }"
+          @update:label="(n) => {
+            map.setCity(n)
+            drawDistrict(n)
+          }" />
       </div>
       <transition enter-active-class="animate__animated animate__backInLeft"
         leave-active-class="animate__animated animate__backOutLeft">
@@ -577,12 +577,6 @@ export default {
     baseCity(n) {
       if (this.show) {
         this.initPlugins()
-        if (this.baseCityInitialized) {
-          this.map.setCity(n)
-          this.drawDistrict(n)
-        } else {
-          this.baseCityInitialized = true
-        }
       }
     },
   },
@@ -711,7 +705,6 @@ export default {
       const base = {
         map: null,
         baseCity: '',
-        baseCityInitialized: false,
         MapOptions: {},
         imagePicker: {
           show: false,
