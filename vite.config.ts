@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite'
-import { createVuePlugin } from 'vite-plugin-vue2'
+import vue from '@vitejs/plugin-vue2'
 import Unocss from 'unocss/vite'
 import { presetUno, presetAttributify } from 'unocss'
 import Icons from 'unplugin-icons/vite'
@@ -14,7 +14,7 @@ export default defineConfig({
     }
   },
   plugins: [
-    createVuePlugin(/*options*/),
+    vue(),
     Unocss({
       presets: [
         presetAttributify({ /* options */ }),

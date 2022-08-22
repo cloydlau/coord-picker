@@ -56,6 +56,7 @@
   "devDependencies": {
     "@cloydlau/scripts": "latest",
     "@iconify/json": "latest",
+    "@vitejs/plugin-vue2": "latest",
     "element-ui": "latest",
     "json-editor-vue": "latest",
     "sass": "latest",
@@ -63,8 +64,6 @@
     "unocss": "0.43.1",
     "unplugin-icons": "latest",
     "vite": "latest",
-    "vite-plugin-vue2": "latest",
-    "vue": "2",
-    "vue-template-compiler": "latest"
+    "vue": "2"
   }
 }
