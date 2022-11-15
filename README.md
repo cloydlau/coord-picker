@@ -21,7 +21,7 @@
 - 支持限定覆盖物的数量上限、下限
 - POI 搜索、搜索关键字自动补全
 - 根据传参情况智能初始化至合适的位置
-- 全局或局部注册，参数支持全局或局部配置（[vue-global-config](https://github.com/cloydlau/vue-global-config) 提供技术支持）
+- 局部注册 + 局部传参，也可以全局注册 + 全局传参（[vue-global-config](https://github.com/cloydlau/vue-global-config) 提供技术支持）
 
 <br>
 
