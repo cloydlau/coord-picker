@@ -1,7 +1,7 @@
 import 'sweetalert2-preset/dist/style.css'
 import { warning } from 'sweetalert2-preset'
-import { notEmpty } from '../utils'
 import { conclude } from 'vue-global-config'
+import { notEmpty } from '../utils'
 import { globalProps } from '../index'
 
 export default {
@@ -12,7 +12,7 @@ export default {
   computed: {
     Polygon() {
       return conclude([this.polygon, globalProps.polygon], {
-        type: Array
+        type: Array,
       })
     },
     PolygonStatus() {
@@ -24,7 +24,7 @@ export default {
     },
     PolygonCount() {
       return conclude([this.polygonCount, globalProps.polygonCount, 0], {
-        type: [Number, Array]
+        type: [Number, Array],
       })
     },
     PolygonMaxCount() {
@@ -64,11 +64,11 @@ export default {
     syncPolygon() {
       // 同步可能经过删除、节点变化的多边形
       this.overlay.polygon = []
-      this.overlay.polygonInstance.map(v => {
+      this.overlay.polygonInstance.map((v) => {
         if (v) {
           // 新创建的polygon getPath()获取的lng和lat默认只保留6位小数 而R和Q是完整的
           this.overlay.polygon.push({
-            path: Array.from(v.getPath(), v => ({ lng: this.roundOff(v.R), lat: this.roundOff(v.Q) }))
+            path: Array.from(v.getPath(), v => ({ lng: this.roundOff(v.R), lat: this.roundOff(v.Q) })),
           })
         }
       })
@@ -77,7 +77,7 @@ export default {
       if (polygon) {
         for (let i = 0; i < polygon.length; i++) {
           const path = []
-          for (let v of polygon[i]?.path || []) {
+          for (const v of polygon[i]?.path || []) {
             if (notEmpty(v.lng) && notEmpty(v.lat)) {
               path.push([v.lng, v.lat])
             }
@@ -87,7 +87,7 @@ export default {
               ...this.polygonStyle,
               fillColor: '#00D3FC',
               map: this.map,
-              path
+              path,
             }))
             this.editPolygon({ editable })
           }
@@ -95,7 +95,7 @@ export default {
       } else {
         this.mouseTool.polygon({
           ...this.polygonStyle,
-          fillColor: 'transparent'
+          fillColor: 'transparent',
         })
       }
     },
@@ -104,44 +104,43 @@ export default {
 
       if (this.PolygonStatus === 'editable') {
         const polygonContextMenu = new AMap.ContextMenu()
-        polygonContextMenu.addItem('删除', e => {
+        polygonContextMenu.addItem('删除', (e) => {
           if (this.CurrentPolygonCount <= this.PolygonMinCount) {
             warning(`至少绘制${this.PolygonMinCount}个多边形`)
           } else {
             if (editable) {
               this.overlay.polygonEditor[i].close()
               this.$set(this.overlay.polygonEditor, i, undefined)
-
             }
             this.overlay.polygonInstance[i].setMap(null)
             this.$set(this.overlay.polygonInstance, i, undefined)
           }
         }, 0)
-        this.overlay.polygonInstance[i].on('rightclick', e => {
+        this.overlay.polygonInstance[i].on('rightclick', (e) => {
           polygonContextMenu.open(this.map, e.lnglat)
         })
       }
 
-      /*this.overlay.polygonInstance[i].on('mouseout', e => {
+      /* this.overlay.polygonInstance[i].on('mouseout', e => {
         this.text.setText('单击绘制点位')
-      })*/
+      }) */
 
       this.overlay.polygonInstance[i].on('click', this.onMapClick)
 
-      /*this.overlay.polygonInstance[i].on('mousemove', e => {
+      /* this.overlay.polygonInstance[i].on('mousemove', e => {
         this.text.setText((editable ? '拖拽角调整形状，' : '') + '右键删除')
         this.setTextPosition(e)
-      })*/
+      }) */
 
       let polygonEditor = null
       if (editable) {
-        polygonEditor = AMap.PolygonEditor ?
-          new AMap.PolygonEditor(this.map, this.overlay.polygonInstance[i]) :
-          new AMap.PolyEditor(this.map, this.overlay.polygonInstance[i])
+        polygonEditor = AMap.PolygonEditor
+          ? new AMap.PolygonEditor(this.map, this.overlay.polygonInstance[i])
+          : new AMap.PolyEditor(this.map, this.overlay.polygonInstance[i])
         polygonEditor.open()
       }
       this.overlay.polygonEditor.push(polygonEditor)
       this.overlay.polygonInstance[i].setMap(this.map)
     },
-  }
+  },
 }

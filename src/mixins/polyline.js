@@ -1,7 +1,7 @@
 import 'sweetalert2-preset/dist/style.css'
 import { warning } from 'sweetalert2-preset'
-import { notEmpty } from '../utils'
 import { conclude } from 'vue-global-config'
+import { notEmpty } from '../utils'
 import { globalProps } from '../index'
 
 export default {
@@ -12,7 +12,7 @@ export default {
   computed: {
     Polyline() {
       return conclude([this.polyline, globalProps.polyline], {
-        type: Array
+        type: Array,
       })
     },
     PolylineStatus() {
@@ -24,7 +24,7 @@ export default {
     },
     PolylineCount() {
       return conclude([this.polylineCount, globalProps.polylineCount, 0], {
-        type: [Number, Array]
+        type: [Number, Array],
       })
     },
     PolylineMaxCount() {
@@ -45,16 +45,16 @@ export default {
         zIndex: 51,
       },
       labelMarkerStyle: {
-        "direction": "top",
-        "offset": [0, 0],
-        "style": {
-          "fontSize": 12,
-          "fontWeight": "normal",
-          "fillColor": "black",
-          "backgroundColor": "#fff",
-          "padding": [2, 5, 2, 5],
-        }
-      }
+        direction: 'top',
+        offset: [0, 0],
+        style: {
+          fontSize: 12,
+          fontWeight: 'normal',
+          fillColor: 'black',
+          backgroundColor: '#fff',
+          padding: [2, 5, 2, 5],
+        },
+      },
     }
   },
   methods: {
@@ -71,11 +71,11 @@ export default {
     syncPolyline() {
       // 同步可能经过删除、节点变化的折线
       this.overlay.polyline = []
-      this.overlay.polylineInstance.map(v => {
+      this.overlay.polylineInstance.map((v) => {
         if (v) {
           // 新创建的 polyline，getPath() 获取的 lng 和 lat 默认只保留6位小数 而 R 和 Q 是完整的
           this.overlay.polyline.push({
-            path: Array.from(v.getPath(), v => ({ lng: this.roundOff(v.R), lat: this.roundOff(v.Q) }))
+            path: Array.from(v.getPath(), v => ({ lng: this.roundOff(v.R), lat: this.roundOff(v.Q) })),
           })
         }
       })
@@ -84,7 +84,7 @@ export default {
       if (polyline) {
         for (let i = 0; i < polyline.length; i++) {
           const path = []
-          for (let v of polyline[i]?.path || []) {
+          for (const v of polyline[i]?.path || []) {
             if (notEmpty(v.lng) && notEmpty(v.lat)) {
               path.push([v.lng, v.lat])
             }
@@ -92,7 +92,7 @@ export default {
           if (path.length > 0) {
             this.overlay.polylineInstance.push(new AMap.Polyline({
               ...this.polylineStyle,
-              path
+              path,
             }))
             this.editPolyline({ editable })
           }
@@ -114,7 +114,7 @@ export default {
       }
 
       const labelsLayer = new AMap.LabelsLayer({
-        //zooms: [10, 18],
+        // zooms: [10, 18],
         zIndex: 100,
         collision: true, // 开启标注避让，默认为开启，v1.4.15 新增属性
         animation: true, // 开启标注淡入动画，默认为开启，v1.4.15 新增属性
@@ -136,8 +136,8 @@ export default {
             content,
           },
           extData: {
-            index
-          }
+            index,
+          },
         }))
       })
 
@@ -151,7 +151,7 @@ export default {
       // 右键删除
       if (this.PolylineStatus === 'editable') {
         const polylineContextMenu = new AMap.ContextMenu()
-        polylineContextMenu.addItem('删除', e => {
+        polylineContextMenu.addItem('删除', (e) => {
           if (this.CurrentPolylineCount <= this.PolylineMinCount) {
             warning(`至少绘制${this.PolylineMinCount}条折线`)
           } else {
@@ -169,7 +169,7 @@ export default {
             this.$set(this.overlay.labelsLayer, i, undefined)
           }
         }, 0)
-        this.overlay.polylineInstance[i].on('rightclick', e => {
+        this.overlay.polylineInstance[i].on('rightclick', (e) => {
           polylineContextMenu.open(this.map, e.lnglat)
         })
       }

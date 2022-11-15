@@ -19,18 +19,18 @@ export default {
     },
     Rectangle() {
       return conclude([this.rectangle, globalProps.rectangle], {
-        type: Array
+        type: Array,
       })
     },
     RectangleImage() {
       const temp = conclude([this.rectangleImage, globalProps.rectangleImage, []], {
-        type: [String, Array]
+        type: [String, Array],
       })
       return (typeof temp === 'string') ? [temp] : temp
     },
     RectangleCount() {
       return conclude([this.rectangleCount, globalProps.rectangleCount, 0], {
-        type: [Number, Array]
+        type: [Number, Array],
       })
     },
     RectangleMaxCount() {
@@ -77,12 +77,12 @@ export default {
         ...image && { image },
         northeast: {
           lng: bounds.northEast ? this.roundOff(bounds.northEast.lng) : this.roundOff(bounds.northeast.lng),
-          lat: bounds.northEast ? this.roundOff(bounds.northEast.lat) : this.roundOff(bounds.northeast.lat)
+          lat: bounds.northEast ? this.roundOff(bounds.northEast.lat) : this.roundOff(bounds.northeast.lat),
         },
         southwest: {
           lng: bounds.southWest ? this.roundOff(bounds.southWest.lng) : this.roundOff(bounds.southwest.lng),
-          lat: bounds.southWest ? this.roundOff(bounds.southWest.lat) : this.roundOff(bounds.southwest.lat)
-        }
+          lat: bounds.southWest ? this.roundOff(bounds.southWest.lat) : this.roundOff(bounds.southwest.lat),
+        },
       }
       // 矩形可能不包含贴图 所以需要判空
       this.overlay.imageLayerInstance[i]?.setBounds(bounds)
@@ -98,7 +98,7 @@ export default {
 
       if (this.RectangleStatus === 'editable') {
         const contextMenu = new AMap.ContextMenu()
-        contextMenu.addItem('删除', e => {
+        contextMenu.addItem('删除', (e) => {
           if (this.CurrentRectangleCount <= this.RectangleMinCount) {
             warning(`至少绘制${this.RectangleMinCount}个矩形`)
           } else {
@@ -116,7 +116,7 @@ export default {
             }
           }
         }, 0)
-        rectangleInstance.on('rightclick', e => {
+        rectangleInstance.on('rightclick', (e) => {
           contextMenu.open(this.map, e.lnglat)
         })
       }
@@ -136,18 +136,18 @@ export default {
       if (editable) {
         this.editRectangle({
           i,
-          rectangleInstance
+          rectangleInstance,
         })
       }
     },
     editRectangle({ i, rectangleInstance }) {
-      /*rectangleInstance.on('mousemove', e => {
+      /* rectangleInstance.on('mousemove', e => {
         this.text.setText('拖拽角调整大小')
         this.setTextPosition(e)
       })
       rectangleInstance.on('mouseout', e => {
         this.text.setText('单击绘制点位')
-      })*/
+      }) */
 
       const rectangleEditor = new AMap.RectangleEditor(this.map, rectangleInstance)
 
@@ -156,34 +156,34 @@ export default {
       /**
        * 移动选框时 同步矩形角坐标
        */
-      rectangleEditor.on('adjust', e => {
+      rectangleEditor.on('adjust', (e) => {
         this.syncRectangleBounds({
           i,
-          bounds: e.bounds || e.Td // 兼容 1.x
+          bounds: e.bounds || e.Td, // 兼容 1.x
         })
       })
       // 短距离平移触发
-      /*this.text.on('mouseup', e => {
+      /* this.text.on('mouseup', e => {
         this.syncRectangleBounds(rectangleInstance.getBounds())
-      })*/
+      }) */
       // 短距离平移触发
-      rectangleInstance.on('mouseup', e => {
+      rectangleInstance.on('mouseup', (e) => {
         this.syncRectangleBounds({
           i,
-          bounds: rectangleInstance.getBounds()
+          bounds: rectangleInstance.getBounds(),
         })
       })
       // 长距离平移触发
-      /*this.map.on('mouseup', e => {
+      /* this.map.on('mouseup', e => {
         if (rectangleInstance) {
           this.syncRectangleBounds({
             i,
             bound: rectangleInstance.getBounds()
           })
         }
-      })*/
+      }) */
 
       rectangleEditor.open()
     },
-  }
+  },
 }

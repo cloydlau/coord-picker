@@ -1,7 +1,7 @@
 <template>
   <div class="toolbar">
     <div class="panel">
-      <slot/>
+      <slot />
     </div>
   </div>
 </template>
