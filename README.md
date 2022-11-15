@@ -1,8 +1,13 @@
 # coord-picker
 
-坐标拾取工具
+<p align="left">
+  <a href="https://npmjs.com/package/coord-picker"><img src="https://img.shields.io/npm/v/coord-picker.svg" alt="npm package"></a>
+  <a href="https://npmjs.com/package/coord-picker"><img src="http://img.badgesize.io/https://unpkg.com/coord-picker/dist/coord-picker.umd.js?compression=gzip&label=gziped" alt="gziped"></a>
+</p>
 
-![图片](https://raw.githubusercontent.com/cloydlau/coord-picker/master/preview.png)
+> 坐标拾取工具
+
+![preview](https://raw.githubusercontent.com/cloydlau/coord-picker/master/preview.png)
 
 <br>
 
@@ -22,28 +27,16 @@
 
 ## 安装
 
-![NPM](https://nodei.co/npm/coord-picker.png)
+### 外置依赖
 
-```sh
-npm add coord-picker element-ui
-```
+- `vue@2`
+- `element-ui`
 
-```ts
-// 全局引入
-
-import 'coord-picker/dist/style.css'
-import CoordPicker from 'coord-picker'
-
-Vue.use(CoordPicker, {
-  // 全局配置
-})
-```
+### 局部注册
 
 ```vue
-<!-- 局部引入 -->
-
 <template>
-  <CoordPicker v-bind="{/* 局部配置 */}"/>
+  <CoordPicker v-bind="{/* 局部配置 */}" />
 </template>
 
 <script>
@@ -56,67 +49,78 @@ export default {
 </script>
 ```
 
+### 全局注册
+
+```ts
+import 'coord-picker/dist/style.css'
+import CoordPicker from 'coord-picker'
+
+Vue.use(CoordPicker, {
+  // 全局配置
+})
+```
+
 <br>
 
 ## 参数
 
 ### 基础参数
 
-| 名称 | 说明 | 类型 | 可选值 | 默认值 |
-| --- | --- | --- | --- | --- |
-| show.sync | 开关 | boolean | | false |
-| loadOptions | [AMapLoader.load 的参数](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) ，其中 `loadOptions.key` 必传 | object | | |
-| mapOptions[.sync] | [AMap.Map 的参数2](https://lbs.amap.com/api/javascript-api/reference/map) | object | | |
-| city | 初始行政区 | string | | |
-| precision | 坐标精度（保留几位小数） | number | | 6 |
-| addressComponent | 地址成分 | object, function | | |
+| 名称              | 说明                                                                                                      | 类型             | 可选值 | 默认值  |
+| ----------------- | --------------------------------------------------------------------------------------------------------- | ---------------- | ------ | ------- |
+| show.sync         | 开关                                                                                                      | boolean          |        | `false` |
+| loadOptions       | [AMapLoader.load 的参数](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) ，其中 `loadOptions.key` 必传 | object           |        |         |
+| mapOptions[.sync] | [AMap.Map 的参数2](https://lbs.amap.com/api/javascript-api/reference/map)                                 | object           |        |         |
+| city              | 初始行政区                                                                                                | string           |        |         |
+| precision         | 坐标精度（保留几位小数）                                                                                  | number           |        | `6`     |
+| addressComponent  | 地址成分                                                                                                  | object, function |        |         |
 
 ### 中心点相关
 
-| 名称 | 说明 | 类型 | 可选值 | 默认值 |
-| --- | --- | --- | --- | --- |
-| lng.sync | 经度 | number, string | | |
-| lat.sync | 纬度 | number, string | | |
-| address.sync | 地址 | string | | |
+| 名称         | 说明 | 类型           | 默认值 |
+| ------------ | ---- | -------------- | ------ |
+| lng.sync     | 经度 | number, string |        |
+| lat.sync     | 纬度 | number, string |        |
+| address.sync | 地址 | string         |        |
 
 ### 点位相关
 
-| 名称 | 说明 | 类型 | 可选值 | 默认值 |
-| --- | --- | --- | --- | --- |
-| marker.sync | 点位列表 | object[] | | |
-| markerCount | 点位数量限制 | number, number[] | | 1 |
+| 名称        | 说明         | 类型             | 默认值 |
+| ----------- | ------------ | ---------------- | ------ |
+| marker.sync | 点位列表     | object[]         |        |
+| markerCount | 点位数量限制 | number, number[] | `1`    |
 
 ### 折线相关
 
-| 名称 | 说明 | 类型 | 可选值 | 默认值 |
-| --- | --- | --- | --- | --- |
-| polyline.sync | 折线列表 | object[] | | |
-| polylineCount | 折线数量限制 | number, number[] | | 0 |
+| 名称          | 说明         | 类型             | 默认值 |
+| ------------- | ------------ | ---------------- | ------ |
+| polyline.sync | 折线列表     | object[]         |        |
+| polylineCount | 折线数量限制 | number, number[] | `0`    |
 
 ### 矩形相关
 
-| 名称 | 说明 | 类型 | 可选值 | 默认值 |
-| --- | --- | --- | --- | --- |
-| rectangle.sync | 矩形 | object[] | | |
-| rectangleCount | 矩形数量限制 | number, number[] | | 0 |
-| rectangleImage | 嵌在矩形内的贴图链接 | string, string[] | | |
+| 名称           | 说明                 | 类型             | 默认值 |
+| -------------- | -------------------- | ---------------- | ------ |
+| rectangle.sync | 矩形                 | object[]         |        |
+| rectangleCount | 矩形数量限制         | number, number[] | `0`    |
+| rectangleImage | 嵌在矩形内的贴图链接 | string, string[] |        |
 
 ### 多边形相关
 
-| 名称 | 说明 | 类型 | 可选值 | 默认值 |
-| --- | --- | --- | --- | --- |
-| polygon.sync | 多边形列表 | object[] | | |
-| polygonCount | 多边形数量限制 | number, number[] | | 0 |
+| 名称         | 说明           | 类型             | 默认值 |
+| ------------ | -------------- | ---------------- | ------ |
+| polygon.sync | 多边形列表     | object[]         |        |
+| polygonCount | 多边形数量限制 | number, number[] | `0`    |
 
-坐标值类型：
+⚠ 在打开 coord-picker 之前，请确保所有参数已传入，为避免与用户的操作发生冲突，组件内部不会监听参数后续的变化
 
-- number 和 string 都能接收，但返回时，由于 JS 的 number 类型存在精度丢失问题，故返回 string
+⚠ 坐标值类型: number 和 string 都能接收，但返回时，由于 JS 的 number 类型存在精度丢失问题，故返回 string
 
 ### city
 
 > 高德 Web 服务 API 的同名参数
 
-可选值：指定城市的中文（如北京）、指定城市的中文全拼（beijing）、citycode（010）、adcode（110000），不支持县级市。当指定城市查询内容为空时，会进行全国范围内的地址转换检索。
+可选值: 指定城市的中文（如北京）、指定城市的中文全拼（beijing）、citycode（010）、adcode（110000），不支持县级市。当指定城市查询内容为空时，会进行全国范围内的地址转换检索。
 
 adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/download) 获取
 
@@ -137,12 +141,12 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
 
 ### addressComponent
 
-获取的 address 默认是包含省市区的完整地址，你可以用以下两种方式来自定义地址成分：
+获取的 address 默认是包含省市区的完整地址，你可以用以下两种方式来自定义地址成分: 
 
 - object
 
 ```
-{ 
+{
   province: true, // address 中是否包含省
   city: true,     // address 中是否包含市
   district: true  // address 中是否包含区县
@@ -165,33 +169,21 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
 
 <br>
 
-## Events
+## 事件
 
-| 名称 | 说明 | 回调参数 |
-| --- | --- | --- |
-| load | 高德地图加载完成时，即 [AMapLoader.load().then](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) | AMap（同高德） |
-| error | 调用高德 API 报错时，含 [AMapLoader.load().catch](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) | 同高德 |
-| confirm | 点击确认按钮时 | |
-| cancel | 点击取消按钮时 | |
+| 名称             | 说明                                                                                                 | 回调参数       |
+| ---------------- | ---------------------------------------------------------------------------------------------------- | -------------- |
+| load             | 高德地图加载完成时，即 [AMapLoader.load().then](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/)   | AMap（同高德） |
+| error            | 调用高德 API 报错时，含 [AMapLoader.load().catch](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) | 同高德         |
+| confirm          | 点击确认按钮时                                                                                       |                |
+| cancel           | 点击取消按钮时                                                                                       |                |
 | ...el-dialog事件 |
-
-<br>
-
-## 参数配置规则
-
-- 双向绑定参数（`v-model` / `value` / `*.sync`）仅支持局部配置
-- 其余参数均支持全局或局部配置
-
-权重：
-
-- 局部配置高于全局配置
-- 对于对象类型的参数，局部配置会与全局配置进行合并，同名属性会被局部配置覆盖
 
 <br>
 
 ## 定位优先级
 
-`“根据传参情况智能初始化至合适的位置”`，具体参数权重排序如下：
+`“根据传参情况智能初始化至合适的位置”`，具体参数权重排序如下:
 
 1. 中心点
 
@@ -357,11 +349,5 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
 ## 高德 JS-API 版本
 
 `1.4.15`（2.0存在诸多问题，性能也不如1.x，等待后续更新）
-
-<br>
-
-## Notice
-
-在打开 coord-picker 之前，请确保所有参数已传入，为避免与用户的操作发生冲突，组件内部不会监听参数后续的变化
 
 <br>

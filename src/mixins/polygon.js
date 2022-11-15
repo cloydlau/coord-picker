@@ -1,6 +1,6 @@
-import 'cozyalert/dist/style.css'
-import { warning } from 'cozyalert'
-import { notEmpty } from 'kayran'
+import 'sweetalert2-preset/dist/style.css'
+import { warning } from 'sweetalert2-preset'
+import { notEmpty } from '../utils'
 import { conclude } from 'vue-global-config'
 import { globalProps } from '../index'
 

@@ -173,11 +173,11 @@
 </template>
 
 <script>
-import { isEmpty, notEmpty, typeOf, waitFor } from 'kayran'
+import { isEmpty, notEmpty } from './utils'
 import 'kikimore/dist/style.css'
 import { Select as KiSelect, FormDialog as KiFormDialog } from 'kikimore'
-import 'cozyalert/dist/style.css'
-import { error, warning, confirm } from 'cozyalert'
+import 'sweetalert2-preset/dist/style.css'
+import { error, warning, confirm } from 'sweetalert2-preset'
 import { debounce, cloneDeep } from 'lodash-es'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
@@ -207,13 +207,13 @@ export default {
       required: true
     },
     lat: {
-      validator: value => ['string', 'null', 'number'].includes(typeOf(value)),
+      validator: value => ['string', 'number'].includes(typeof value),
     },
     lng: {
-      validator: value => ['string', 'null', 'number'].includes(typeOf(value)),
+      validator: value => ['string', 'number'].includes(typeof value),
     },
     address: {
-      validator: value => ['string', 'null'].includes(typeOf(value)),
+      validator: value => 'string' === typeof value,
     },
     city: {},
     precision: {},
@@ -403,7 +403,9 @@ export default {
                           this.searchResult = []
                           return []
                         } else {
-                          return await this.fetchSuggestions()
+                          return await this.fetchSuggestions().catch(e => {
+                            console.error(e)
+                          })
                         }
                       },
                       key: ['name'],
@@ -516,7 +518,9 @@ export default {
 
             //this.map.addControl(new AMap.ControlBar())
 
-            await this.locate()
+            await this.locate().catch(e => {
+              console.error(e)
+            })
 
             this.$emit('load', AMap)
           })
@@ -905,7 +909,9 @@ export default {
     },
     async onMapClick(e) {
       const { lng: longitude, lat: latitude } = e.lnglat
-      const [{ address, name }] = await waitFor(this.getAddress([e.lnglat.lng, e.lnglat.lat]))
+      const { address, name } = await this.getAddress([e.lnglat.lng, e.lnglat.lat]).catch(e => {
+        console.error(e)
+      })
       this.drawMarker({
         longitude,
         latitude,
@@ -936,7 +942,7 @@ export default {
         return {
           'number': () => value.toFixed(this.Precision).toString(),
           'string': () => Number(value).toFixed(this.Precision).toString()
-        }[typeOf(value)]()
+        }[typeof value]()
       }
     },
     confirm() {
@@ -1362,7 +1368,9 @@ export default {
           if (this.address) {
             address = this.address
           } else {
-            const [result] = await waitFor(this.getAddress([this.lng, this.lat]))
+            const result = await this.getAddress([this.lng, this.lat]).catch(e => {
+              console.error(e)
+            })
             address = result.address
             name = result.name
           }
@@ -1410,20 +1418,24 @@ export default {
         }
         // 初始化
         else {
-          this.baseCity = (await waitFor(this.getBaseCity()))[0]
+          this.baseCity = await this.getBaseCity().catch(e => {
+            console.error(e)
+          })
           this.initPlugins()
 
           /**
            * 绘制覆盖物
            */
-          const [result] = await waitFor(this.initOverlays())
+          const result = await this.initOverlays().catch(e => {
+            console.error(e)
+          })
           let centerDesignated = result.centerDesignated,
             hasOverlay = result.hasOverlay
 
           /**
            * 中心点定位
            */
-          // 如果没有传覆盖物且没有传zoom 给zoom赋默认值
+          // 如果没有传覆盖物且没有传 zoom，给 zoom 赋默认值
           if (centerDesignated && isEmpty(this.MapOptions.zoom)) {
             this.MapOptions.zoom = 12
           }
@@ -1438,9 +1450,11 @@ export default {
             this.setCenter([longitude, latitude])
             centerDesignated = true
           }
-          // 定位至address
+          // 定位至 address
           else if (this.address) {
-            const [result] = await waitFor(this.useAMapAPI('Geocoder.getLocation', this.address))
+            const result = await this.useAMapAPI('Geocoder.getLocation', this.address).catch(e => {
+              console.error(e)
+            })
             const { lng, lat } = result?.geocodes[0]?.location || {}
             if (notEmpty(lng) && notEmpty(lat)) {
               this.setCenter([lng, lat])

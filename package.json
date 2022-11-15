@@ -1,69 +1,77 @@
 {
   "name": "coord-picker",
   "version": "0.7.5",
+  "private": false,
+  "description": "Coordinates picker for AMap & TMap",
   "author": "cloydlau",
   "license": "MIT",
-  "description": "Coordinates picker for AMap & TMap / 高德 & 腾讯地图坐标拾取工具",
+  "repository": "https://github.com/cloydlau/coord-picker",
   "keywords": [
     "地图选点",
     "坐标拾取",
     "高德地图",
     "腾讯地图",
-    "多边形",
-    "轮廓",
     "coordinate",
     "coordinates",
     "amap",
     "tmap"
   ],
-  "private": false,
-  "repository": "https://github.com/cloydlau/coord-picker",
-  "main": "dist/coord-picker.umd.js",
-  "module": "./dist/coord-picker.mjs",
-  "files": [
-    "dist"
-  ],
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "require": "./dist/coord-picker.umd.js",
       "import": "./dist/coord-picker.mjs",
       "browser": "./dist/coord-picker.mjs"
     },
-    "./dist/style.css": "./dist/style.css"
+    "./*": "./*"
   },
+  "main": "./dist/coord-picker.umd.js",
+  "module": "./dist/coord-picker.mjs",
+  "unpkg": "./dist/coord-picker.umd.js",
+  "jsdelivr": "./dist/coord-picker.umd.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "docs"
+  ],
   "scripts": {
     "dev": "vite --open",
     "build": "vite build",
     "serve": "vite preview",
-    "test": "vitest --config ./vitest.config.ts",
-    "test2": "vitest --config ./vitest.vue2.config.ts",
-    "coverage": "vitest run --coverage"
-  },
-  "dependencies": {
-    "@amap/amap-jsapi-loader": "latest",
-    "@tarekraafat/autocomplete.js": "^9.1.1",
-    "cozyalert": "latest",
-    "kayran": "latest",
-    "kikimore": "latest",
-    "lodash-es": "latest",
-    "pic-viewer": "latest",
-    "vue-global-config": "latest"
+    "release": "npx case-police --fix && npx lint-staged && pnpm build && cl release"
   },
   "peerDependencies": {
     "element-ui": "2",
     "vue": "2"
   },
+  "dependencies": {
+    "@amap/amap-jsapi-loader": "latest",
+    "@tarekraafat/autocomplete.js": "^9.1.1",
+    "kikimore": "latest",
+    "lodash-es": "latest",
+    "pic-viewer": "latest",
+    "sweetalert2": "latest",
+    "sweetalert2-preset": "latest",
+    "vue-global-config": "latest"
+  },
   "devDependencies": {
-    "@cloydlau/scripts": "latest",
+    "@antfu/eslint-config": "latest",
     "@iconify/json": "latest",
     "@vitejs/plugin-vue2": "latest",
+    "case-police": "latest",
     "element-ui": "latest",
+    "eslint": "latest",
+    "husky": "latest",
     "json-editor-vue": "latest",
+    "lint-staged": "latest",
     "sass": "latest",
     "typescript": "latest",
     "unocss": "0.43.1",
+    "unplugin-auto-import": "0.11.2",
     "unplugin-icons": "latest",
+    "vanilla-jsoneditor": "latest",
     "vite": "latest",
-    "vue": "2"
+    "vite-plugin-dts": "latest",
+    "vue": "^2.7.14"
   }
 }
