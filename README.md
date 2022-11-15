@@ -62,9 +62,9 @@ Vue.use(CoordPicker, {
 
 <br>
 
-## 参数
+## Props
 
-### 基础参数
+> 这里仅列出基础参数，覆盖物的参数请在相关章节查看
 
 | 名称              | 说明                                                                                                      | 类型             | 可选值 | 默认值  |
 | ----------------- | --------------------------------------------------------------------------------------------------------- | ---------------- | ------ | ------- |
@@ -72,162 +72,90 @@ Vue.use(CoordPicker, {
 | loadOptions       | [AMapLoader.load 的参数](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) ，其中 `loadOptions.key` 必传 | object           |        |         |
 | mapOptions[.sync] | [AMap.Map 的参数2](https://lbs.amap.com/api/javascript-api/reference/map)                                 | object           |        |         |
 | city              | 初始行政区                                                                                                | string           |        |         |
+| lng.sync          | 经度                                                                                                      | string, number   |        |
+| lat.sync          | 纬度                                                                                                      | string, number   |        |
 | precision         | 坐标精度（保留几位小数）                                                                                  | number           |        | `6`     |
+| address.sync      | 地址                                                                                                      | string           |        |
 | addressComponent  | 地址成分                                                                                                  | object, function |        |         |
 
-### 中心点相关
-
-| 名称         | 说明 | 类型           | 默认值 |
-| ------------ | ---- | -------------- | ------ |
-| lng.sync     | 经度 | number, string |        |
-| lat.sync     | 纬度 | number, string |        |
-| address.sync | 地址 | string         |        |
-
-### 点位相关
-
-| 名称        | 说明         | 类型             | 默认值 |
-| ----------- | ------------ | ---------------- | ------ |
-| marker.sync | 点位列表     | object[]         |        |
-| markerCount | 点位数量限制 | number, number[] | `1`    |
-
-### 折线相关
-
-| 名称          | 说明         | 类型             | 默认值 |
-| ------------- | ------------ | ---------------- | ------ |
-| polyline.sync | 折线列表     | object[]         |        |
-| polylineCount | 折线数量限制 | number, number[] | `0`    |
-
-### 矩形相关
-
-| 名称           | 说明                 | 类型             | 默认值 |
-| -------------- | -------------------- | ---------------- | ------ |
-| rectangle.sync | 矩形                 | object[]         |        |
-| rectangleCount | 矩形数量限制         | number, number[] | `0`    |
-| rectangleImage | 嵌在矩形内的贴图链接 | string, string[] |        |
-
-### 多边形相关
-
-| 名称         | 说明           | 类型             | 默认值 |
-| ------------ | -------------- | ---------------- | ------ |
-| polygon.sync | 多边形列表     | object[]         |        |
-| polygonCount | 多边形数量限制 | number, number[] | `0`    |
-
-⚠ 在打开 coord-picker 之前，请确保所有参数已传入，为避免与用户的操作发生冲突，组件内部不会监听参数后续的变化
-
-⚠ 坐标值类型: number 和 string 都能接收，但返回时，由于 JS 的 number 类型存在精度丢失问题，故返回 string
+⚠ 在打开 `coord-picker` 之前，请确保所有参数已传入，为避免与用户的操作发生冲突，组件内部不会监听参数后续的变化。
 
 ### city
 
-> 高德 Web 服务 API 的同名参数
+高德 Web 服务 API 的同名参数。
 
 可选值: 指定城市的中文（如北京）、指定城市的中文全拼（beijing）、citycode（010）、adcode（110000），不支持县级市。当指定城市查询内容为空时，会进行全国范围内的地址转换检索。
 
-adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/download) 获取
+adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/download)获取。
 
 长度超过6位数？
 
 组件内部做了处理，如果你传入的 city 超过6位数，也会以仅保留前6位的形式支持。
 
-### markerCount, rectangleCount, polygonCount
-
-- number
-
-数量上限
-
-- number[]
-
-    0. 数量下限
-    1. 数量上限
-
 ### addressComponent
 
-获取的 address 默认是包含省市区的完整地址，你可以用以下两种方式来自定义地址成分: 
+获取的 address 默认是包含省市区的完整地址，你可以用以下两种方式来自定义地址成分:
 
 - object
 
-```
+```json
 {
-  province: true, // address 中是否包含省
-  city: true,     // address 中是否包含市
-  district: true  // address 中是否包含区县
+  "province": true, // address 中是否包含省
+  "city": true, // address 中是否包含市
+  "district": true // address 中是否包含区县
 }
 ```
 
 - function
 
-自由组合
-
-```
-({ province, city, district ... }) => `${province} - ${city} - ${district}`
+```ts
+({ province, city, district }) => `${province} - ${city} - ${district}`
 ```
 
 ### mapOptions
 
 为什么支持双向绑定？
 
-- mapOptions 包含可能发生变化的属性，如缩放比例（`zoom`）
-
-<br>
-
-## 事件
-
-| 名称             | 说明                                                                                                 | 回调参数       |
-| ---------------- | ---------------------------------------------------------------------------------------------------- | -------------- |
-| load             | 高德地图加载完成时，即 [AMapLoader.load().then](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/)   | AMap（同高德） |
-| error            | 调用高德 API 报错时，含 [AMapLoader.load().catch](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) | 同高德         |
-| confirm          | 点击确认按钮时                                                                                       |                |
-| cancel           | 点击取消按钮时                                                                                       |                |
-| ...el-dialog事件 |
-
-<br>
-
-## 定位优先级
-
-`“根据传参情况智能初始化至合适的位置”`，具体参数权重排序如下:
-
-1. 中心点
-
-2. 点位（单个）
-
-3. 详细地址
-
-4. 覆盖物、点位（多个）
-
-5. 参数指定的行政区
-
-6. IP所在行政区（调用高德 `CitySearch` 接口）
-
-> 1、2、3以 `setCenter` 方式定位，4以 `setFitView` 方式定位，5、6以 `setCity` 方式定位
+- mapOptions 包含可能发生变化的属性，如缩放比例 `zoom`
 
 <br>
 
 ## 绘制点位
 
-> 使用 `AMap.Marker`
+### Props
 
-### 如何启用
+| 名称        | 说明         | 类型             | 默认值 |
+| ----------- | ------------ | ---------------- | ------ |
+| marker.sync | 点位列表     | object[]         |        |
+| markerCount | 点位数量限制 | number, number[] | `1`    |
 
-- `markerCount > 0` 时，开启编辑点位功能
+#### markerCount
 
-- `markerCount === 0` 时，也会依据 marker 参数渲染点位（只读）
+类型
+- `number`: 数量上限
+- `number[]`: [数量下限, 数量上限]
 
-### 数据格式
+值
+- `markerCount > 0`: 开启编辑点位功能
+- `markerCount === 0`: 依据 marker 参数渲染点位（只读）
 
-```
+#### marker
+
+```json
 [
   // 点位1
   {
-    lng: '',
-    lat: '',
-    address: '',
-    name: ''
+    "lng": "",
+    "lat": "",
+    "address": "",
+    "name": ""
   },
   // 点位2
   {
-    lng: '',
-    lat: '',
-    address: '',
-    name: ''
+    "lng": "",
+    "lat": "",
+    "address": "",
+    "name": ""
   }
 ]
 ```
@@ -236,22 +164,33 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
 
 ## 绘制折线
 
-### 如何启用
+### Props
 
-- `polylineCount > 0` 时，开启编辑折线功能
+| 名称          | 说明         | 类型             | 默认值 |
+| ------------- | ------------ | ---------------- | ------ |
+| polyline.sync | 折线列表     | object[]         |        |
+| polylineCount | 折线数量限制 | number, number[] | `0`    |
 
-- `polylineCount === 0` 时，也会依据 polyline 参数渲染折线（只读）
+#### polylineCount
 
-### 数据格式
+类型
+- `number`: 数量上限
+- `number[]`: [数量下限, 数量上限]
 
-```
+值
+- `polylineCount > 0`: 开启编辑折线功能
+- `polylineCount === 0`: 依据 polyline 参数渲染折线（只读）
+
+#### polyline
+
+```json
 [
   // 折线1
   {
     "path": [
       { "lng": "106.627636", "lat": "26.692251" },
       { "lng": "106.604633", "lat": "26.647459" },
-      { "lng": "106.682224", "lat": "26.658505" },
+      { "lng": "106.682224", "lat": "26.658505" }
     ]
   },
   // 折线2
@@ -259,7 +198,7 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
     "path": [
       { "lng": "106.707973", "lat": "26.676606" },
       { "lng": "106.688404", "lat": "26.628739" },
-      { "lng": "106.748486", "lat": "26.678447" },
+      { "lng": "106.748486", "lat": "26.678447" }
     ]
   }
 ]
@@ -269,30 +208,40 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
 
 ## 绘制矩形
 
-> 使用 `AMap.Rectangle` 和 `AMap.ImageLayer`
+### Props
 
-### 如何启用
+| 名称           | 说明                 | 类型             | 默认值 |
+| -------------- | -------------------- | ---------------- | ------ |
+| rectangle.sync | 矩形                 | object[]         |        |
+| rectangleCount | 矩形数量限制         | number, number[] | `0`    |
+| rectangleImage | 嵌在矩形内的贴图链接 | string, string[] |        |
 
-- `rectangleCount > 0` 时，开启编辑矩形功能
+#### rectangleCount
 
-- `rectangleCount === 0` 时，也会依据 rectangle 参数渲染矩形（只读）
+类型
+- `number`: 数量上限
+- `number[]`: [数量下限, 数量上限]
 
-### 数据格式
+值
+- `rectangleCount > 0`: 开启编辑矩形功能
+- `rectangleCount === 0`: 依据 rectangle 参数渲染矩形（只读）
 
-```
+#### rectangle
+
+```json
 [
   // 矩形1
   {
-    image: '贴图链接',
-    southwest: { lng: '经度', lat: '纬度' }, // 西南角坐标（兼容东南角）
-    northeast: { lng: '经度', lat: '纬度' }, // 东北角坐标（兼容西北角）
+    "image": "贴图链接",
+    "southwest": { "lng": "经度", "lat": "纬度" }, // 西南角坐标（兼容东南角）
+    "northeast": { "lng": "经度", "lat": "纬度" } // 东北角坐标（兼容西北角）
   },
   // 矩形2
   {
-    image: '贴图链接',
-    southwest: { lng: '经度', lat: '纬度' }, // 西南角坐标（兼容东南角）
-    northeast: { lng: '经度', lat: '纬度' }, // 东北角坐标（兼容西北角）
-  },
+    "image": "贴图链接",
+    "southwest": { "lng": "经度", "lat": "纬度" }, // 西南角坐标（兼容东南角）
+    "northeast": { "lng": "经度", "lat": "纬度" } // 东北角坐标（兼容西北角）
+  }
 ]
 ```
 
@@ -300,30 +249,41 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
 
 ## 绘制多边形
 
-### 如何启用
+### Props
 
-- `polygonCount > 0` 时，开启编辑多边形功能
+| 名称         | 说明           | 类型             | 默认值 |
+| ------------ | -------------- | ---------------- | ------ |
+| polygon.sync | 多边形列表     | object[]         |        |
+| polygonCount | 多边形数量限制 | number, number[] | `0`    |
 
-- `polygonCount === 0` 时，也会依据 polygon 参数渲染多边形（只读）
+#### polygonCount
 
-### 数据格式
+类型
+- `number`: 数量上限
+- `number[]`: [数量下限, 数量上限]
 
-```
+值
+- `polygonCount > 0`: 开启编辑多边形功能
+- `polygonCount === 0`: 依据 polygon 参数渲染多边形（只读）
+
+#### polygon
+
+```json
 [
   // 多边形1
   {
-    path: [
-      { 'lng': '106.44294', 'lat': '26.644338' },
-      { 'lng': '106.431267', 'lat': '26.504937' },
-      { 'lng': '106.569282', 'lat': '26.585405' }
+    "path": [
+      { "lng": "106.44294", "lat": "26.644338" },
+      { "lng": "106.431267", "lat": "26.504937" },
+      { "lng": "106.569282", "lat": "26.585405" }
     ]
   },
   // 多边形2
   {
-    path: [
-      { 'lng': '106.623527', 'lat': '26.52767' },
-      { 'lng': '106.602241', 'lat': '26.415188' },
-      { 'lng': '106.721031', 'lat': '26.472979' }
+    "path": [
+      { "lng": "106.623527", "lat": "26.52767" },
+      { "lng": "106.602241", "lat": "26.415188" },
+      { "lng": "106.721031", "lat": "26.472979" }
     ]
   }
 ]
@@ -331,12 +291,15 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
 
 <br>
 
-## 命名规则
+## 事件
 
-为什么不使用全称 `longitude` 和 `latitude` ？
-
-- 高德自己的 API 也没有完全统一，有的用简称有的用全称，coord-picker 为方便起见统一使用简称 `lng` 和 `lat`
-- 如果命名/格式与你所需不一致，可考虑二次封装
+| 名称              | 说明                                                                                                 | 回调参数 |
+| ----------------- | ---------------------------------------------------------------------------------------------------- | -------- |
+| load              | 高德地图加载完成时，即 [AMapLoader.load().then](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/)   | AMap     |
+| error             | 调用高德 API 报错时，含 [AMapLoader.load().catch](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) | 同高德   |
+| confirm           | 点击确认按钮时                                                                                       |          |
+| cancel            | 点击取消按钮时                                                                                       |          |
+| ...el-dialog 事件 |
 
 <br>
 
@@ -346,8 +309,31 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
 
 <br>
 
+## 坐标值数据类型
+
+number 和 string 都能接收，但返回时，由于 JS 的 number 类型存在精度丢失问题，故返回 string
+
+<br>
+
 ## 高德 JS-API 版本
 
-`1.4.15`（2.0存在诸多问题，性能也不如1.x，等待后续更新）
+1.4.15
+
+> 2.0存在诸多问题，性能也不如1.x，等待后续更新
+
+<br>
+
+## 命名
+
+为什么不使用全称 `longitude` 和 `latitude` ？
+
+- 高德自己的 API 也没有完全统一，有的用简称有的用全称，coord-picker 为方便起见统一使用简称 `lng` 和 `lat`
+- 如果命名 / 格式与你所需不一致，可考虑二次封装
+
+<br>
+
+## 更新日志
+
+各版本详细改动请参考 [release notes](https://github.com/cloydlau/coord-picker/releases) 。
 
 <br>

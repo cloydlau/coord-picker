@@ -1,3 +1,5 @@
+import { isPlainObject } from 'lodash-es'
+
 export function isEmpty(value) {
   return {
     object: () =>

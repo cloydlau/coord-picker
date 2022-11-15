@@ -200,8 +200,8 @@
     </Toolbar>
 
     <div
-      v-show="!Loading" id="zoom"
-      class="absolute left-3px bottom-40px" style="color:#3297FD;position:absolute;left:3px;bottom:40px;"
+      v-show="!Loading" id="zoom" class="absolute left-3px bottom-40px"
+      style="color:#3297FD;position:absolute;left:3px;bottom:40px;"
     >
       <span class="text-45px" style="font-size:35px;">{{
         MapOptions.zoom
@@ -263,7 +263,6 @@ import 'pic-viewer/dist/style.css'
 import PicViewer from 'pic-viewer'
 import { conclude } from 'vue-global-config'
 import { globalProps } from './index'
-const prefix = `[${name}] `
 
 export default {
   name: 'CoordPicker',
@@ -477,9 +476,7 @@ export default {
                           this.searchResult = []
                           return []
                         } else {
-                          return await this.fetchSuggestions().catch((e) => {
-                            console.error(e)
-                          })
+                          return await this.fetchSuggestions()
                         }
                       },
                       key: ['name'],
@@ -539,8 +536,8 @@ export default {
             if (this.LoadOptions.plugins.includes('AMap.MouseTool')) {
               this.mouseTool = new AMap.MouseTool(this.map)
               this.mouseTool.on('draw', (e) => {
-                // 1.x：e.obj.CLASS_NAME==='AMap.Polygon'
-                // 2.x：e.obj.className==='Overlay.Rectangle'
+                // 1.x: e.obj.CLASS_NAME==='AMap.Polygon'
+                // 2.x: e.obj.className==='Overlay.Rectangle'
                 if (this.active === 'rectangle') {
                   // 绘制完毕后，恢复至初始选中的工具
                   this.active = 'marker'
@@ -566,8 +563,8 @@ export default {
                     this.mouseTool.rectangle(this.rectangleStyle)
                   }) */
                 }
-                // 1.x：e.obj.CLASS_NAME==='AMap.Polygon'
-                // 2.x：e.obj.className==='Overlay.Polygon'
+                // 1.x: e.obj.CLASS_NAME==='AMap.Polygon'
+                // 2.x: e.obj.className==='Overlay.Polygon'
                 else if (this.active === 'polygon') {
                   // 绘制完毕后，恢复至初始选中的工具
                   this.active = 'marker'
@@ -602,7 +599,7 @@ export default {
             this.$emit('update:show', false)
             this.$emit('error', e)
             console.error(e)
-            error(`高德地图初始化失败：${JSON.stringify(e)}`)
+            error(`初始化失败${typeof e === 'string' ? `: ${e}` : ''}`)
           })
           .finally((e) => {
           })
@@ -682,51 +679,51 @@ export default {
         html: `
 <ul style="text-align:left">
   ${this.MarkerStatus === 'editable'
-? `
+            ? `
   <li>点位</li>
     <ul style="margin-bottom:1rem">
-      <li>添加：选中点位工具 → 点击地图；搜索位置 → 点击搜索结果</li>
-      <li>删除：右键点位 → 点击[删除]；点位列表 → 点击右上角[×]</li>
-      <li>重置：点位工具下拉菜单 → 重置点位</li>
-      <li>清除：点位工具下拉菜单 → 清除点位</li>
+      <li>添加: 选中点位工具 → 点击地图；搜索位置 → 点击搜索结果</li>
+      <li>删除: 右键点位 → 点击[删除]；点位列表 → 点击右上角[×]</li>
+      <li>重置: 点位工具下拉菜单 → 重置点位</li>
+      <li>清除: 点位工具下拉菜单 → 清除点位</li>
     </ul>`
-: ''}
+            : ''}
   ${this.PolylineStatus === 'editable'
-? `
+            ? `
   <li>折线</li>
     <ul style="margin-bottom:1rem">
-      <li>添加：选中折线工具 → 单击地图确定起点，双击结束绘制</li>
-      <li>调整形状：拖动折线上的圆点处</li>
-      <li>删除某个点：点击这个点</li>
-      <li>删除折线：右键折线（线上，点上不行） → 点击[删除]</li>
-      <li>重置：折线工具下拉菜单 → 重置折线</li>
-      <li>清除：折线工具下拉菜单 → 清除折线</li>
+      <li>添加: 选中折线工具 → 单击地图确定起点，双击结束绘制</li>
+      <li>调整形状: 拖动折线上的圆点处</li>
+      <li>删除某个点: 点击这个点</li>
+      <li>删除折线: 右键折线（线上，点上不行） → 点击[删除]</li>
+      <li>重置: 折线工具下拉菜单 → 重置折线</li>
+      <li>清除: 折线工具下拉菜单 → 清除折线</li>
     </ul>`
-: ''}
+            : ''}
   ${this.RectangleStatus === 'editable'
-? `
+            ? `
   <li>矩形</li>
     <ul style="margin-bottom:1rem">
-      <li>添加：选中矩形工具 → 长按左键并拖动，松开完成绘制</li>
-      <li>选择贴图：矩形工具下拉菜单 → 选择贴图</li>
-      <li>调整形状：拖动矩形角上的圆点处</li>
-      <li>删除某个点：点击这个点（四个点以上时有效）</li>
-      <li>删除矩形：右键矩形 → 点击[删除]</li>
-      <li>重置：矩形工具下拉菜单 → 重置矩形</li>
-      <li>清除：矩形工具下拉菜单 → 清除矩形</li>
+      <li>添加: 选中矩形工具 → 长按左键并拖动，松开完成绘制</li>
+      <li>选择贴图: 矩形工具下拉菜单 → 选择贴图</li>
+      <li>调整形状: 拖动矩形角上的圆点处</li>
+      <li>删除某个点: 点击这个点（四个点以上时有效）</li>
+      <li>删除矩形: 右键矩形 → 点击[删除]</li>
+      <li>重置: 矩形工具下拉菜单 → 重置矩形</li>
+      <li>清除: 矩形工具下拉菜单 → 清除矩形</li>
     </ul>`
-: ''}
+            : ''}
   ${this.PolygonStatus === 'editable'
-? `
+            ? `
   <li>多边形</li>
     <ul style="margin-bottom:1rem">
-      <li>添加：选中多边形工具 → 单击地图确定起点，双击结束绘制</li>
-      <li>调整形状：拖动多边形角上的圆点处</li>
-      <li>删除：右键多边形 → 点击[删除]</li>
-      <li>重置：多边形工具下拉菜单 → 重置多边形</li>
-      <li>清除：多边形工具下拉菜单 → 清除多边形</li>
+      <li>添加: 选中多边形工具 → 单击地图确定起点，双击结束绘制</li>
+      <li>调整形状: 拖动多边形角上的圆点处</li>
+      <li>删除: 右键多边形 → 点击[删除]</li>
+      <li>重置: 多边形工具下拉菜单 → 重置多边形</li>
+      <li>清除: 多边形工具下拉菜单 → 清除多边形</li>
     </ul>`
-: ''}
+            : ''}
 </ul>
                     `,
         width: 700,
@@ -757,7 +754,7 @@ export default {
     }, */
     initPlugins() {
       /**
-       * 不写在watch原因：需要同步执行
+       * 不写在watch原因: 需要同步执行
        */
       const param = {
         city: this.baseCity,
@@ -958,42 +955,34 @@ export default {
     getAddress([lng, lat]) {
       return new Promise((resolve, reject) => {
         if (this.plugins.Geocoder) {
-          this.useAMapAPI('Geocoder.getAddress', [lng, lat])
-            .then((result) => {
-              if (result.regeocode?.formattedAddress) {
-                const { province, city, district, township } = result.regeocode.addressComponent
-                const name = result.regeocode.formattedAddress.replace(province + city + district + township, '')
-                if (typeof this.AddressComponent === 'function') {
-                  resolve({ address: this.AddressComponent(result.regeocode.addressComponent), name })
-                } else {
-                  let address = result.regeocode.formattedAddress
-                  for (const k in this.AddressComponent) {
-                    if (this.AddressComponent[k] === false) {
-                      address = address.replace(result.regeocode.addressComponent[k], '')
-                    }
-                  }
-                  resolve({ city, address, name })
-                }
+          this.useAMapAPI('Geocoder.getAddress', [lng, lat]).then(({ regeocode }) => {
+            if (regeocode?.formattedAddress) {
+              const { province, city, district, township } = regeocode.addressComponent
+              const name = regeocode.formattedAddress.replace(province + city + district + township, '')
+              if (typeof this.AddressComponent === 'function') {
+                resolve({ address: this.AddressComponent(regeocode.addressComponent), name })
               } else {
-                reject()
+                let address = regeocode.formattedAddress
+                for (const k in this.AddressComponent) {
+                  if (this.AddressComponent[k] === false) {
+                    address = address.replace(regeocode.addressComponent[k], '')
+                  }
+                }
+                resolve({ city, address, name })
               }
-            }).catch((e) => {
-              console.error(e)
-            })
-            .catch((result) => {
-              reject()
-            })
+            } else {
+              resolve({})
+            }
+          })
         } else {
-          // baseCity为空时
-          resolve()
+          // baseCity 为空时
+          resolve({})
         }
       })
     },
     async onMapClick(e) {
       const { lng: longitude, lat: latitude } = e.lnglat
-      const { address, name } = await this.getAddress([e.lnglat.lng, e.lnglat.lat]).catch((e) => {
-        console.error(e)
-      })
+      const { address, name } = await this.getAddress([e.lnglat.lng, e.lnglat.lat])
       this.drawMarker({
         longitude,
         latitude,
@@ -1002,20 +991,7 @@ export default {
       })
     },
     fetchSuggestions(queryString, cb) {
-      return new Promise((resolve, reject) => {
-        this.useAMapAPI('AutoComplete.search', this.keyword)
-          .then((result) => {
-            resolve(result.tips || [])
-          })
-          .catch((result, status) => {
-            if (status === 'no_data') {
-              resolve([])
-            } else {
-              error(result)
-              reject()
-            }
-          })
-      })
+      return this.useAMapAPI('AutoComplete.search', this.keyword).then(({ tips }) => tips || [])
     },
     roundOff(value) {
       if (isEmpty(value)) {
@@ -1222,9 +1198,7 @@ export default {
             return recycledListElement
           }
 
-          return `<li class="poibox">${
-            innerHTML
-            }</li>`
+          return `<li class="poibox">${innerHTML}</li>`
         },
         // 列表节点上监听的事件
         listElementEvents: ['click', 'mouseenter', 'mouseleave'],
@@ -1348,21 +1322,17 @@ export default {
     },
     drawDistrict(districtName) {
       if (districtName && this.PolygonStatus === 'editable') {
-        this.useAMapAPI('DistrictSearch.search', districtName)
-          .then((result) => {
-            const bounds = result.districtList?.[0]?.boundaries
-            if (bounds?.length) {
-              confirm(`是否绘制${districtName}轮廓？`)
-                .then(() => {
-                  this.drawPolygon({
-                    polygon: Array.from(bounds, v => ({ path: v })),
-                    editable: false,
-                  })
-                })
-            }
-          })
-          .catch((result, status) => {
-          })
+        this.useAMapAPI('DistrictSearch.search', districtName).then(({ districtList }) => {
+          const bounds = districtList?.[0]?.boundaries
+          if (bounds?.length) {
+            confirm(`是否绘制${districtName}轮廓？`).then(() => {
+              this.drawPolygon({
+                polygon: Array.from(bounds, v => ({ path: v })),
+                editable: false,
+              })
+            })
+          }
+        })
       }
     },
     async initOverlays(arr) {
@@ -1448,9 +1418,7 @@ export default {
           if (this.address) {
             address = this.address
           } else {
-            const result = await this.getAddress([this.lng, this.lat]).catch((e) => {
-              console.error(e)
-            })
+            const result = await this.getAddress([this.lng, this.lat])
             address = result.address
             name = result.name
           }
@@ -1498,9 +1466,7 @@ export default {
         }
         // 初始化
         else {
-          this.baseCity = await this.getBaseCity().catch((e) => {
-            console.error(e)
-          })
+          this.baseCity = await this.getBaseCity()
           this.initPlugins()
 
           /**
@@ -1532,9 +1498,7 @@ export default {
           }
           // 定位至 address
           else if (this.address) {
-            const result = await this.useAMapAPI('Geocoder.getLocation', this.address).catch((e) => {
-              console.error(e)
-            })
+            const result = await this.useAMapAPI('Geocoder.getLocation', this.address)
             const { lng, lat } = result?.geocodes[0]?.location || {}
             if (notEmpty(lng) && notEmpty(lat)) {
               this.setCenter([lng, lat])
@@ -1565,7 +1529,7 @@ export default {
       }
     },
     getBaseCity() {
-      // 直辖市：['110100', '120100', '310100', '500100']
+      // 直辖市: ['110100', '120100', '310100', '500100']
       let City = conclude([this.city, globalProps.city, ''], {
         type: String,
       })
@@ -1582,13 +1546,9 @@ export default {
           resolve(City)
         } else {
           this.plugins.CitySearch = new AMap.CitySearch()
-          this.useAMapAPI('CitySearch.getLocalCity')
-            .then((result) => {
-              resolve(result.city)
-            })
-            .catch((result) => {
-              reject()
-            })
+          this.useAMapAPI('CitySearch.getLocalCity').then(({ city }) => {
+            resolve(city)
+          })
         }
       })
     },
@@ -1599,18 +1559,11 @@ export default {
       }
       this.searching = true
       this.debounce('search', () => {
-        this.useAMapAPI('PlaceSearch.search', this.keyword)
-          .then((result) => {
-            this.searchResult = result.poiList?.pois || []
-          })
-          .catch((result) => {
-            if (result.info === 'TIP_CITIES') {
-              this.$message.info('未找到相关结果，尝试输入更精确的关键字，或切换城市哦')
-            }
-          })
-          .finally(() => {
-            this.searching = false
-          })
+        this.useAMapAPI('PlaceSearch.search', this.keyword).then(({ poiList }) => {
+          this.searchResult = poiList?.pois || []
+        }).finally(() => {
+          this.searching = false
+        })
       }, null, 500)
     },
     useAMapAPI() {
@@ -1621,12 +1574,15 @@ export default {
       args.shift()
       return new Promise((resolve, reject) => {
         this.plugins[plugin][fn](...args, (status, result) => {
-          console.log(prefix, `高德 Web 服务 API ${apiName} 参数：`, args, '，返回值：\n', result, status)
-          if (status === 'complete' && result.info === 'OK') {
-            resolve(result, status)
-          } else {
-            reject(result, status)
-            this.$emit('error', status, result)
+          const OK = result.info === 'OK'
+          const color = OK ? '#409EFF' : '#FF0000'
+          console.log(`%c调用高德 Web 服务 API: ${apiName}`, `color:${color}; font-weight:bold;`,
+            '\n  参数: ', args,
+            '\n  返回值: ', result)
+          resolve(result)
+          if (!OK) {
+            this.$emit('error', result)
+            error(result.info)
           }
           this.loading = false
         })

@@ -73,5 +73,13 @@
     "vite": "latest",
     "vite-plugin-dts": "latest",
     "vue": "^2.7.14"
+  },
+  "lint-staged": {
+    "!(demo/**/*)*.{js,ts,tsx,vue,md}": [
+      "eslint --fix"
+    ]
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   }
 }

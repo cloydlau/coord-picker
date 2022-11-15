@@ -3,9 +3,9 @@ import App from './index.vue'
 
 import 'element-ui/lib/theme-chalk/index.css'
 import ElementUI from 'element-ui'
-Vue.use(ElementUI)
 
 import CoordPicker from '../src'
+Vue.use(ElementUI)
 window._AMapSecurityConfig = { securityJsCode: import.meta.env.VITE_APP_SCURITY_JS_CODE }
 Vue.use(CoordPicker, {
   loadOptions: {
@@ -17,7 +17,7 @@ Vue.use(CoordPicker, {
     province: true,
     city: true,
     district: true,
-  }
+  },
 })
 
 Vue.config.productionTip = false
