@@ -1,7 +1,7 @@
 import path from 'path'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue2'
-import Unocss from 'unocss/vite'
+import UnoCSS from 'unocss/vite'
 import { presetAttributify, presetUno } from 'unocss'
 import Icons from 'unplugin-icons/vite'
 import dts from 'vite-plugin-dts'
@@ -20,7 +20,7 @@ export default defineConfig({
   },
   plugins: [
     vue(),
-    Unocss({
+    UnoCSS({
       presets: [
         presetAttributify({ /* options */ }),
         presetUno(),

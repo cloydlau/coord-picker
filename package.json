@@ -1,6 +1,6 @@
 {
   "name": "coord-picker",
-  "version": "0.7.5",
+  "version": "0.7.6",
   "private": false,
   "description": "Coordinates picker for AMap & TMap",
   "author": "cloydlau",
