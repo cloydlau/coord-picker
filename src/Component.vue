@@ -599,7 +599,10 @@ export default {
             this.$emit('update:show', false)
             this.$emit('error', e)
             console.error(e)
-            error(`初始化失败${typeof e === 'string' ? `: ${e}` : ''}`)
+            error({
+              titleText: '高德地图初始化失败',
+              ...typeof e === 'string' && { text: e },
+            })
           })
           .finally((e) => {
           })
