@@ -78,7 +78,7 @@ Vue.use(CoordPicker, {
 | address.sync      | 地址                                                                                                      | string           |
 | addressComponent  | 地址成分                                                                                                  | object, function |         |
 
-⚠ 在打开 `coord-picker` 之前，请确保所有参数已传入，为避免与用户的操作发生冲突，组件内部不会监听参数后续的变化。
+> ⚠ 在打开 `coord-picker` 之前，请确保所有参数已传入，为避免与用户的操作发生冲突，组件内部不会监听参数后续的变化。
 
 ### city
 
