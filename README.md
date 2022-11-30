@@ -82,19 +82,32 @@ Vue.use(CoordPicker, {
 
 <body>
   <div id="app">
-    <coord-picker show></coord-picker>
+    <coord-picker
+      show
+      :load-options="loadOptions"
+    ></coord-picker>
   </div>
   <script src="https://unpkg.com/vue@2"></script>
   <script src="https://unpkg.com/element-ui/lib/index.js"></script>
   <script src="https://unpkg.com/coord-picker@0.8"></script>
   <script>
+    window._AMapSecurityConfig = { serviceHost: 'xxx/_AMapService/' }
+
     new Vue({
       components: { CoordPicker },
+      data() {
+        return {
+          loadOptions: {
+            key: 'xxx',
+          },
+        }
+      },
     }).$mount('#app')
   </script>
 </body>
 
 </html>
+
 ```
 
 <br>

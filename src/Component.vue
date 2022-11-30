@@ -514,130 +514,132 @@ export default {
     },
   },
   watch: {
-    show(n, o) {
-      if (n) {
-        this.MapOptions = conclude([this.mapOptions, globalProps.mapOptions, {
-          // viewMode: '3D',
-        }], {
-          type: Object,
-        })
+    show: {
+      immediate: true,
+      handler(n, o) {
+        if (n) {
+          this.MapOptions = conclude([this.mapOptions, globalProps.mapOptions, {
+            // viewMode: '3D',
+          }], {
+            type: Object,
+          })
 
-        // this.customClass = 'animate__animated animate__zoomIn'
-        AMapLoader.load(this.LoadOptions)
-          .then(async (AMap) => {
-            this.map = new AMap.Map('map-container', this.MapOptions)
+          // this.customClass = 'animate__animated animate__zoomIn'
+          AMapLoader.load(this.LoadOptions)
+            .then(async (AMap) => {
+              this.map = new AMap.Map('map-container', this.MapOptions)
 
-            this.map.on('complete', () => {
-              this.$nextTick(() => {
-                /* this.meny = Meny.create({
-                  // The element that will be animated in from off screen
-                  menuElement: document.querySelector('.drawer'),
-                  // The contents that gets pushed aside while Meny is active
-                  contentsElement: document.querySelector('#map-container'),
-                  // [optional] The alignment of the menu (top/right/bottom/left)
-                  position: Meny.getQuery().p || 'left',
-                  // [optional] The height of the menu (when using top/bottom position)
-                  height: 200,
-                  // [optional] The width of the menu (when using left/right position)
-                  width: 384,
-                  // [optional] Distance from mouse (in pixels) when menu should open
-                  threshold: 40,
-                  // [optional] Use mouse movement to automatically open/close
-                  mouse: true,
-                  // [optional] Use touch swipe events to open/close
-                  touch: true,
-                  angle: 15.5
-                }) */
+              this.map.on('complete', () => {
+                this.$nextTick(() => {
+                  /* this.meny = Meny.create({
+                    // The element that will be animated in from off screen
+                    menuElement: document.querySelector('.drawer'),
+                    // The contents that gets pushed aside while Meny is active
+                    contentsElement: document.querySelector('#map-container'),
+                    // [optional] The alignment of the menu (top/right/bottom/left)
+                    position: Meny.getQuery().p || 'left',
+                    // [optional] The height of the menu (when using top/bottom position)
+                    height: 200,
+                    // [optional] The width of the menu (when using left/right position)
+                    width: 384,
+                    // [optional] Distance from mouse (in pixels) when menu should open
+                    threshold: 40,
+                    // [optional] Use mouse movement to automatically open/close
+                    mouse: true,
+                    // [optional] Use touch swipe events to open/close
+                    touch: true,
+                    angle: 15.5
+                  }) */
 
-                const autoCompleteEl = document.querySelector('#autoComplete')
-                autoCompleteEl.addEventListener('blur', (e) => {
-                  const el = document.querySelector('#autoComplete_list')
-                  if (el) {
-                    el.style.visibility = 'hidden'
-                  }
-                })
-                autoCompleteEl.addEventListener('focus', (e) => {
-                  const el = document.querySelector('#autoComplete_list')
-                  if (el) {
-                    document.querySelector('#autoComplete_list').style.visibility = 'visible'
-                  }
-                })
-
-                if (!this.autoCompleteInput) {
-                  this.autoCompleteInput = new AutoComplete({
-                    data: { // Data src [Array, Function, Async] | (REQUIRED)
-                      src: async () => {
-                        if (isEmpty(this.keyword)) {
-                          this.searchResult = []
-                          return []
-                        } else {
-                          return await this.fetchSuggestions()
-                        }
-                      },
-                      key: ['name'],
-                      cache: false,
-                    },
-                    placeHolder: '搜索位置', // Place Holder text                 | (Optional)
-                    selector: '#autoComplete', // Input field selector              | (Optional)
-                    threshold: 1, // Min. Chars length to start Engine | (Optional)
-                    debounce: 300, // Post duration for engine to start | (Optional)
-                    searchEngine: 'loose', // Search Engine type/mode           | (Optional)
-                    resultsList: { // Rendered results list object      | (Optional)
-                      render: true,
-                    },
-                    maxResults: 10, // Max. number of rendered results | (Optional)
-                    highlight: true, // Highlight matching results      | (Optional)
-                    onSelection: (feedback) => { // Action script onSelection event | (Optional)
-                      // console.log(feedback.selection.value.image_url)
-                      this.keyword = feedback.selection.value.name
-                      document.querySelector('#autoComplete_list').style.visibility = 'hidden'
-                    },
+                  const autoCompleteEl = document.querySelector('#autoComplete')
+                  autoCompleteEl.addEventListener('blur', (e) => {
+                    const el = document.querySelector('#autoComplete_list')
+                    if (el) {
+                      el.style.visibility = 'hidden'
+                    }
                   })
-                }
+                  autoCompleteEl.addEventListener('focus', (e) => {
+                    const el = document.querySelector('#autoComplete_list')
+                    if (el) {
+                      document.querySelector('#autoComplete_list').style.visibility = 'visible'
+                    }
+                  })
 
-                this.initializing = false
+                  if (!this.autoCompleteInput) {
+                    this.autoCompleteInput = new AutoComplete({
+                      data: { // Data src [Array, Function, Async] | (REQUIRED)
+                        src: async () => {
+                          if (isEmpty(this.keyword)) {
+                            this.searchResult = []
+                            return []
+                          } else {
+                            return await this.fetchSuggestions()
+                          }
+                        },
+                        key: ['name'],
+                        cache: false,
+                      },
+                      placeHolder: '搜索位置', // Place Holder text                 | (Optional)
+                      selector: '#autoComplete', // Input field selector              | (Optional)
+                      threshold: 1, // Min. Chars length to start Engine | (Optional)
+                      debounce: 300, // Post duration for engine to start | (Optional)
+                      searchEngine: 'loose', // Search Engine type/mode           | (Optional)
+                      resultsList: { // Rendered results list object      | (Optional)
+                        render: true,
+                      },
+                      maxResults: 10, // Max. number of rendered results | (Optional)
+                      highlight: true, // Highlight matching results      | (Optional)
+                      onSelection: (feedback) => { // Action script onSelection event | (Optional)
+                        // console.log(feedback.selection.value.image_url)
+                        this.keyword = feedback.selection.value.name
+                        document.querySelector('#autoComplete_list').style.visibility = 'hidden'
+                      },
+                    })
+                  }
+
+                  this.initializing = false
+                })
               })
-            })
 
-            // 在图面添加比例尺控件，展示地图在当前层级和纬度下的比例尺
-            this.map.addControl(new AMap.Scale())
+              // 在图面添加比例尺控件，展示地图在当前层级和纬度下的比例尺
+              this.map.addControl(new AMap.Scale())
 
-            // 在图面添加类别切换控件，实现默认图层与卫星图、实施交通图层之间切换的控制
-            this.map.addControl(new AMap.MapType())
+              // 在图面添加类别切换控件，实现默认图层与卫星图、实施交通图层之间切换的控制
+              this.map.addControl(new AMap.MapType())
 
-            this.active = 'marker'
+              this.active = 'marker'
 
-            /* this.text = new AMap.Text({
-              anchor: 'center', // 设置文本标记锚点
-              offset: new AMap.Pixel(0, -20),
-              style: {
-                'border-radius': '17.5px',
-                'padding': '5px 10px',
-                'border-width': 0,
-                'box-shadow': '0 2px 6px 0 rgba(114, 124, 245, .5)',
-                'text-align': 'center',
-              },
-              //zIndex: 9999 // MarkerList始终比它高10
-            })
-            this.text.setMap(this.map)
-            this.map.on('mousemove', this.setTextPosition) */
+              /* this.text = new AMap.Text({
+                anchor: 'center', // 设置文本标记锚点
+                offset: new AMap.Pixel(0, -20),
+                style: {
+                  'border-radius': '17.5px',
+                  'padding': '5px 10px',
+                  'border-width': 0,
+                  'box-shadow': '0 2px 6px 0 rgba(114, 124, 245, .5)',
+                  'text-align': 'center',
+                },
+                //zIndex: 9999 // MarkerList始终比它高10
+              })
+              this.text.setMap(this.map)
+              this.map.on('mousemove', this.setTextPosition) */
 
-            this.map.on('click', this.onMapClick)
+              this.map.on('click', this.onMapClick)
 
-            if (notEmpty(this.MapOptions.zoom)) {
-              this.MapOptions.zoom = Number(this.MapOptions.zoom)
-            }
+              if (notEmpty(this.MapOptions.zoom)) {
+                this.MapOptions.zoom = Number(this.MapOptions.zoom)
+              }
 
-            if (this.LoadOptions.plugins.includes('AMap.MouseTool')) {
-              this.mouseTool = new AMap.MouseTool(this.map)
-              this.mouseTool.on('draw', (e) => {
-                // 1.x: e.obj.CLASS_NAME==='AMap.Polygon'
-                // 2.x: e.obj.className==='Overlay.Rectangle'
-                if (this.active === 'rectangle') {
-                  // 绘制完毕后，恢复至初始选中的工具
-                  this.active = 'marker'
-                  // 如果矩形只允许有一个 清除之前绘制的
-                  /* if (
+              if (this.LoadOptions.plugins.includes('AMap.MouseTool')) {
+                this.mouseTool = new AMap.MouseTool(this.map)
+                this.mouseTool.on('draw', (e) => {
+                  // 1.x: e.obj.CLASS_NAME==='AMap.Polygon'
+                  // 2.x: e.obj.className==='Overlay.Rectangle'
+                  if (this.active === 'rectangle') {
+                    // 绘制完毕后，恢复至初始选中的工具
+                    this.active = 'marker'
+                    // 如果矩形只允许有一个 清除之前绘制的
+                    /* if (
                     this.Rectangle?.length === 1 &&
                     this.overlay.rectangleInstance.length === 1 &&
                     this.RectangleMaxCount === 1
@@ -645,72 +647,73 @@ export default {
                     this.overlay.rectangleInstance.pop().setMap(null)
                     this.overlay.rectangleEditor.pop().close()
                   } */
-                  // this.overlay.rectangleInstance.push(e.obj)
-                  // this.editRectangle(this.overlay.rectangleInstance.getBounds()) 1.x中编辑绘制出来矩形会报错
-                  e.obj.setMap(null) // 1.x改为销毁绘制出来的矩形并新建一个矩形对象
+                    // this.overlay.rectangleInstance.push(e.obj)
+                    // this.editRectangle(this.overlay.rectangleInstance.getBounds()) 1.x中编辑绘制出来矩形会报错
+                    e.obj.setMap(null) // 1.x改为销毁绘制出来的矩形并新建一个矩形对象
 
-                  this.drawRectangle({
-                    image: this.curImage,
-                    bounds: e.obj.getBounds(),
-                  })
+                    this.drawRectangle({
+                      image: this.curImage,
+                      bounds: e.obj.getBounds(),
+                    })
 
-                  /* this.$nextTick(() => {
-                    this.mouseTool.rectangle(this.rectangleStyle)
-                  }) */
-                }
-                // 1.x: e.obj.CLASS_NAME==='AMap.Polygon'
-                // 2.x: e.obj.className==='Overlay.Polygon'
-                else if (this.active === 'polygon') {
-                  // 绘制完毕后，恢复至初始选中的工具
-                  this.active = 'marker'
-                  e.obj.setOptions({
-                    ...this.polygonStyle,
-                    fillColor: '#00D3FC',
-                  })
-                  this.overlay.polygonInstance.push(e.obj)
-                  this.editPolygon({ editable: true })
-                } else if (this.active === 'polyline') {
-                  // 绘制完毕后，恢复至初始选中的工具
-                  this.active = 'marker'
-                  e.obj.setOptions({
-                    ...this.polylineStyle,
-                  })
-                  this.overlay.polylineInstance.push(e.obj)
-                  this.editPolyline({ editable: true })
-                }
-                this.mouseTool.close()
+                    /* this.$nextTick(() => {
+                      this.mouseTool.rectangle(this.rectangleStyle)
+                    }) */
+                  }
+                  // 1.x: e.obj.CLASS_NAME==='AMap.Polygon'
+                  // 2.x: e.obj.className==='Overlay.Polygon'
+                  else if (this.active === 'polygon') {
+                    // 绘制完毕后，恢复至初始选中的工具
+                    this.active = 'marker'
+                    e.obj.setOptions({
+                      ...this.polygonStyle,
+                      fillColor: '#00D3FC',
+                    })
+                    this.overlay.polygonInstance.push(e.obj)
+                    this.editPolygon({ editable: true })
+                  } else if (this.active === 'polyline') {
+                    // 绘制完毕后，恢复至初始选中的工具
+                    this.active = 'marker'
+                    e.obj.setOptions({
+                      ...this.polylineStyle,
+                    })
+                    this.overlay.polylineInstance.push(e.obj)
+                    this.editPolyline({ editable: true })
+                  }
+                  this.mouseTool.close()
+                })
+              }
+
+              // this.map.addControl(new AMap.ControlBar())
+
+              await this.locate().catch((e) => {
+                console.error(e)
               })
-            }
 
-            // this.map.addControl(new AMap.ControlBar())
-
-            await this.locate().catch((e) => {
+              this.$emit('load', AMap)
+            }).catch((e) => {
+              this.$emit('update:show', false)
+              this.$emit('error', e)
               console.error(e)
+              SwalPreset.error({
+                titleText: '高德地图初始化失败',
+                ...typeof e === 'string' && { text: e },
+              })
             })
-
-            this.$emit('load', AMap)
-          }).catch((e) => {
-            this.$emit('update:show', false)
-            this.$emit('error', e)
-            console.error(e)
-            SwalPreset.error({
-              titleText: '高德地图初始化失败',
-              ...typeof e === 'string' && { text: e },
-            })
-          })
-      } else {
-        // 正常退出
-        if (this.map) {
-          // this.customClass = 'animate__animated animate__zoomOut'
-          window.__CoordPicker__deleteMarker = undefined
-          this.searchResult = []
-          this.keyword = ''
-          this.map.destroy()
-          // 如果乾坤的子系统共享一个window对象 会导致报错——'禁止多种API加载方式混用'
-          AMapLoader.reset()
-          this.clear()
+        } else {
+          // 正常退出
+          if (this.map) {
+            // this.customClass = 'animate__animated animate__zoomOut'
+            window.__CoordPicker__deleteMarker = undefined
+            this.searchResult = []
+            this.keyword = ''
+            this.map.destroy()
+            // 如果乾坤的子系统共享一个 window 对象，会报错: '禁止多种API加载方式混用'
+            AMapLoader.reset()
+            this.clear()
+          }
         }
-      }
+      },
     },
     keyword() {
       this.search()
