@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue2'
 import UnoCSS from 'unocss/vite'
 import { presetAttributify, presetUno } from 'unocss'
+import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 import Icons from 'unplugin-icons/vite'
 import dts from 'vite-plugin-dts'
 import AutoImport from 'unplugin-auto-import/vite'
@@ -27,6 +28,7 @@ export default defineConfig({
         // ...other presets
       ],
     }),
+    cssInjectedByJsPlugin(),
     Icons(),
     AutoImport({
       // targets to transform
@@ -54,6 +56,7 @@ export default defineConfig({
       name,
       entry: 'src/index.ts',
     },
+    cssCodeSplit: true,
     sourcemap: true,
     rollupOptions: {
       external: ['element-ui', 'vue'],

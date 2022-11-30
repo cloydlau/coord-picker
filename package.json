@@ -41,7 +41,7 @@
     "release": "npx case-police --fix && npx lint-staged && pnpm build && cl release"
   },
   "peerDependencies": {
-    "element-ui": "2",
+    "element-ui": ">=2",
     "vue": "2"
   },
   "dependencies": {
@@ -70,11 +70,12 @@
     "lint-staged": "latest",
     "sass": "latest",
     "typescript": "latest",
-    "unocss": "0.43.1",
+    "unocss": "latest",
     "unplugin-auto-import": "latest",
     "unplugin-icons": "latest",
     "vanilla-jsoneditor": "latest",
     "vite": "latest",
+    "vite-plugin-css-injected-by-js": "latest",
     "vite-plugin-dts": "latest",
     "vue": "^2.7.14"
   },
@@ -84,6 +85,6 @@
     ]
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
+    "registry": "https://registry.npmjs.org"
   }
 }

@@ -36,6 +36,8 @@
 - `vue@2`
 - `element-ui`
 
+<br>
+
 ### 局部注册
 
 ```vue
@@ -44,7 +46,6 @@
 </template>
 
 <script>
-import 'coord-picker/dist/style.css'
 import CoordPicker from 'coord-picker'
 
 export default {
@@ -53,10 +54,11 @@ export default {
 </script>
 ```
 
+<br>
+
 ### 全局注册
 
 ```ts
-import 'coord-picker/dist/style.css'
 import CoordPicker from 'coord-picker'
 
 Vue.use(CoordPicker, {
