@@ -825,7 +825,6 @@ export default {
 </ul>
                     `,
         width: 700,
-        confirmButtonText: 'ok',
         cancelButtonText: '不再提示',
         showCancelButton: false,
       })
@@ -902,6 +901,8 @@ export default {
                 customClass: {
                   popup: 'coord-picker-confirm',
                 },
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
               })
             }
           },
@@ -1423,7 +1424,11 @@ export default {
         this.useAMapAPI('DistrictSearch.search', districtName).then(({ districtList }) => {
           const bounds = districtList?.[0]?.boundaries
           if (bounds?.length) {
-            SwalPreset.confirm(`是否绘制${districtName}轮廓？`).then(() => {
+            SwalPreset.confirm({
+              titleText: `是否绘制${districtName}轮廓？`,
+              confirmButtonText: '是',
+              cancelButtonText: '否',
+            }).then(() => {
               this.drawPolygon({
                 polygon: Array.from(bounds, v => ({ path: v })),
                 editable: false,

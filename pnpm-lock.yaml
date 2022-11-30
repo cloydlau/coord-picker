@@ -40,7 +40,7 @@ dependencies:
   lodash-es: 4.17.21
   pic-viewer: 0.7.0_vue@2.7.14
   sweetalert2: 11.6.14
-  sweetalert2-preset: 0.1.0_sweetalert2@11.6.14
+  sweetalert2-preset: 0.2.0_sweetalert2@11.6.14
   vue-global-config: 0.2.6_vue@2.7.14
 
 devDependencies:
@@ -4273,8 +4273,8 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /sweetalert2-preset/0.1.0_sweetalert2@11.6.14:
-    resolution: {integrity: sha512-aL3lDftlkKuffZAxpczCg4BqVnABWaY6Brwn5BV0rJ6VFfpQhbsBowUvXP/lzY8Si9X8NTBVMlsRImK7YPysMQ==}
+  /sweetalert2-preset/0.2.0_sweetalert2@11.6.14:
+    resolution: {integrity: sha512-AD4vcWiy64E+StoeSaxn6WmQoC2o446P6f75NhLYHXf3yBgPB+r/BjTFdowMOCLawUT5Bgjag9Vd9Ndk2XkZiw==}
     peerDependencies:
       sweetalert2: '>=11'
     dependencies:
