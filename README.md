@@ -66,6 +66,45 @@ Vue.use(CoordPicker, {
 
 <br>
 
+### CDN + ESM
+
+> ⚠ 暂不支持（ElementUI 未提供 ESM 导出）
+
+<br>
+
+### CDN + UMD
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"
+  >
+</head>
+
+<body>
+  <div id="app">
+    <coord-picker show></coord-picker>
+  </div>
+  <script src="https://unpkg.com/vue@2"></script>
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <script src="https://unpkg.com/coord-picker@0.8"></script>
+  <script>
+    new Vue({
+      components: { CoordPicker },
+    }).$mount('#app')
+  </script>
+</body>
+
+</html>
+```
+
+<br>
+
 ## Props
 
 > 这里仅列出基础参数，覆盖物的参数请在相关章节查看

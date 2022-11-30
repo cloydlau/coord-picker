@@ -253,11 +253,11 @@ import autoComplete from '@tarekraafat/autocomplete.js/dist/js/autoComplete'
 // import './styles/meny-arrow.scss'
 import './styles/autocomplete.scss'
 import './styles/marker-list.scss'
+import { pascalCasedName as name } from '../package.json'
 import polygon from '@/mixins/polygon'
 import polyline from '@/mixins/polyline'
 import rectangle from '@/mixins/rectangle'
 import Toolbar from '@/components/Toolbar.vue'
-import { name } from '../package.json'
 import cities from './assets/city.json'
 import 'pic-viewer/dist/style.css'
 import PicViewer from 'pic-viewer'
@@ -265,8 +265,8 @@ import { conclude } from 'vue-global-config'
 import { globalProps } from './index'
 
 export default {
-  name: 'CoordPicker',
   components: { Toolbar, KiSelect, KiFormDialog, PicViewer },
+  name,
   mixins: [polygon, polyline, rectangle],
   props: {
     show: {

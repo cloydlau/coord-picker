@@ -6,7 +6,7 @@ import { presetAttributify, presetUno } from 'unocss'
 import Icons from 'unplugin-icons/vite'
 import dts from 'vite-plugin-dts'
 import AutoImport from 'unplugin-auto-import/vite'
-import { name } from './package.json'
+import { name, pascalCasedName } from './package.json'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -59,6 +59,7 @@ export default defineConfig({
       external: ['element-ui', 'vue'],
       output: {
         globals: {
+          [name]: pascalCasedName,
           'element-ui': 'ElementUI',
           'vue': 'Vue',
         },
