@@ -1,7 +1,7 @@
 import SwalPreset from 'sweetalert2-preset'
 import { conclude } from 'vue-global-config'
+import { globalProps } from '../install'
 import { notEmpty } from '../utils'
-import { globalProps } from '../index'
 
 export default {
   props: {

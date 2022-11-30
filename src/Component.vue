@@ -1,8 +1,14 @@
 <template>
   <el-dialog
-    v-if="show" :visible="show" :fullscreen="true" :append-to-body="true"
-    :show-close="false" destroy-on-close custom-class="coord-picker"
-    @close="$emit('update:show', false)" v-on="$listeners"
+    v-if="show"
+    :visible="show"
+    :fullscreen="true"
+    :append-to-body="true"
+    :show-close="false"
+    destroy-on-close
+    custom-class="coord-picker"
+    @close="$emit('update:show', false)"
+    v-on="$listeners"
   >
     <!-- <div slot="title" class="title">
       <span v-text="title||'坐标拾取'" class="title-text"/>
@@ -11,14 +17,20 @@
       <div class="autoComplete-wrapper">
         <span class="magnifier" />
         <input
-          id="autoComplete" v-model="keyword" tabindex="1" @keyup.enter="e => {
+          id="autoComplete"
+          v-model="keyword"
+          tabindex="1"
+          @keyup.enter="e => {
             search()
             e.currentTarget.blur()
           }"
         >
         <KiSelect
-          ref="regionKiSelect" v-model="baseCity" class="region-selector"
-          placeholder="当前城市" :options="cities"
+          ref="regionKiSelect"
+          v-model="baseCity"
+          class="region-selector"
+          placeholder="当前城市"
+          :options="cities"
           :props="{ value: 'id', label: 'name', groupLabel: 'name', groupOptions: 'cities' }"
           @update:label="(n) => {
             map.setCity(n)
@@ -30,8 +42,17 @@
         enter-active-class="animate__animated animate__backInLeft"
         leave-active-class="animate__animated animate__backOutLeft"
       >
-        <div v-show="searchResult.length > 0" v-loading="searching" class="drawer">
-          <div v-for="(v, i) of searchResult" :key="i" class="item" @click="locate(v)">
+        <div
+          v-show="searchResult.length > 0"
+          v-loading="searching"
+          class="drawer"
+        >
+          <div
+            v-for="(v, i) of searchResult"
+            :key="i"
+            class="item"
+            @click="locate(v)"
+          >
             <div>{{ v.name }}</div>
             <div>{{ v.address }}</div>
           </div>
@@ -42,17 +63,26 @@
         <span>搜索</span>
       </div> -->
       <div
-        id="map-container" ref="map-container" v-loading="Loading"
+        id="map-container"
+        ref="map-container"
+        v-loading="Loading"
         element-loading-custom-class="map-container"
       />
 
-      <div id="panel" class="scrollbar1">
+      <div
+        id="panel"
+        class="scrollbar1"
+      >
         <ul id="myList" />
       </div>
     </div>
 
     <Toolbar>
-      <el-tooltip effect="dark" content="使用帮助" placement="bottom">
+      <el-tooltip
+        effect="dark"
+        content="使用帮助"
+        placement="bottom"
+      >
         <a @click.stop="help">
           <svg viewBox="0 0 24 24">
             <path
@@ -74,14 +104,16 @@
             />
           </svg>
         </a>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="reset">
-            重置点位
-          </el-dropdown-item>
-          <el-dropdown-item command="clear">
-            清除点位
-          </el-dropdown-item>
-        </el-dropdown-menu>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item command="reset">
+              重置点位
+            </el-dropdown-item>
+            <el-dropdown-item command="clear">
+              清除点位
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
       </el-dropdown>
       <el-dropdown
         v-if="(polyline && polyline.length) || PolylineMaxCount > 0"
@@ -96,14 +128,16 @@
             />
           </svg>
         </a>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="reset">
-            重置折线
-          </el-dropdown-item>
-          <el-dropdown-item command="clear">
-            清除折线
-          </el-dropdown-item>
-        </el-dropdown-menu>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item command="reset">
+              重置折线
+            </el-dropdown-item>
+            <el-dropdown-item command="clear">
+              清除折线
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
       </el-dropdown>
       <el-dropdown
         v-if="(rectangle && rectangle.length) || RectangleMaxCount > 0"
@@ -111,7 +145,10 @@
         @command="command => { this[command](['rectangle']) }"
       >
         <a @click.stop="onRectangleBtnClick">
-          <svg viewBox="0 0 100 100" :class="!RectangleMaxCount && 'disabled'">
+          <svg
+            viewBox="0 0 100 100"
+            :class="!RectangleMaxCount && 'disabled'"
+          >
             <path
               fill="currentColor"
               d="M12.55 15C5.662 15 0 20.661 0 27.55c0 6.017 4.317 11.096 10 12.286v20.428c-5.683 1.19-10 6.27-10 12.287C0 79.44 5.661 85.1 12.55 85.1c6.047 0 11.09-4.374 12.241-10.1h50.455c1.152 5.732 6.253 10.1 12.305 10.1c6.65 0 12.105-5.288 12.478-11.852a3.5 3.5 0 0 0 .07-.697a3.5 3.5 0 0 0-.07-.697C99.703 66.117 95.495 61.356 90 60.246V39.854c5.495-1.11 9.703-5.87 10.03-11.606a3.5 3.5 0 0 0 .07-.697a3.5 3.5 0 0 0-.07-.697C99.655 20.29 94.201 15 87.55 15c-6.016 0-11.096 4.317-12.286 10H24.77c-1.19-5.676-6.209-10-12.22-10zm0 7c3.107 0 5.55 2.444 5.55 5.55c0 3.107-2.443 5.55-5.55 5.55C9.445 33.1 7 30.657 7 27.55C7 24.445 9.444 22 12.55 22zm75 0c3.107 0 5.55 2.444 5.55 5.55c0 3.107-2.443 5.55-5.55 5.55c-3.106 0-5.55-2.443-5.55-5.55c0-3.106 2.444-5.55 5.55-5.55zM24.218 32h51.62A12.678 12.678 0 0 0 83 39.225v21.65A12.684 12.684 0 0 0 75.875 68h-51.7A12.64 12.64 0 0 0 17 60.838V39.262A12.638 12.638 0 0 0 24.217 32zM12.55 67c3.106 0 5.549 2.444 5.549 5.55c0 3.107-2.443 5.55-5.55 5.55C9.445 78.1 7 75.657 7 72.55C7 69.445 9.444 67 12.55 67zm75 0c3.106 0 5.549 2.444 5.549 5.55c0 3.107-2.443 5.55-5.55 5.55c-3.106 0-5.55-2.443-5.55-5.55c0-3.106 2.444-5.55 5.55-5.55z"
@@ -119,20 +156,22 @@
             />
           </svg>
         </a>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item
-            v-if="RectangleMaxCount > 0 && RectangleImage.length > 0"
-            command="setCurImage"
-          >
-            选择贴图
-          </el-dropdown-item>
-          <el-dropdown-item command="reset">
-            重置矩形
-          </el-dropdown-item>
-          <el-dropdown-item command="clear">
-            清除矩形
-          </el-dropdown-item>
-        </el-dropdown-menu>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item
+              v-if="RectangleMaxCount > 0 && RectangleImage.length > 0"
+              command="setCurImage"
+            >
+              选择贴图
+            </el-dropdown-item>
+            <el-dropdown-item command="reset">
+              重置矩形
+            </el-dropdown-item>
+            <el-dropdown-item command="clear">
+              清除矩形
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
       </el-dropdown>
       <el-dropdown
         v-if="(polygon && polygon.length) || PolygonMaxCount > 0"
@@ -140,57 +179,87 @@
         @command="command => { this[command](['polygon']) }"
       >
         <a @click.stop="onPolygonBtnClick">
-          <svg viewBox="0 0 256 256" :class="!PolygonMaxCount && 'disabled'">
+          <svg
+            viewBox="0 0 256 256"
+            :class="!PolygonMaxCount && 'disabled'"
+          >
             <path
               fill="currentColor"
               d="M230.6 49.4a31.9 31.9 0 0 0-45.2 0a30.2 30.2 0 0 0-5.2 6.7L152 48.4a32 32 0 0 0-54.6-23a32 32 0 0 0-5.8 37.4L57.7 93.3a32 32 0 0 0-40.3 4.1a31.9 31.9 0 0 0 0 45.2A31.6 31.6 0 0 0 40 152a32.1 32.1 0 0 0 20.3-7.2l70 51.3a32 32 0 0 0 7.1 34.5a31.9 31.9 0 0 0 45.2 0a31.9 31.9 0 0 0 0-45.2a43.3 43.3 0 0 0-4.7-4l27.3-77.5h2.8a31.6 31.6 0 0 0 22.6-9.4a31.9 31.9 0 0 0 0-45.1ZM108.7 36.7a16 16 0 1 1 0 22.6a15.9 15.9 0 0 1 0-22.6Zm-80 94.6a15.9 15.9 0 0 1 0-22.6a16 16 0 1 1 0 22.6Zm142.6 88a16 16 0 0 1-22.6-22.6a16 16 0 0 1 22.6 22.6Zm-8.5-43.2a32.4 32.4 0 0 0-23.1 7.1l-70-51.3a32.4 32.4 0 0 0-1.3-26.7l33.9-30.5A32.4 32.4 0 0 0 120 80a31.6 31.6 0 0 0 22.6-9.4a30.2 30.2 0 0 0 5.2-6.7l28.2 7.7a31.6 31.6 0 0 0 9.4 23a43.3 43.3 0 0 0 4.7 4Zm56.5-92.8a16 16 0 0 1-22.6-22.6a16 16 0 1 1 22.6 22.6Z"
             />
           </svg>
         </a>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="reset">
-            重置多边形
-          </el-dropdown-item>
-          <el-dropdown-item command="clear">
-            清除多边形
-          </el-dropdown-item>
-        </el-dropdown-menu>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item command="reset">
+              重置多边形
+            </el-dropdown-item>
+            <el-dropdown-item command="clear">
+              清除多边形
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
       </el-dropdown>
-      <el-tooltip effect="dark" content="取消" placement="bottom">
-        <el-popconfirm title="不保存并退出" @confirm="cancel" @onConfirm="cancel">
-          <a slot="reference">
-            <svg viewBox="0 0 24 24">
-              <path
-                fill="currentColor"
-                d="M12 20c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m0-18C6.47 2 2 6.47 2 12s4.47 10 10 10s10-4.47 10-10S17.53 2 12 2m2.59 6L12 10.59L9.41 8L8 9.41L10.59 12L8 14.59L9.41 16L12 13.41L14.59 16L16 14.59L13.41 12L16 9.41L14.59 8Z"
-              />
-            </svg>
-          </a>
+      <el-tooltip
+        effect="dark"
+        content="取消"
+        placement="bottom"
+      >
+        <el-popconfirm
+          title="不保存并退出"
+          @confirm="cancel"
+          @onConfirm="cancel"
+        >
+          <template #reference>
+            <a>
+              <svg viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M12 20c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m0-18C6.47 2 2 6.47 2 12s4.47 10 10 10s10-4.47 10-10S17.53 2 12 2m2.59 6L12 10.59L9.41 8L8 9.41L10.59 12L8 14.59L9.41 16L12 13.41L14.59 16L16 14.59L13.41 12L16 9.41L14.59 8Z"
+                />
+              </svg>
+            </a>
+          </template>
         </el-popconfirm>
       </el-tooltip>
       <el-tooltip
-        :class="Loading && 'invisible'" effect="dark" content="确定"
+        :class="Loading && 'invisible'"
+        effect="dark"
+        content="确定"
         placement="bottom"
       >
         <a @click.stop="confirm">
           <svg viewBox="0 0 24 24">
             <g
-              fill="none" stroke="currentColor" stroke-linecap="round"
-              stroke-linejoin="round" stroke-width="2"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
             >
               <path
-                stroke-dasharray="60" stroke-dashoffset="60"
+                stroke-dasharray="60"
+                stroke-dashoffset="60"
                 d="M3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z"
               >
                 <animate
-                  fill="freeze" attributeName="stroke-dashoffset" dur="0.5s"
+                  fill="freeze"
+                  attributeName="stroke-dashoffset"
+                  dur="0.5s"
                   values="60;0"
                 />
               </path>
-              <path stroke-dasharray="14" stroke-dashoffset="14" d="M8 12L11 15L16 10">
+              <path
+                stroke-dasharray="14"
+                stroke-dashoffset="14"
+                d="M8 12L11 15L16 10"
+              >
                 <animate
-                  fill="freeze" attributeName="stroke-dashoffset" begin="0.6s"
-                  dur="0.2s" values="14;0"
+                  fill="freeze"
+                  attributeName="stroke-dashoffset"
+                  begin="0.6s"
+                  dur="0.2s"
+                  values="14;0"
                 />
               </path>
             </g>
@@ -200,30 +269,48 @@
     </Toolbar>
 
     <div
-      v-show="!Loading" id="zoom" class="absolute left-3px bottom-40px"
+      v-show="!Loading"
+      id="zoom"
+      class="absolute left-3px bottom-40px"
       style="color:#3297FD;position:absolute;left:3px;bottom:40px;"
     >
-      <span class="text-45px" style="font-size:35px;">{{
+      <span
+        class="text-45px"
+        style="font-size:35px;"
+      >{{
         MapOptions.zoom
       }}</span>
-      <span class="text-10px" style="font-size:10px;"> 缩放级别</span>
+      <span
+        class="text-10px"
+        style="font-size:10px;"
+      > 缩放级别</span>
     </div>
 
     <KiFormDialog
-      v-model="imagePicker.data" :show.sync="imagePicker.show" append-to-body
-      :retrieve="imagePicker.retrieve" :submit="imagePicker.submit" title="选择嵌在矩形内的贴图"
+      v-model="imagePicker.data"
+      :show.sync="imagePicker.show"
+      append-to-body
+      :retrieve="imagePicker.retrieve"
+      :submit="imagePicker.submit"
+      title="选择嵌在矩形内的贴图"
       custom-class="imagePicker"
     >
       <div flex="~">
-        <PicViewer :value="RectangleImage" :viewerjs="false">
+        <PicViewer
+          :value="RectangleImage"
+          :viewerjs="false"
+        >
           <template #default="{ src }">
             <div class="inline-block relative">
               <img
-                :src="src" class="h-148px cursor-pointer" alt=""
+                :src="src"
+                class="h-148px cursor-pointer"
+                alt=""
                 @click="changeCurImage(src)"
               >
               <svg
-                v-show="imagePicker.data === src" viewBox="0 0 24 24"
+                v-show="imagePicker.data === src"
+                viewBox="0 0 24 24"
                 class="absolute -right-3 -top-3 w-25px"
               >
                 <path
@@ -246,16 +333,17 @@ import SwalPreset from 'sweetalert2-preset'
 import { cloneDeep, debounce } from 'lodash-es'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
-import autoComplete from '@tarekraafat/autocomplete.js/dist/js/autoComplete'
+import AutoComplete from '@tarekraafat/autocomplete.js/dist/js/autoComplete'
 import PicViewer from 'pic-viewer'
 import { conclude } from 'vue-global-config'
 // import './styles/meny-arrow.scss'
+import './styles/sweetalert2.scss'
 import './styles/autocomplete.scss'
 import './styles/marker-list.scss'
 import { pascalCasedName as name } from '../package.json'
 import { isEmpty, notEmpty } from './utils'
 import cities from './assets/city.json'
-import { globalProps } from './index'
+import { globalProps } from './install'
 import polygon from '@/mixins/polygon'
 import polyline from '@/mixins/polyline'
 import rectangle from '@/mixins/rectangle'
@@ -324,6 +412,7 @@ export default {
       } else if (this.Marker?.length > 0) {
         return 'readonly'
       }
+      return undefined
     },
     Marker() {
       return conclude([this.marker, globalProps.marker], {
@@ -386,13 +475,15 @@ export default {
                 'AMap.RectangleEditor',
               ]
             : [],
-          ...this.PolylineStatus === 'editable' ? [
-            'AMap.MouseTool',
-            'AMap.ContextMenu',
-            'AMap.PolyEditor', // 2.x为 AMap.PolylineEditor
-            'AMap.LabelsLayer',
-            'AMap.LabelMarker',
-          ] : [],
+          ...this.PolylineStatus === 'editable'
+            ? [
+                'AMap.MouseTool',
+                'AMap.ContextMenu',
+                'AMap.PolyEditor', // 2.x为 AMap.PolylineEditor
+                'AMap.LabelsLayer',
+                'AMap.LabelMarker',
+              ]
+            : [],
           ...this.PolylineStatus === 'readonly'
             ? [
                 'AMap.Polyline',
@@ -400,13 +491,15 @@ export default {
                 'AMap.LabelMarker',
               ]
             : [],
-          ...this.PolygonStatus === 'editable' ? [
-            'AMap.MouseTool',
-            'AMap.ContextMenu',
-            'AMap.Polygon',
-            'AMap.DistrictSearch',
-            'AMap.PolyEditor', // 2.x为 AMap.PolygonEditor
-          ] : [],
+          ...this.PolygonStatus === 'editable'
+            ? [
+                'AMap.MouseTool',
+                'AMap.ContextMenu',
+                'AMap.Polygon',
+                'AMap.DistrictSearch',
+                'AMap.PolyEditor', // 2.x为 AMap.PolygonEditor
+              ]
+            : [],
           ...this.PolygonStatus === 'readonly'
             ? [
                 'AMap.Polygon',
@@ -471,7 +564,7 @@ export default {
                 })
 
                 if (!this.autoCompleteInput) {
-                  this.autoCompleteInput = new autoComplete({
+                  this.autoCompleteInput = new AutoComplete({
                     data: { // Data src [Array, Function, Async] | (REQUIRED)
                       src: async () => {
                         if (isEmpty(this.keyword)) {
@@ -596,8 +689,7 @@ export default {
             })
 
             this.$emit('load', AMap)
-          })
-          .catch((e) => {
+          }).catch((e) => {
             this.$emit('update:show', false)
             this.$emit('error', e)
             console.error(e)
@@ -605,8 +697,6 @@ export default {
               titleText: '高德地图初始化失败',
               ...typeof e === 'string' && { text: e },
             })
-          })
-          .finally((e) => {
           })
       } else {
         // 正常退出
@@ -896,7 +986,7 @@ export default {
             return
           }
 
-          this.overlay.markerInstance.map((v) => {
+          this.overlay.markerInstance.forEach((v) => {
             if (v) {
               this.map.remove(v)
             }
@@ -1253,6 +1343,16 @@ export default {
         }
       })
 
+      const focusMarker = (marker) => {
+        marker.setTop(true)
+
+        // 不在地图视野内
+        if (!(this.map.getBounds().contains(marker.getPosition()))) {
+          // 移动到中心
+          this.map.setCenter(marker.getPosition())
+        }
+      }
+
       this.plugins.MarkerList.on('markerMouseover', function (event, record) {
         if (record && record.marker) {
           focusMarker(record.marker)
@@ -1291,16 +1391,6 @@ export default {
 
       // 渲染数据
       this.plugins.MarkerList.render(marker)
-
-      const focusMarker = (marker) => {
-        marker.setTop(true)
-
-        // 不在地图视野内
-        if (!(this.map.getBounds().contains(marker.getPosition()))) {
-          // 移动到中心
-          this.map.setCenter(marker.getPosition())
-        }
-      }
 
       const isElementInViewport = (el) => {
         const rect = el.getBoundingClientRect()
@@ -1341,7 +1431,8 @@ export default {
       }
     },
     async initOverlays(arr) {
-      let centerDesignated = false; let hasOverlay = false
+      let centerDesignated = false
+      let hasOverlay = false
 
       if (!arr || arr.includes('rectangle')) {
         if (this.RectangleImage.length === 1) {
@@ -1349,7 +1440,7 @@ export default {
         }
 
         if (this.Rectangle?.length > 0) {
-          this.Rectangle.map((v) => {
+          this.Rectangle.forEach((v) => {
             const { image, southwest, northeast } = v || {}
             const { lng: southwestLng, lat: southwestLat } = southwest || {}
             const { lng: northeastLng, lat: northeastLat } = northeast || {}
@@ -1409,7 +1500,7 @@ export default {
       if (!arr || arr.includes('marker')) {
         // 传了点位 绘制点位
         if (this.Marker?.length > 0) {
-          cloneDeep(this.Marker).map((v) => {
+          cloneDeep(this.Marker).forEach((v) => {
             v.longitude = v.lng
             v.latitude = v.lat
             delete v.lng
@@ -1571,11 +1662,10 @@ export default {
         })
       }, null, 500)
     },
-    useAMapAPI() {
+    useAMapAPI(...args) {
       this.loading = true
-      const apiName = arguments[0]
+      const apiName = args[0]
       const [plugin, fn] = apiName.split('.')
-      const args = Array.from(arguments)
       args.shift()
       return new Promise((resolve, reject) => {
         this.plugins[plugin][fn](...args, (status, result) => {

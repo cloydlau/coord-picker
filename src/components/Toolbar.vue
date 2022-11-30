@@ -30,7 +30,8 @@ $btnSize: 30px;
     padding: 3px 8px;
     border: 1px solid rgba(64, 158, 255, 0.2);
 
-    & > .el-tooltip, & > .el-dropdown {
+    &>.el-tooltip,
+    &>.el-dropdown {
       width: $btnSize;
       height: $btnSize;
       display: flex;

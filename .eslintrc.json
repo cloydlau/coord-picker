@@ -22,6 +22,8 @@
     "vue/attribute-hyphenation": 0,
     "curly": 0,
     "brace-style": 0,
-    "@typescript-eslint/brace-style": 0
+    "@typescript-eslint/brace-style": 0,
+    "vue/no-deprecated-dollar-listeners-api": 0,
+    "no-console": 0
   }
 }
