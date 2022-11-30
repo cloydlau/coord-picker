@@ -1,5 +1,4 @@
-import 'sweetalert2-preset/dist/style.css'
-import { warning } from 'sweetalert2-preset'
+import SwalPreset from 'sweetalert2-preset'
 import { conclude } from 'vue-global-config'
 import { notEmpty } from '../utils'
 import { globalProps } from '../index'
@@ -55,7 +54,7 @@ export default {
       // 只读模式点击无效果
       if (this.PolygonMaxCount > 0) {
         if (this.CurrentPolygonCount >= this.PolygonMaxCount) {
-          warning(`最多绘制${this.PolygonMaxCount}个多边形`)
+          SwalPreset.warning(`最多绘制${this.PolygonMaxCount}个多边形`)
         } else {
           this.active = 'polygon'
         }
@@ -106,7 +105,7 @@ export default {
         const polygonContextMenu = new AMap.ContextMenu()
         polygonContextMenu.addItem('删除', (e) => {
           if (this.CurrentPolygonCount <= this.PolygonMinCount) {
-            warning(`至少绘制${this.PolygonMinCount}个多边形`)
+            SwalPreset.warning(`至少绘制${this.PolygonMinCount}个多边形`)
           } else {
             if (editable) {
               this.overlay.polygonEditor[i].close()

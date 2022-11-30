@@ -241,32 +241,34 @@
 </template>
 
 <script>
-import { isEmpty, notEmpty } from './utils'
-import 'kikimore/dist/style.css'
-import { FormDialog as KiFormDialog, Select as KiSelect } from 'kikimore'
-import 'sweetalert2-preset/dist/style.css'
-import { confirm, error, warning } from 'sweetalert2-preset'
+import { FormDialog, Select } from 'kikimore'
+import SwalPreset from 'sweetalert2-preset'
 import { cloneDeep, debounce } from 'lodash-es'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
 import autoComplete from '@tarekraafat/autocomplete.js/dist/js/autoComplete'
+import PicViewer from 'pic-viewer'
+import { conclude } from 'vue-global-config'
 // import './styles/meny-arrow.scss'
 import './styles/autocomplete.scss'
 import './styles/marker-list.scss'
 import { pascalCasedName as name } from '../package.json'
+import { isEmpty, notEmpty } from './utils'
+import cities from './assets/city.json'
+import { globalProps } from './index'
 import polygon from '@/mixins/polygon'
 import polyline from '@/mixins/polyline'
 import rectangle from '@/mixins/rectangle'
 import Toolbar from '@/components/Toolbar.vue'
-import cities from './assets/city.json'
-import 'pic-viewer/dist/style.css'
-import PicViewer from 'pic-viewer'
-import { conclude } from 'vue-global-config'
-import { globalProps } from './index'
 
 export default {
-  components: { Toolbar, KiSelect, KiFormDialog, PicViewer },
   name,
+  components: {
+    [FormDialog.name]: FormDialog,
+    [Select.name]: Select,
+    Toolbar,
+    PicViewer,
+  },
   mixins: [polygon, polyline, rectangle],
   props: {
     show: {
@@ -599,7 +601,7 @@ export default {
             this.$emit('update:show', false)
             this.$emit('error', e)
             console.error(e)
-            error({
+            SwalPreset.error({
               titleText: '高德地图初始化失败',
               ...typeof e === 'string' && { text: e },
             })
@@ -677,7 +679,7 @@ export default {
       this.imagePicker.show = true
     },
     help() {
-      confirm({
+      SwalPreset.confirm({
         titleText: '使用帮助',
         html: `
 <ul style="text-align:left">
@@ -802,7 +804,7 @@ export default {
             this.curImage = this.imagePicker.data
             this.active = 'rectangle'
             if (!this.curImage) {
-              return confirm({
+              return SwalPreset.confirm({
                 title: '您没有选取任何贴图，绘制的矩形将是空心的',
                 customClass: {
                   popup: 'coord-picker-confirm',
@@ -860,27 +862,27 @@ export default {
         switch (v) {
           case 'marker': {
             if (this.MarkerMinCount > 0 && this.CurrentMarkerCount > 0) {
-              warning(`至少绘制${this.MarkerMinCount}个点位`)
+              SwalPreset.warning(`至少绘制${this.MarkerMinCount}个点位`)
               return false
             }
             break
           }
           case 'rectangle': {
             if (this.RectangleMinCount > 0 && this.CurrentRectangleCount > 0) {
-              warning(`至少绘制${this.RectangleMinCount}个矩形`)
+              SwalPreset.warning(`至少绘制${this.RectangleMinCount}个矩形`)
               return false
             }
             break
           }
           case 'polygon':
             if (this.PolygonMinCount > 0 && this.CurrentPolygonCount > 0) {
-              warning(`至少绘制${this.PolygonMinCount}个多边形`)
+              SwalPreset.warning(`至少绘制${this.PolygonMinCount}个多边形`)
               return false
             }
             break
           case 'polyline':
             if (this.PolylineMinCount > 0 && this.CurrentPolylineCount > 0) {
-              warning(`至少绘制${this.PolylineMinCount}条折线`)
+              SwalPreset.warning(`至少绘制${this.PolylineMinCount}条折线`)
               return false
             }
         }
@@ -1042,7 +1044,7 @@ export default {
     },
     drawMarker(markerOptions, isInit = false) {
       if (this.MarkerMaxCount > 1 && this.CurrentMarkerCount >= this.MarkerMaxCount && !isInit) {
-        warning(`最多标记${this.MarkerMaxCount}个点位`)
+        SwalPreset.warning(`最多标记${this.MarkerMaxCount}个点位`)
       } else {
         /* const position = [lng, lat]
         const marker = new AMap.Marker({
@@ -1162,7 +1164,7 @@ export default {
           const contextMenu = new AMap.ContextMenu()
           contextMenu.addItem('删除', (e) => {
             if (this.CurrentMarkerCount <= this.MarkerMinCount) {
-              warning(`至少绘制${this.MarkerMinCount}个点位`)
+              SwalPreset.warning(`至少绘制${this.MarkerMinCount}个点位`)
             } else {
               this.overlay.markerInstance.splice(context.index, 1)
               this.drawMarkerList(this.overlay.markerInstance)
@@ -1328,7 +1330,7 @@ export default {
         this.useAMapAPI('DistrictSearch.search', districtName).then(({ districtList }) => {
           const bounds = districtList?.[0]?.boundaries
           if (bounds?.length) {
-            confirm(`是否绘制${districtName}轮廓？`).then(() => {
+            SwalPreset.confirm(`是否绘制${districtName}轮廓？`).then(() => {
               this.drawPolygon({
                 polygon: Array.from(bounds, v => ({ path: v })),
                 editable: false,
@@ -1585,7 +1587,7 @@ export default {
           resolve(result)
           if (!OK) {
             this.$emit('error', result)
-            error(result.info)
+            SwalPreset.error(result.info)
           }
           this.loading = false
         })

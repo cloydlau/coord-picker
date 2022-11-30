@@ -1,5 +1,4 @@
-import 'sweetalert2-preset/dist/style.css'
-import { warning } from 'sweetalert2-preset'
+import SwalPreset from 'sweetalert2-preset'
 import { conclude } from 'vue-global-config'
 import { notEmpty } from '../utils'
 import { globalProps } from '../index'
@@ -62,7 +61,7 @@ export default {
       // 只读模式点击无效果
       if (this.PolylineMaxCount > 0) {
         if (this.CurrentPolylineCount >= this.PolylineMaxCount) {
-          warning(`最多绘制${this.PolylineMaxCount}条折线`)
+          SwalPreset.warning(`最多绘制${this.PolylineMaxCount}条折线`)
         } else {
           this.active = 'polyline'
         }
@@ -153,7 +152,7 @@ export default {
         const polylineContextMenu = new AMap.ContextMenu()
         polylineContextMenu.addItem('删除', (e) => {
           if (this.CurrentPolylineCount <= this.PolylineMinCount) {
-            warning(`至少绘制${this.PolylineMinCount}条折线`)
+            SwalPreset.warning(`至少绘制${this.PolylineMinCount}条折线`)
           } else {
             if (editable) {
               // 删除折线编辑器

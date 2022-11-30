@@ -1,5 +1,4 @@
-import 'sweetalert2-preset/dist/style.css'
-import { warning } from 'sweetalert2-preset'
+import SwalPreset from 'sweetalert2-preset'
 import { conclude } from 'vue-global-config'
 import { globalProps } from '../index'
 
@@ -62,7 +61,7 @@ export default {
       // 只读模式点击无效果
       if (this.RectangleMaxCount > 0) {
         if (this.CurrentRectangleCount >= this.RectangleMaxCount) {
-          warning(`最多绘制${this.RectangleMaxCount}个矩形`)
+          SwalPreset.warning(`最多绘制${this.RectangleMaxCount}个矩形`)
         } else if (!this.curImage && this.RectangleImage.length > 1) {
           this.imagePicker.show = true
         } else {
@@ -100,7 +99,7 @@ export default {
         const contextMenu = new AMap.ContextMenu()
         contextMenu.addItem('删除', (e) => {
           if (this.CurrentRectangleCount <= this.RectangleMinCount) {
-            warning(`至少绘制${this.RectangleMinCount}个矩形`)
+            SwalPreset.warning(`至少绘制${this.RectangleMinCount}个矩形`)
           } else {
             this.$set(this.overlay.rectangle, i, undefined)
             // 矩形可能是空心的 需要判空
