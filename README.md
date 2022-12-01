@@ -11,7 +11,7 @@
 
 > 坐标拾取工具
 
-![preview](https://raw.githubusercontent.com/cloydlau/coord-picker/master/preview.png)
+![preview](https://raw.githubusercontent.com/cloydlau/coord-picker/main/preview.png)
 
 <br>
 
