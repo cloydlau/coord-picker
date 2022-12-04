@@ -31,6 +31,10 @@
 
 ## 安装
 
+```shell
+npm add coord-picker
+```
+
 ### 外置依赖
 
 - `vue@2`
