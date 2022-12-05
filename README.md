@@ -1,17 +1,22 @@
-# Coord Picker <sup>[![Version Badge][npm-version-svg]][package-url]</sup>
+<h1 align="center">
+  <a href="https://npmjs.com/package/coord-picker" target="_blank" rel="noopener noreferrer">
+    Coord Picker <sup><img alt="version" src="https://versionbadg.es/cloydlau/coord-picker.svg"></sup>
+  </a>
+</h1>
 
-[npm-version-svg]: https://versionbadg.es/cloydlau/coord-picker.svg
-[package-url]: https://npmjs.com/package/coord-picker
+<p align="center">
+  坐标拾取工具
+</p>
 
-<p align="left">
+<p align="center">
   <a href="https://bundlephobia.com/package/coord-picker"><img alt="minzipped size" src="https://img.shields.io/bundlephobia/minzip/coord-picker"></a>
   <a href="https://eslint.org"><img alt="code style" src="https://img.shields.io/badge/code_style-ESLint-4B32C3.svg?logo=eslint"></a>
   <a href="https://conventionalcommits.org"><img alt="conventional commits" src="https://img.shields.io/badge/commits-Conventional-FE5196.svg?logo=conventionalcommits&logoColor=white"></a>
 </p>
 
-> 坐标拾取工具
-
-![preview](https://raw.githubusercontent.com/cloydlau/coord-picker/main/preview.png)
+<p align="center">
+  <img alt="preview" src="https://raw.githubusercontent.com/cloydlau/coord-picker/main/preview.png">
+</p>
 
 <br>
 
@@ -347,13 +352,13 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
 
 ## Events
 
-| 名称              | 说明                                                                                                 | 回调参数 |
-| ----------------- | ---------------------------------------------------------------------------------------------------- | -------- |
-| load              | 高德地图加载完成时，即 [AMapLoader.load().then](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/)   | AMap     |
-| error             | 调用高德 API 报错时，含 [AMapLoader.load().catch](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) | 同高德   |
-| confirm           | 点击确认按钮时                                                                                       |          |
-| cancel            | 点击取消按钮时                                                                                       |          |
-| ...el-dialog 事件 |
+| 名称    | 说明                                                                                                 | 回调参数 |
+| ------- | ---------------------------------------------------------------------------------------------------- | -------- |
+| load    | 高德地图加载完成时，即 [AMapLoader.load().then](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/)   | AMap     |
+| error   | 调用高德 API 报错时，含 [AMapLoader.load().catch](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) | 同高德   |
+| confirm | 点击确认按钮时                                                                                       |          |
+| cancel  | 点击取消按钮时                                                                                       |          |
+| ...     | `el-dialog` 的 events                                                                                |          |
 
 <br>
 
