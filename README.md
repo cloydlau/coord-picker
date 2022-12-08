@@ -354,7 +354,7 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
 
 | 名称    | 说明                                                                                                 | 回调参数 |
 | ------- | ---------------------------------------------------------------------------------------------------- | -------- |
-| load    | 高德地图加载完成时，即 [AMapLoader.load().then](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/)   | AMap     |
+| load    | 高德地图加载完成时，即 [AMapLoader.load().then](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/)   | `AMap`   |
 | error   | 调用高德 API 报错时，含 [AMapLoader.load().catch](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) | 同高德   |
 | confirm | 点击确认按钮时                                                                                       |          |
 | cancel  | 点击取消按钮时                                                                                       |          |
