@@ -393,6 +393,6 @@ number 和 string 都能接收，但返回时，由于 JS 的 number 类型存�
 
 ## 更新日志
 
-各版本详细改动请参考 [release notes](https://github.com/cloydlau/coord-picker/releases)
+各版本详细改动请参考 [release notes](https://github.com/cloydlau/coord-picker/releases) 。
 
 <br>
