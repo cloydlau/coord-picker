@@ -125,17 +125,17 @@ Vue.use(CoordPicker, {
 
 > 这里仅列出基础参数，覆盖物的参数请在相关章节查看
 
-| 名称              | 说明                                                                                                      | 类型              | 默认值  |
-| ----------------- | --------------------------------------------------------------------------------------------------------- | ----------------- | ------- |
-| show[.sync]       | 开关                                                                                                      | boolean           | `false` |
-| loadOptions       | [AMapLoader.load 的参数](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) ，其中 `loadOptions.key` 必传 | object            |         |
-| mapOptions[.sync] | [AMap.Map 的参数2](https://lbs.amap.com/api/javascript-api/reference/map)                                 | object            |         |
-| city              | 初始行政区                                                                                                | string            |         |
-| lng[.sync]        | 经度                                                                                                      | string / number   |
-| lat[.sync]        | 纬度                                                                                                      | string / number   |
-| precision         | 坐标精度（保留几位小数）                                                                                  | number            | `6`     |
-| address[.sync]    | 地址                                                                                                      | string            |
-| addressComponent  | 地址成分                                                                                                  | object / function |         |
+| 名称              | 说明                                                                                                      | 类型                                                                                                                           | 默认值  |
+| ----------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------- |
+| show[.sync]       | 开关                                                                                                      | boolean                                                                                                                        | `false` |
+| loadOptions       | [AMapLoader.load 的参数](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) ，其中 `loadOptions.key` 必传 | object                                                                                                                         |         |
+| mapOptions[.sync] | [AMap.Map 的参数2](https://lbs.amap.com/api/javascript-api/reference/map)                                 | object                                                                                                                         |         |
+| city              | 初始行政区                                                                                                | string                                                                                                                         |         |
+| lng[.sync]        | 经度                                                                                                      | string / number                                                                                                                |
+| lat[.sync]        | 纬度                                                                                                      | string / number                                                                                                                |
+| precision         | 坐标精度（保留几位小数）                                                                                  | number                                                                                                                         | `6`     |
+| address[.sync]    | 地址                                                                                                      | string                                                                                                                         |
+| addressComponent  | 地址成分                                                                                                  | object / (addressComponent: [AddressComponent](https://lbs.amap.com/api/javascript-api/reference/lnglat-to-address)) => string |         |
 
 > ⚠ 在打开 `coord-picker` 之前，请确保所有参数已传入，为避免与用户的操作发生冲突，组件内部不会监听参数后续的变化。
 
