@@ -5,7 +5,7 @@
 </h1>
 
 <p align="center">
-  坐标拾取工具
+  坐标拾取工具。
 </p>
 
 <p align="center">
@@ -125,17 +125,17 @@ Vue.use(CoordPicker, {
 
 > 这里仅列出基础参数，覆盖物的参数请在相关章节查看
 
-| 名称              | 说明                                                                                                      | 类型             | 默认值  |
-| ----------------- | --------------------------------------------------------------------------------------------------------- | ---------------- | ------- |
-| show.sync         | 开关                                                                                                      | boolean          | `false` |
-| loadOptions       | [AMapLoader.load 的参数](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) ，其中 `loadOptions.key` 必传 | object           |         |
-| mapOptions[.sync] | [AMap.Map 的参数2](https://lbs.amap.com/api/javascript-api/reference/map)                                 | object           |         |
-| city              | 初始行政区                                                                                                | string           |         |
-| lng.sync          | 经度                                                                                                      | string, number   |
-| lat.sync          | 纬度                                                                                                      | string, number   |
-| precision         | 坐标精度（保留几位小数）                                                                                  | number           | `6`     |
-| address.sync      | 地址                                                                                                      | string           |
-| addressComponent  | 地址成分                                                                                                  | object, function |         |
+| 名称              | 说明                                                                                                      | 类型              | 默认值  |
+| ----------------- | --------------------------------------------------------------------------------------------------------- | ----------------- | ------- |
+| show[.sync]       | 开关                                                                                                      | boolean           | `false` |
+| loadOptions       | [AMapLoader.load 的参数](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) ，其中 `loadOptions.key` 必传 | object            |         |
+| mapOptions[.sync] | [AMap.Map 的参数2](https://lbs.amap.com/api/javascript-api/reference/map)                                 | object            |         |
+| city              | 初始行政区                                                                                                | string            |         |
+| lng[.sync]        | 经度                                                                                                      | string / number   |
+| lat[.sync]        | 纬度                                                                                                      | string / number   |
+| precision         | 坐标精度（保留几位小数）                                                                                  | number            | `6`     |
+| address[.sync]    | 地址                                                                                                      | string            |
+| addressComponent  | 地址成分                                                                                                  | object / function |         |
 
 > ⚠ 在打开 `coord-picker` 之前，请确保所有参数已传入，为避免与用户的操作发生冲突，组件内部不会监听参数后续的变化。
 
@@ -183,16 +183,16 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
 
 ### Props
 
-| 名称        | 说明         | 类型             | 默认值 |
-| ----------- | ------------ | ---------------- | ------ |
-| marker.sync | 点位列表     | object[]         |        |
-| markerCount | 点位数量限制 | number, number[] | `1`    |
+| 名称          | 说明         | 类型                        | 默认值 |
+| ------------- | ------------ | --------------------------- | ------ |
+| marker[.sync] | 点位列表     | object[]                    |        |
+| markerCount   | 点位数量限制 | number / [number?, number?] | `1`    |
 
 #### markerCount
 
 类型
-- `number`: 数量上限
-- `number[]`: [数量下限, 数量上限]
+- number: 数量上限
+- [number?, number?]: [数量下限, 数量上限]
 
 值
 - `markerCount > 0`: 开启编辑点位功能
@@ -225,16 +225,16 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
 
 ### Props
 
-| 名称          | 说明         | 类型             | 默认值 |
-| ------------- | ------------ | ---------------- | ------ |
-| polyline.sync | 折线列表     | object[]         |        |
-| polylineCount | 折线数量限制 | number, number[] | `0`    |
+| 名称            | 说明         | 类型                        | 默认值 |
+| --------------- | ------------ | --------------------------- | ------ |
+| polyline[.sync] | 折线列表     | object[]                    |        |
+| polylineCount   | 折线数量限制 | number / [number?, number?] | `0`    |
 
 #### polylineCount
 
 类型
-- `number`: 数量上限
-- `number[]`: [数量下限, 数量上限]
+- number: 数量上限
+- [number?, number?]: [数量下限, 数量上限]
 
 值
 - `polylineCount > 0`: 开启编辑折线功能
@@ -269,17 +269,17 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
 
 ### Props
 
-| 名称           | 说明                 | 类型             | 默认值 |
-| -------------- | -------------------- | ---------------- | ------ |
-| rectangle.sync | 矩形                 | object[]         |        |
-| rectangleCount | 矩形数量限制         | number, number[] | `0`    |
-| rectangleImage | 嵌在矩形内的贴图链接 | string, string[] |        |
+| 名称             | 说明                 | 类型                        | 默认值 |
+| ---------------- | -------------------- | --------------------------- | ------ |
+| rectangle[.sync] | 矩形                 | object[]                    |        |
+| rectangleCount   | 矩形数量限制         | number / [number?, number?] | `0`    |
+| rectangleImage   | 嵌在矩形内的贴图链接 | string / string[]           |        |
 
 #### rectangleCount
 
 类型
-- `number`: 数量上限
-- `number[]`: [数量下限, 数量上限]
+- number: 数量上限
+- [number?, number?]: [数量下限, 数量上限]
 
 值
 - `rectangleCount > 0`: 开启编辑矩形功能
@@ -310,16 +310,16 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
 
 ### Props
 
-| 名称         | 说明           | 类型             | 默认值 |
-| ------------ | -------------- | ---------------- | ------ |
-| polygon.sync | 多边形列表     | object[]         |        |
-| polygonCount | 多边形数量限制 | number, number[] | `0`    |
+| 名称           | 说明           | 类型                        | 默认值 |
+| -------------- | -------------- | --------------------------- | ------ |
+| polygon[.sync] | 多边形列表     | object[]                    |        |
+| polygonCount   | 多边形数量限制 | number / [number?, number?] | `0`    |
 
 #### polygonCount
 
 类型
-- `number`: 数量上限
-- `number[]`: [数量下限, 数量上限]
+- number: 数量上限
+- [number?, number?]: [数量下限, 数量上限]
 
 值
 - `polygonCount > 0`: 开启编辑多边形功能
@@ -384,15 +384,15 @@ number 和 string 都能接收，但返回时，由于 JS 的 number 类型存�
 
 ## 命名
 
-为什么不使用全称 `longitude` 和 `latitude` ？
+为什么不使用全称 longitude 和 latitude ？
 
-- 高德自己的 API 也没有完全统一，有的用简称有的用全称，coord-picker 为方便起见统一使用简称 `lng` 和 `lat`
+- 高德自己的 API 也没有完全统一，有的用简称有的用全称，coord-picker 为方便起见统一使用简称 lng 和 lat
 - 如果命名 / 格式与你所需不一致，可考虑二次封装
 
 <br>
 
 ## 更新日志
 
-各版本详细改动请参考 [release notes](https://github.com/cloydlau/coord-picker/releases) 。
+各版本详细改动请参考 [release notes](https://github.com/cloydlau/coord-picker/releases)
 
 <br>

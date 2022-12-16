@@ -7,7 +7,7 @@ import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 import Icons from 'unplugin-icons/vite'
 import dts from 'vite-plugin-dts'
 import AutoImport from 'unplugin-auto-import/vite'
-import { name, pascalCasedName } from './package.json'
+import { name, PascalCasedName } from './package.json'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -62,7 +62,7 @@ export default defineConfig({
       external: ['element-ui', 'vue'],
       output: {
         globals: {
-          [name]: pascalCasedName,
+          [name]: PascalCasedName,
           'element-ui': 'ElementUI',
           'vue': 'Vue',
         },
