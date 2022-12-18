@@ -22,15 +22,15 @@
 
 ## 特性
 
-- 坐标拾取、绘制点位（双向绑定坐标）
-- 拖拉拽绘制折线（双向绑定坐标）
-- 拖拉拽绘制矩形、内嵌贴图的矩形（双向绑定坐标）
-- 拖拉拽绘制多边形（双向绑定坐标）
+- 坐标拾取、绘制点位 (双向绑定坐标)
+- 拖拉拽绘制折线 (双向绑定坐标)
+- 拖拉拽绘制矩形、内嵌贴图的矩形 (双向绑定坐标)
+- 拖拉拽绘制多边形 (双向绑定坐标)
 - 覆盖物支持只读模式 & 编辑模式
 - 支持限定覆盖物的数量上限、下限
 - POI 搜索、搜索关键字自动补全
 - 根据传参情况智能初始化至合适的位置
-- 局部注册 + 局部传参，也可以全局注册 + 全局传参（[vue-global-config](https://github.com/cloydlau/vue-global-config) 提供技术支持）
+- 局部注册 + 局部传参，也可以全局注册 + 全局传参 ([vue-global-config](https://github.com/cloydlau/vue-global-config) 提供技术支持)
 
 <br>
 
@@ -73,7 +73,7 @@ Vue.use(CoordPicker, {
 
 ### CDN + ESM
 
-> ⚠ 暂不支持（ElementUI 未提供 ESM 导出）
+> ⚠ 暂不支持 (ElementUI 未提供 ESM 导出)
 
 ### CDN + UMD
 
@@ -143,17 +143,17 @@ Vue.use(CoordPicker, {
 
 高德 Web 服务 API 的同名参数。
 
-可选值: 指定城市的中文（如北京）、指定城市的中文全拼（beijing）、citycode（010）、adcode（110000），不支持县级市。当指定城市查询内容为空时，会进行全国范围内的地址转换检索。
+可选值：指定城市的中文 (如北京)、指定城市的中文全拼 (beijing)、citycode (010)、adcode (110000)，不支持县级市。当指定城市查询内容为空时，会进行全国范围内的地址转换检索。
 
 adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/download)获取。
 
-长度超过6位数？
+长度超过 6 位数？
 
-组件内部做了处理，如果你传入的 city 超过6位数，也会以仅保留前6位的形式支持。
+组件内部做了处理，如果你传入的 city 超过 6 位数，也会以仅保留前 6 位的形式支持。
 
 ### addressComponent
 
-获取的 address 默认是包含省市区的完整地址，你可以用以下两种方式来自定义地址成分:
+获取的 address 默认是包含省市区的完整地址，你可以用以下两种方式来自定义地址成分：
 
 - object
 
@@ -191,12 +191,12 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
 #### markerCount
 
 类型
-- number: 数量上限
-- [number?, number?]: [数量下限, 数量上限]
+- `number`：数量上限
+- `[number?, number?]`：[数量下限，数量上限]
 
 值
-- `markerCount > 0`: 开启编辑点位功能
-- `markerCount === 0`: 依据 marker 参数渲染点位（只读）
+- `markerCount > 0`：开启编辑点位功能
+- `markerCount === 0`：依据 marker 参数渲染点位 (只读)
 
 #### marker
 
@@ -233,12 +233,12 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
 #### polylineCount
 
 类型
-- number: 数量上限
-- [number?, number?]: [数量下限, 数量上限]
+- `number`：数量上限
+- `[number?, number?]`：[数量下限，数量上限]
 
 值
-- `polylineCount > 0`: 开启编辑折线功能
-- `polylineCount === 0`: 依据 polyline 参数渲染折线（只读）
+- `polylineCount > 0`：开启编辑折线功能
+- `polylineCount === 0`：依据 polyline 参数渲染折线 (只读)
 
 #### polyline
 
@@ -278,12 +278,12 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
 #### rectangleCount
 
 类型
-- number: 数量上限
-- [number?, number?]: [数量下限, 数量上限]
+- `number`：数量上限
+- `[number?, number?]`：[数量下限，数量上限]
 
 值
-- `rectangleCount > 0`: 开启编辑矩形功能
-- `rectangleCount === 0`: 依据 rectangle 参数渲染矩形（只读）
+- `rectangleCount > 0`：开启编辑矩形功能
+- `rectangleCount === 0`：依据 rectangle 参数渲染矩形 (只读)
 
 #### rectangle
 
@@ -318,12 +318,12 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
 #### polygonCount
 
 类型
-- number: 数量上限
-- [number?, number?]: [数量下限, 数量上限]
+- `number`：数量上限
+- `[number?, number?]`：[数量下限，数量上限]
 
 值
-- `polygonCount > 0`: 开启编辑多边形功能
-- `polygonCount === 0`: 依据 polygon 参数渲染多边形（只读）
+- `polygonCount > 0`：开启编辑多边形功能
+- `polygonCount === 0`：依据 polygon 参数渲染多边形 (只读)
 
 #### polygon
 
@@ -378,13 +378,13 @@ number 和 string 都能接收，但返回时，由于 JS 的 number 类型存�
 
 1.4.15
 
-> 2.0存在诸多问题，性能也不如1.x，等待后续更新
+> 2.0 存在诸多问题，性能也不如 1.x，等待后续更新
 
 <br>
 
 ## 命名
 
-为什么不使用全称 longitude 和 latitude ？
+为什么不使用全称 longitude 和 latitude？
 
 - 高德自己的 API 也没有完全统一，有的用简称有的用全称，coord-picker 为方便起见统一使用简称 lng 和 lat
 - 如果命名 / 格式与你所需不一致，可考虑二次封装
@@ -393,6 +393,6 @@ number 和 string 都能接收，但返回时，由于 JS 的 number 类型存�
 
 ## 更新日志
 
-各版本详细改动请参考 [release notes](https://github.com/cloydlau/coord-picker/releases) 。
+各版本详细改动请参考 [release notes](https://github.com/cloydlau/coord-picker/releases)。
 
 <br>

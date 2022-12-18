@@ -35,7 +35,7 @@
     "dev": "vite --open",
     "build": "vite build",
     "serve": "vite preview",
-    "release": "npx case-police --fix && npx lint-staged && pnpm build && cl release"
+    "release": "npx case-police --fix && npx zhlint README.md --fix && npx lint-staged && pnpm build && cl release"
   },
   "peerDependencies": {
     "element-ui": ">=2",
@@ -46,7 +46,7 @@
     "@tarekraafat/autocomplete.js": "^9.1.1",
     "kikimore": "^0.11.1",
     "lodash-es": "^4.17.21",
-    "pic-viewer": "^0.8.3",
+    "pic-viewer": "^0.8.4",
     "sweetalert2": "^11.6.15",
     "sweetalert2-preset": "^0.2.0",
     "vue-global-config": "^0.3.0"
@@ -57,15 +57,15 @@
     "@commitlint/config-conventional": "^17.3.0",
     "@iconify/json": "^2.1.153",
     "@types/lodash-es": "^4.17.6",
-    "@types/node": "^18.11.15",
+    "@types/node": "^18.11.17",
     "@vitejs/plugin-vue2": "^2.2.0",
     "case-police": "^0.5.10",
     "element-ui": "^2.15.12",
-    "eslint": "^8.29.0",
+    "eslint": "^8.30.0",
     "husky": "^8.0.2",
-    "json-editor-vue": "^0.10.2",
+    "json-editor-vue": "^0.10.4",
     "lint-staged": "^13.1.0",
-    "sass": "^1.56.2",
+    "sass": "^1.57.0",
     "typescript": "^4.9.4",
     "unocss": "^0.47.6",
     "unplugin-auto-import": "^0.12.1",
@@ -74,7 +74,8 @@
     "vite": "^4.0.1",
     "vite-plugin-css-injected-by-js": "^2.1.1",
     "vite-plugin-dts": "^1.7.1",
-    "vue": "^2.7.14"
+    "vue": "^2.7.14",
+    "zhlint": "^0.7.1"
   },
   "lint-staged": {
     "{src,__tests__}/**.*": [
