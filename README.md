@@ -37,7 +37,7 @@
 ## 安装
 
 ```shell
-npm add coord-picker
+npm i coord-picker
 ```
 
 ### 外置依赖
