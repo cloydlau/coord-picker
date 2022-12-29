@@ -42,8 +42,8 @@ npm i coord-picker
 
 ### 外置依赖
 
-- `vue@2`
-- `element-ui`
+- vue@2
+- element-ui
 
 ### 局部注册
 
