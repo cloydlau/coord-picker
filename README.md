@@ -358,7 +358,7 @@ adcode 信息可参考[城市编码表](https://lbs.amap.com/api/webservice/down
 | error   | 调用高德 API 报错时，含 [AMapLoader.load().catch](https://lbs.amap.com/api/jsapi-v2/guide/abc/load/) | 同高德   |
 | confirm | 点击确认按钮时                                                                                       |          |
 | cancel  | 点击取消按钮时                                                                                       |          |
-| ...     | `el-dialog` 的 events                                                                                |          |
+| ...     | `el-dialog` 的事件                                                                                   |          |
 
 <br>
 
