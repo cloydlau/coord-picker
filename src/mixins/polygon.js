@@ -33,7 +33,7 @@ export default {
       return Array.isArray(this.PolygonCount) ? this.PolygonCount[0] : undefined
     },
     CurrentPolygonCount() {
-      return this.overlay.polygonInstance.filter(v => v).length
+      return this.overlay.polygonInstance.filter((v) => v).length
     },
   },
   data() {
@@ -67,7 +67,7 @@ export default {
         if (v) {
           // 新创建的polygon getPath()获取的lng和lat默认只保留6位小数 而R和Q是完整的
           this.overlay.polygon.push({
-            path: Array.from(v.getPath(), v => ({ lng: this.roundOff(v.R), lat: this.roundOff(v.Q) })),
+            path: Array.from(v.getPath(), (v) => ({ lng: this.roundOff(v.R), lat: this.roundOff(v.Q) })),
           })
         }
       })
@@ -82,12 +82,14 @@ export default {
             }
           }
           if (path.length > 0) {
-            this.overlay.polygonInstance.push(new AMap.Polygon({
-              ...this.polygonStyle,
-              fillColor: '#00D3FC',
-              map: this.map,
-              path,
-            }))
+            this.overlay.polygonInstance.push(
+              new AMap.Polygon({
+                ...this.polygonStyle,
+                fillColor: '#00D3FC',
+                map: this.map,
+                path,
+              }),
+            )
             this.editPolygon({ editable })
           }
         }
@@ -103,18 +105,22 @@ export default {
 
       if (this.PolygonStatus === 'editable') {
         const polygonContextMenu = new AMap.ContextMenu()
-        polygonContextMenu.addItem('删除', (e) => {
-          if (this.CurrentPolygonCount <= this.PolygonMinCount) {
-            SwalPreset.warning(`至少绘制${this.PolygonMinCount}个多边形`)
-          } else {
-            if (editable) {
-              this.overlay.polygonEditor[i].close()
-              this.$set(this.overlay.polygonEditor, i, undefined)
+        polygonContextMenu.addItem(
+          '删除',
+          (e) => {
+            if (this.CurrentPolygonCount <= this.PolygonMinCount) {
+              SwalPreset.warning(`至少绘制${this.PolygonMinCount}个多边形`)
+            } else {
+              if (editable) {
+                this.overlay.polygonEditor[i].close()
+                this.$set(this.overlay.polygonEditor, i, undefined)
+              }
+              this.overlay.polygonInstance[i].setMap(null)
+              this.$set(this.overlay.polygonInstance, i, undefined)
             }
-            this.overlay.polygonInstance[i].setMap(null)
-            this.$set(this.overlay.polygonInstance, i, undefined)
-          }
-        }, 0)
+          },
+          0,
+        )
         this.overlay.polygonInstance[i].on('rightclick', (e) => {
           polygonContextMenu.open(this.map, e.lnglat)
         })

@@ -25,7 +25,7 @@ export default {
       const temp = conclude([this.rectangleImage, globalProps.rectangleImage, []], {
         type: [String, Array],
       })
-      return (typeof temp === 'string') ? [temp] : temp
+      return typeof temp === 'string' ? [temp] : temp
     },
     RectangleCount() {
       return conclude([this.rectangleCount, globalProps.rectangleCount, 0], {
@@ -39,7 +39,7 @@ export default {
       return Array.isArray(this.RectangleCount) ? this.RectangleCount[0] : undefined
     },
     CurrentRectangleCount() {
-      return this.overlay.rectangleInstance.filter(v => v).length
+      return this.overlay.rectangleInstance.filter((v) => v).length
     },
   },
   data() {
@@ -73,7 +73,7 @@ export default {
       // 兼容1.x
       this.overlay.rectangle[i] = {
         ...this.overlay.rectangle[i],
-        ...image && { image },
+        ...(image && { image }),
         northeast: {
           lng: bounds.northEast ? this.roundOff(bounds.northEast.lng) : this.roundOff(bounds.northeast.lng),
           lat: bounds.northEast ? this.roundOff(bounds.northEast.lat) : this.roundOff(bounds.northeast.lat),
@@ -97,24 +97,28 @@ export default {
 
       if (this.RectangleStatus === 'editable') {
         const contextMenu = new AMap.ContextMenu()
-        contextMenu.addItem('删除', (e) => {
-          if (this.CurrentRectangleCount <= this.RectangleMinCount) {
-            SwalPreset.warning(`至少绘制${this.RectangleMinCount}个矩形`)
-          } else {
-            this.$set(this.overlay.rectangle, i, undefined)
-            // 矩形可能是空心的 需要判空
-            if (editable && this.overlay.rectangleEditor[i]) {
-              this.overlay.rectangleEditor[i].close()
-              this.$set(this.overlay.rectangleEditor, i, undefined)
+        contextMenu.addItem(
+          '删除',
+          (e) => {
+            if (this.CurrentRectangleCount <= this.RectangleMinCount) {
+              SwalPreset.warning(`至少绘制${this.RectangleMinCount}个矩形`)
+            } else {
+              this.$set(this.overlay.rectangle, i, undefined)
+              // 矩形可能是空心的 需要判空
+              if (editable && this.overlay.rectangleEditor[i]) {
+                this.overlay.rectangleEditor[i].close()
+                this.$set(this.overlay.rectangleEditor, i, undefined)
+              }
+              this.overlay.rectangleInstance[i].setMap(null)
+              this.$set(this.overlay.rectangleInstance, i, undefined)
+              if (this.overlay.imageLayerInstance[i]) {
+                this.overlay.imageLayerInstance[i].setMap(null)
+                this.$set(this.overlay.imageLayerInstance, i, undefined)
+              }
             }
-            this.overlay.rectangleInstance[i].setMap(null)
-            this.$set(this.overlay.rectangleInstance, i, undefined)
-            if (this.overlay.imageLayerInstance[i]) {
-              this.overlay.imageLayerInstance[i].setMap(null)
-              this.$set(this.overlay.imageLayerInstance, i, undefined)
-            }
-          }
-        }, 0)
+          },
+          0,
+        )
         rectangleInstance.on('rightclick', (e) => {
           contextMenu.open(this.map, e.lnglat)
         })

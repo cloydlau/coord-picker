@@ -35,7 +35,7 @@
     "dev": "vite --open",
     "build": "vite build",
     "serve": "vite preview",
-    "release": "npx case-police --fix && npx zhlint README.md --fix && npx lint-staged && pnpm build && cl release"
+    "release": "npx lint-staged && pnpm build && cl release"
   },
   "peerDependencies": {
     "element-ui": ">=2",
@@ -52,7 +52,6 @@
     "vue-global-config": "^0.3.1"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.34.1",
     "@commitlint/cli": "^17.4.1",
     "@commitlint/config-conventional": "^17.4.0",
     "@iconify/json": "^2.2.4",
@@ -61,10 +60,10 @@
     "@vitejs/plugin-vue2": "^2.2.0",
     "case-police": "^0.5.10",
     "element-ui": "^2.15.12",
-    "eslint": "^8.31.0",
     "husky": "^8.0.3",
     "json-editor-vue": "^0.10.5",
     "lint-staged": "^13.1.0",
+    "rome": "^11.0.0",
     "sass": "^1.57.1",
     "typescript": "^4.9.4",
     "unocss": "^0.47.6",
@@ -78,8 +77,10 @@
     "zhlint": "^0.7.1"
   },
   "lint-staged": {
-    "{src,__tests__}/**.*": [
-      "eslint --fix"
+    "{src,__tests__}/**.*": "rome check",
+    "*.md": [
+      "case-police --fix",
+      "zhlint --fix"
     ]
   },
   "publishConfig": {

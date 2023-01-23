@@ -33,7 +33,7 @@ export default {
       return Array.isArray(this.PolylineCount) ? this.PolylineCount[0] : undefined
     },
     CurrentPolylineCount() {
-      return this.overlay.polylineInstance.filter(v => v).length
+      return this.overlay.polylineInstance.filter((v) => v).length
     },
   },
   data() {
@@ -74,7 +74,7 @@ export default {
         if (v) {
           // 新创建的 polyline，getPath() 获取的 lng 和 lat 默认只保留6位小数 而 R 和 Q 是完整的
           this.overlay.polyline.push({
-            path: Array.from(v.getPath(), v => ({ lng: this.roundOff(v.R), lat: this.roundOff(v.Q) })),
+            path: Array.from(v.getPath(), (v) => ({ lng: this.roundOff(v.R), lat: this.roundOff(v.Q) })),
           })
         }
       })
@@ -89,10 +89,12 @@ export default {
             }
           }
           if (path.length > 0) {
-            this.overlay.polylineInstance.push(new AMap.Polyline({
-              ...this.polylineStyle,
-              path,
-            }))
+            this.overlay.polylineInstance.push(
+              new AMap.Polyline({
+                ...this.polylineStyle,
+                path,
+              }),
+            )
             this.editPolyline({ editable })
           }
         }
@@ -128,16 +130,18 @@ export default {
           content = '终点'
         }
 
-        labelsLayer.add(new AMap.LabelMarker({
-          position: [R, Q],
-          text: {
-            ...this.labelMarkerStyle,
-            content,
-          },
-          extData: {
-            index,
-          },
-        }))
+        labelsLayer.add(
+          new AMap.LabelMarker({
+            position: [R, Q],
+            text: {
+              ...this.labelMarkerStyle,
+              content,
+            },
+            extData: {
+              index,
+            },
+          }),
+        )
       })
 
       this.overlay.labelsLayer[i] = labelsLayer
@@ -150,24 +154,28 @@ export default {
       // 右键删除
       if (this.PolylineStatus === 'editable') {
         const polylineContextMenu = new AMap.ContextMenu()
-        polylineContextMenu.addItem('删除', (e) => {
-          if (this.CurrentPolylineCount <= this.PolylineMinCount) {
-            SwalPreset.warning(`至少绘制${this.PolylineMinCount}条折线`)
-          } else {
-            if (editable) {
-              // 删除折线编辑器
-              this.overlay.polylineEditor[i].close()
-              this.$set(this.overlay.polylineEditor, i, undefined)
-            }
-            // 删除折线实例
-            this.overlay.polylineInstance[i].setMap(null)
-            this.$set(this.overlay.polylineInstance, i, undefined)
+        polylineContextMenu.addItem(
+          '删除',
+          (e) => {
+            if (this.CurrentPolylineCount <= this.PolylineMinCount) {
+              SwalPreset.warning(`至少绘制${this.PolylineMinCount}条折线`)
+            } else {
+              if (editable) {
+                // 删除折线编辑器
+                this.overlay.polylineEditor[i].close()
+                this.$set(this.overlay.polylineEditor, i, undefined)
+              }
+              // 删除折线实例
+              this.overlay.polylineInstance[i].setMap(null)
+              this.$set(this.overlay.polylineInstance, i, undefined)
 
-            // 删除文本标记
-            this.overlay.labelsLayer[i].setMap(null)
-            this.$set(this.overlay.labelsLayer, i, undefined)
-          }
-        }, 0)
+              // 删除文本标记
+              this.overlay.labelsLayer[i].setMap(null)
+              this.$set(this.overlay.labelsLayer, i, undefined)
+            }
+          },
+          0,
+        )
         this.overlay.polylineInstance[i].on('rightclick', (e) => {
           polylineContextMenu.open(this.map, e.lnglat)
         })
@@ -177,9 +185,14 @@ export default {
 
       // 形状改变时
       this.overlay.polylineInstance[i].on('change', () => {
-        this.debounce('onPolylineChange', () => {
-          this.addLabelsForPolylineNodes()
-        }, null, 100)
+        this.debounce(
+          'onPolylineChange',
+          () => {
+            this.addLabelsForPolylineNodes()
+          },
+          null,
+          100,
+        )
       })
 
       // 初始化折线编辑器
