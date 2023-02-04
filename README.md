@@ -75,7 +75,7 @@ Vue.use(CoordPicker, {
 
 > ⚠ 暂不支持 (ElementUI 未提供 ESM 导出)
 
-### CDN + UMD
+### CDN + IIFE
 
 ```html
 <!DOCTYPE html>
