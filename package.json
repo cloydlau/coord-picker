@@ -5,7 +5,7 @@
   "private": false,
   "packageManager": "pnpm@7.23.0",
   "description": "Coordinates picker for AMap & TMap.",
-  "author": "cloydlau",
+  "author": "Cloyd Lau",
   "license": "MIT",
   "repository": "https://github.com/cloydlau/coord-picker",
   "keywords": [
