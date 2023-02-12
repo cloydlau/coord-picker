@@ -74,7 +74,10 @@ export default {
         if (v) {
           // 新创建的 polyline，getPath() 获取的 lng 和 lat 默认只保留6位小数 而 R 和 Q 是完整的
           this.overlay.polyline.push({
-            path: Array.from(v.getPath(), (v) => ({ lng: this.roundOff(v.R), lat: this.roundOff(v.Q) })),
+            path: Array.from(v.getPath(), (v) => ({
+              lng: this.roundOff(v.R),
+              lat: this.roundOff(v.Q),
+            })),
           })
         }
       })

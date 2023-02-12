@@ -67,7 +67,10 @@ export default {
         if (v) {
           // 新创建的polygon getPath()获取的lng和lat默认只保留6位小数 而R和Q是完整的
           this.overlay.polygon.push({
-            path: Array.from(v.getPath(), (v) => ({ lng: this.roundOff(v.R), lat: this.roundOff(v.Q) })),
+            path: Array.from(v.getPath(), (v) => ({
+              lng: this.roundOff(v.R),
+              lat: this.roundOff(v.Q),
+            })),
           })
         }
       })
