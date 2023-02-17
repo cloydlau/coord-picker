@@ -33,7 +33,7 @@
           :options="cities"
           :props="{ value: 'id', label: 'name', groupLabel: 'name', groupOptions: 'cities' }"
           @update:label="(n) => {
-            map.setCity(n)
+            map?.setCity(n)
             drawDistrict(n)
           }"
         />
