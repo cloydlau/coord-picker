@@ -328,7 +328,7 @@
 </template>
 
 <script>
-import { FormDialog, Select } from 'kikimore'
+import { KiFormDialog, KiSelect } from 'kikimore'
 import SwalPreset from 'sweetalert2-preset'
 import { cloneDeep, debounce } from 'lodash-es'
 import AMapLoader from '@amap/amap-jsapi-loader'
@@ -352,8 +352,8 @@ import Toolbar from '@/components/Toolbar.vue'
 export default {
   name,
   components: {
-    [FormDialog.name]: FormDialog,
-    [Select.name]: Select,
+    KiFormDialog,
+    KiSelect,
     Toolbar,
     PicViewer,
   },
