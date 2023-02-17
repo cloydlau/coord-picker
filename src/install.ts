@@ -1,5 +1,5 @@
 import 'uno.css'
-import { useGlobalConfig } from 'vue-global-config'
+import { resolveConfig } from 'vue-global-config'
 import Component from './Component.vue'
 
 const globalProps: Record<string, any> = {}
@@ -8,7 +8,7 @@ const globalListeners: Record<string, any> = {}
 const globalHooks: Record<string, any> = {}
 
 Component.install = (app: any, options = {}) => {
-  const { props, attrs, listeners, hooks } = useGlobalConfig(options, Component.props)
+  const { props, attrs, listeners, hooks } = resolveConfig(options, Component.props)
   Object.assign(globalProps, props)
   Object.assign(globalAttrs, attrs)
   Object.assign(globalListeners, listeners)
