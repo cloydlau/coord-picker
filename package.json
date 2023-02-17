@@ -77,7 +77,6 @@
     "zhlint": "latest"
   },
   "lint-staged": {
-    "{src,__tests__}/**.*": "rome check",
     "*.md": [
       "case-police --fix",
       "zhlint --fix"
