@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "@amap/amap-jsapi-loader": "latest",
-    "@tarekraafat/autocomplete.js": "latest",
+    "@tarekraafat/autocomplete.js": "9",
     "kikimore": "latest",
     "lodash-es": "latest",
     "pic-viewer": "latest",
