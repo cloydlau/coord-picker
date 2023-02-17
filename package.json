@@ -73,7 +73,7 @@
     "vite": "latest",
     "vite-plugin-css-injected-by-js": "latest",
     "vite-plugin-dts": "latest",
-    "vue": "latest",
+    "vue": "2",
     "zhlint": "latest"
   },
   "lint-staged": {
