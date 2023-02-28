@@ -34,7 +34,7 @@
           :props="{ value: 'id', label: 'name', groupLabel: 'name', groupOptions: 'cities' }"
           @update:label="(n) => {
             map?.setCity(n)
-            drawDistrict(n)
+            // drawDistrict(n)
           }"
         />
       </div>
@@ -399,7 +399,7 @@ export default {
         AutoComplete: null,
         PlaceSearch: null,
         MarkerList: null,
-        DistrictSearch: null,
+        // DistrictSearch: null,
         CitySearch: null,
         LabelsLayer: null,
       },
@@ -496,7 +496,7 @@ export default {
                 'AMap.MouseTool',
                 'AMap.ContextMenu',
                 'AMap.Polygon',
-                'AMap.DistrictSearch',
+                // 'AMap.DistrictSearch',
                 'AMap.PolyEditor', // 2.x为 AMap.PolygonEditor
               ]
             : [],
@@ -862,13 +862,13 @@ export default {
         ? new AMap.AutoComplete(param)
         : new AMap.Autocomplete(param)
       this.plugins.PlaceSearch = new AMap.PlaceSearch(param)
-      if (this.PolygonStatus === 'editable') {
+      /* if (this.PolygonStatus === 'editable') {
         this.plugins.DistrictSearch = new AMap.DistrictSearch({
           subdistrict: 0, // 获取边界不需要返回下级行政区
           extensions: 'all', // 返回行政区边界坐标组等具体信息
           level: 'district', // 行政级别
         })
-      }
+      } */
       /* if (this.polyline?.length || this.PolylineMaxCount > 0) {
         this.plugins.LabelsLayer = new AMap.LabelsLayer({
           //zooms: [10, 18],
@@ -1419,7 +1419,7 @@ export default {
             }).addClass('flash animated')
       }
     },
-    drawDistrict(districtName) {
+    /* drawDistrict(districtName) {
       if (districtName && this.PolygonStatus === 'editable') {
         this.useAMapAPI('DistrictSearch.search', districtName).then(({ districtList }) => {
           const bounds = districtList?.[0]?.boundaries
@@ -1437,7 +1437,7 @@ export default {
           }
         })
       }
-    },
+    }, */
     async initOverlays(arr) {
       let centerDesignated = false
       let hasOverlay = false
@@ -1559,7 +1559,7 @@ export default {
       if (this.show) {
         // 选中搜索项
         if (selectedLocation) {
-          this.drawDistrict(selectedLocation.name)
+          // this.drawDistrict(selectedLocation.name)
           // this.meny.close()
           this.drawMarker({
             ...selectedLocation,
