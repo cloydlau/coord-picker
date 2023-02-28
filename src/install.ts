@@ -2,7 +2,7 @@ import 'uno.css'
 import { resolveConfig } from 'vue-global-config'
 import component from './component.vue'
 
-const globalProps: Record<string, any> = {}
+const globalProps: Record<string | symbol, any> = {}
 
 component.install = (app: any, options = {}) => {
   const { props } = resolveConfig(options, component.props)
