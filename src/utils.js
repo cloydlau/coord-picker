@@ -3,9 +3,9 @@ import { isPlainObject } from 'lodash-es'
 export function isEmpty(value) {
   return {
     object: () =>
-      value === null ||
-      (Array.isArray(value) && value.length === 0) ||
-      (isPlainObject(value) && Object.getOwnPropertyNames(value).length === 0),
+      value === null
+      || (Array.isArray(value) && value.length === 0)
+      || (isPlainObject(value) && Object.getOwnPropertyNames(value).length === 0),
     number: () => Number.isNaN(value),
     string: () => value === '',
     undefined: () => true,

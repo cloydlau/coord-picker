@@ -1,7 +1,10 @@
 <template>
   <div>
-    <CoordPicker v-bind.sync="props" @cancel="console.log('cancel')"
-      @confirm="console.log('confirm')" />
+    <CoordPicker
+      v-bind.sync="props"
+      @cancel="console.log('cancel')"
+      @confirm="console.log('confirm')"
+    />
     <JsonEditorVue v-model="props" />
   </div>
 </template>
@@ -21,7 +24,7 @@ export default {
         address: '',
         city: '',
         marker: [
-          /*{
+          /* {
             address: '望京阜通东大街6号院3号楼',
             lat: '39.989684',
             lng: '116.480989',
@@ -38,7 +41,7 @@ export default {
             pic: 'http://store.is.autonavi.com/showpic/18a7b09e5679767b4016d27bc2b85573?operate=merge&w=160&h=150&position=5',
             //price: '<font color=\'#999999\'>起价:</font><font color=\'#f53623\'>￥</font><font color=\'#f53623\'>414</font>',
             //rating: '4',
-          }*/
+          } */
         ],
         markerCount: 20,
         rectangleImage: 'https://pic4.zhimg.com/80/v2-670a8e55fc0dcb76fc4860c18963aaa8_720w.jpg',
@@ -47,45 +50,45 @@ export default {
             image: 'https://pic4.zhimg.com/80/v2-670a8e55fc0dcb76fc4860c18963aaa8_720w.jpg',
             southwest: { lng: 106.790543, lat: 26.506218 },
             northeast: { lng: 106.682739, lat: 26.610016 },
-          }
+          },
         ],
         rectangleCount: 2,
         polygon: [
           {
-            'path': [
-              { 'lng': '106.44294', 'lat': '26.644338' },
-              { 'lng': '106.431267', 'lat': '26.504937' },
-              { 'lng': '106.569282', 'lat': '26.585405' }
-            ]
+            path: [
+              { lng: '106.44294', lat: '26.644338' },
+              { lng: '106.431267', lat: '26.504937' },
+              { lng: '106.569282', lat: '26.585405' },
+            ],
           }, {
-            'path': [
-              { 'lng': '106.623527', 'lat': '26.52767' },
-              { 'lng': '106.602241', 'lat': '26.415188' },
-              { 'lng': '106.721031', 'lat': '26.472979' }
-            ]
-          }
+            path: [
+              { lng: '106.623527', lat: '26.52767' },
+              { lng: '106.602241', lat: '26.415188' },
+              { lng: '106.721031', lat: '26.472979' },
+            ],
+          },
         ],
         polygonCount: 3,
         polyline: [
           {
             path: [
-              { "lng": "106.627636", "lat": "26.692251" },
-              { "lng": "106.604633", "lat": "26.647459" },
-              { "lng": "106.682224", "lat": "26.658505" }
-            ]
-          }
+              { lng: '106.627636', lat: '26.692251' },
+              { lng: '106.604633', lat: '26.647459' },
+              { lng: '106.682224', lat: '26.658505' },
+            ],
+          },
         ],
         polylineCount: 2,
         precision: 6,
         addressComponent: undefined,
         mapOptions: {
           zoom: 12,
-          //zooms: [12, 15]
-        }
+          // zooms: [12, 15]
+        },
       },
-      /*addressComponent ({ province, city, district }) {
+      /* addressComponent ({ province, city, district }) {
         return province + city + district
-      },*/
+      }, */
       addressComponentType__: 'object',
       addressComponentObject__: undefined,
     }
@@ -96,9 +99,9 @@ export default {
     },
     addressComponentObject__(n) {
       this.addressComponent = n ? JSON.parse(n) : undefined
-    }
+    },
   },
-  methods: {}
+  methods: {},
 }
 </script>
 

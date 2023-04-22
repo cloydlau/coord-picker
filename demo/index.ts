@@ -1,10 +1,9 @@
 import Vue from 'vue'
-import App from './index.vue'
-
 import 'element-ui/lib/theme-chalk/index.css'
 import ElementUI from 'element-ui'
-
 import CoordPicker from '../src'
+import App from './index.vue'
+
 Vue.use(ElementUI)
 window._AMapSecurityConfig = { securityJsCode: import.meta.env.VITE_APP_SCURITY_JS_CODE }
 Vue.use(CoordPicker, {

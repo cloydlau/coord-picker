@@ -26,7 +26,6 @@
           }"
         >
         <KiSelect
-          ref="regionKiSelect"
           v-model="baseCity"
           class="region-selector"
           placeholder="当前城市"
@@ -64,7 +63,6 @@
       </div> -->
       <div
         id="map-container"
-        ref="map-container"
         v-loading="Loading"
         element-loading-custom-class="map-container"
       />
@@ -336,6 +334,7 @@ import '@tarekraafat/autocomplete.js/dist/css/autoComplete.css'
 import AutoComplete from '@tarekraafat/autocomplete.js/dist/js/autoComplete'
 import PicViewer from 'pic-viewer'
 import { conclude } from 'vue-global-config'
+
 // import './styles/meny-arrow.scss'
 import './styles/sweetalert2.scss'
 import './styles/autocomplete.scss'
@@ -659,10 +658,9 @@ export default {
                     /* this.$nextTick(() => {
                       this.mouseTool.rectangle(this.rectangleStyle)
                     }) */
-                  }
                   // 1.x: e.obj.CLASS_NAME==='AMap.Polygon'
                   // 2.x: e.obj.className==='Overlay.Polygon'
-                  else if (this.active === 'polygon') {
+                  } else if (this.active === 'polygon') {
                     // 绘制完毕后，恢复至初始选中的工具
                     this.active = 'marker'
                     e.obj.setOptions({
@@ -1339,6 +1337,7 @@ export default {
 
           // this.openInfoWindowOnRecord(record);
           // 非选中的id
+          // eslint-disable-next-line @typescript-eslint/no-invalid-this
           if (!this.isSelectedDataId(record.id)) {
             // 设置为hover样式
             record.marker.setIconStyle(hoverIconStyle)
@@ -1365,6 +1364,7 @@ export default {
 
           // that.text.setText('右键删除')
 
+          // eslint-disable-next-line @typescript-eslint/no-invalid-this
           if (!this.isSelectedDataId(record.id)) {
             // 设置为hover样式
             record.marker.setIconStyle(hoverIconStyle)
@@ -1377,6 +1377,7 @@ export default {
         // that.text.setText('单击绘制点位')
 
         if (record && record.marker) {
+          // eslint-disable-next-line @typescript-eslint/no-invalid-this
           if (!this.isSelectedDataId(record.id)) {
             // 恢复默认样式
             record.marker.setIconStyle(defaultIconStyle)
@@ -1415,6 +1416,7 @@ export default {
         $listEle
           .one('webkitAnimationEnd oanimationend msAnimationEnd animationend',
             function (e) {
+              // eslint-disable-next-line @typescript-eslint/no-invalid-this
               $(this).removeClass('flash animated')
             }).addClass('flash animated')
       }
@@ -1515,9 +1517,8 @@ export default {
             delete v.lat
             this.overlay.markerInstance.push(v)
           })
-        }
         // 只传了中心点 将中心点当作一个点位
-        else if (notEmpty(this.lng) && notEmpty(this.lat)) {
+        } else if (notEmpty(this.lng) && notEmpty(this.lat)) {
           let address, name
           if (this.address) {
             address = this.address
@@ -1567,9 +1568,8 @@ export default {
             latitude: selectedLocation.location.lat,
           })
           this.setCenter([selectedLocation.location.lng, selectedLocation.location.lat])
-        }
         // 初始化
-        else {
+        } else {
           this.baseCity = await this.getBaseCity()
           this.initPlugins()
 
@@ -1593,15 +1593,13 @@ export default {
           if (notEmpty(this.lng) && notEmpty(this.lat)) {
             this.setCenter([this.lng, this.lat])
             centerDesignated = true
-          }
           // 点位数量为1 定位至该点位
-          else if (this.overlay.markerInstance.length === 1 && notEmpty(this.overlay.markerInstance[0].longitude) && notEmpty(this.overlay.markerInstance[0].latitude)) {
+          } else if (this.overlay.markerInstance.length === 1 && notEmpty(this.overlay.markerInstance[0].longitude) && notEmpty(this.overlay.markerInstance[0].latitude)) {
             const { longitude, latitude } = this.overlay.markerInstance[0]
             this.setCenter([longitude, latitude])
             centerDesignated = true
-          }
           // 定位至 address
-          else if (this.address) {
+          } else if (this.address) {
             const result = await this.useAMapAPI('Geocoder.getLocation', this.address)
             const { lng, lat } = result?.geocodes[0]?.location || {}
             if (notEmpty(lng) && notEmpty(lat)) {
@@ -1613,9 +1611,8 @@ export default {
             // 存在覆盖物，将视图适配覆盖物
             if (hasOverlay) {
               this.map.setFitView()
-            }
             // 定位至 baseCity
-            else if (this.baseCity) {
+            } else if (this.baseCity) {
               this.map.setCity(this.baseCity)
             }
             // setCity 和 setZoom 同步调用时后者无效

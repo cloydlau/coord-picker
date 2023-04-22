@@ -39,7 +39,7 @@ export default {
       return Array.isArray(this.RectangleCount) ? this.RectangleCount[0] : undefined
     },
     CurrentRectangleCount() {
-      return this.overlay.rectangleInstance.filter((v) => v).length
+      return this.overlay.rectangleInstance.filter(v => v).length
     },
   },
   data() {

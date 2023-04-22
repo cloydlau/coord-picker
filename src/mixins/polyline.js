@@ -33,7 +33,7 @@ export default {
       return Array.isArray(this.PolylineCount) ? this.PolylineCount[0] : undefined
     },
     CurrentPolylineCount() {
-      return this.overlay.polylineInstance.filter((v) => v).length
+      return this.overlay.polylineInstance.filter(v => v).length
     },
   },
   data() {
@@ -70,11 +70,11 @@ export default {
     syncPolyline() {
       // 同步可能经过删除、节点变化的折线
       this.overlay.polyline = []
-      this.overlay.polylineInstance.map((v) => {
+      this.overlay.polylineInstance.forEach((v) => {
         if (v) {
           // 新创建的 polyline，getPath() 获取的 lng 和 lat 默认只保留6位小数 而 R 和 Q 是完整的
           this.overlay.polyline.push({
-            path: Array.from(v.getPath(), (v) => ({
+            path: Array.from(v.getPath(), v => ({
               lng: this.roundOff(v.R),
               lat: this.roundOff(v.Q),
             })),
@@ -125,7 +125,7 @@ export default {
       })
 
       const path = this.overlay.polylineInstance[i].w.path
-      path.map(({ R, Q }, index) => {
+      path.forEach(({ R, Q }, index) => {
         let content = String(index + 1)
         if (index === 0) {
           content = '起点'

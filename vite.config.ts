@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'node:path'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue2'
 import UnoCSS from 'unocss/vite'
@@ -7,7 +7,7 @@ import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 import Icons from 'unplugin-icons/vite'
 import dts from 'vite-plugin-dts'
 import AutoImport from 'unplugin-auto-import/vite'
-import { name, PascalCasedName } from './package.json'
+import { PascalCasedName, name } from './package.json'
 
 // https://vitejs.dev/config/
 export default defineConfig({

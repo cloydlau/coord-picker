@@ -3,7 +3,6 @@
   "PascalCasedName": "CoordPicker",
   "version": "0.8.3",
   "private": false,
-  "packageManager": "pnpm@7.23.0",
   "description": "Coordinates picker for AMap & TMap.",
   "author": "Cloyd Lau",
   "license": "MIT",
@@ -43,7 +42,7 @@
   },
   "dependencies": {
     "@amap/amap-jsapi-loader": "latest",
-    "@tarekraafat/autocomplete.js": "9",
+    "@tarekraafat/autocomplete.js": "^9.1.1",
     "kikimore": "latest",
     "lodash-es": "latest",
     "pic-viewer": "latest",
@@ -52,6 +51,7 @@
     "vue-global-config": "latest"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "latest",
     "@commitlint/cli": "latest",
     "@commitlint/config-conventional": "latest",
     "@iconify/json": "latest",
@@ -60,10 +60,10 @@
     "@vitejs/plugin-vue2": "latest",
     "case-police": "latest",
     "element-ui": "latest",
+    "eslint": "latest",
     "husky": "latest",
     "json-editor-vue": "latest",
     "lint-staged": "latest",
-    "rome": "latest",
     "sass": "latest",
     "typescript": "latest",
     "unocss": "latest",
@@ -73,15 +73,12 @@
     "vite": "latest",
     "vite-plugin-css-injected-by-js": "latest",
     "vite-plugin-dts": "latest",
-    "vue": "2",
+    "vue": "^2.7.14",
     "zhlint": "latest"
   },
   "lint-staged": {
-    "{src,__tests__}/**.{js,ts}": "rome check",
-    "*.md": [
-      "case-police --fix",
-      "zhlint --fix"
-    ]
+    "*.md": ["case-police --fix", "zhlint --fix"],
+    "*": "eslint --fix"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
