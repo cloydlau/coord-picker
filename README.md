@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://bundlephobia.com/package/coord-picker"><img alt="minzipped size" src="https://img.shields.io/bundlephobia/minzip/coord-picker"></a>
-  <a href="https://standardjs.com"><img alt="code style" src="https://img.shields.io/badge/code_style-Standard-F3DF49.svg"></a>
+  <a href="https://standardjs.com"><img alt="code style" src="https://img.shields.io/badge/code_style-Standard-F3DF49.svg?logo=standardjs"></a>
   <a href="https://conventionalcommits.org"><img alt="conventional commits" src="https://img.shields.io/badge/commits-Conventional-FE5196.svg?logo=conventionalcommits&logoColor=white"></a>
 </p>
 
