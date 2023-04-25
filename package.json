@@ -1,7 +1,7 @@
 {
   "name": "coord-picker",
   "PascalCasedName": "CoordPicker",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "private": false,
   "description": "Coordinates picker for AMap & TMap.",
   "author": "Cloyd Lau",
@@ -77,7 +77,10 @@
     "zhlint": "latest"
   },
   "lint-staged": {
-    "*.md": ["case-police --fix", "zhlint --fix"],
+    "*.md": [
+      "case-police --fix",
+      "zhlint --fix"
+    ],
     "*": "eslint --fix"
   },
   "publishConfig": {
