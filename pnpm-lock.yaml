@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@amap/amap-jsapi-loader':
     specifier: latest
@@ -74,7 +78,7 @@ devDependencies:
     version: 5.0.4
   unocss:
     specifier: latest
-    version: 0.51.8(postcss@8.4.23)(vite@4.3.1)
+    version: 0.51.8(postcss@8.4.31)(vite@4.3.1)
   unplugin-auto-import:
     specifier: latest
     version: 0.15.3
@@ -1182,7 +1186,7 @@ packages:
       sirv: 2.0.3
     dev: true
 
-  /@unocss/postcss@0.51.8(postcss@8.4.23):
+  /@unocss/postcss@0.51.8(postcss@8.4.31):
     resolution: {integrity: sha512-IWwxGDfd/pqQMBjp1PKplQIeD6uwUs1qxUkJZXIf/BlGE+dMkjIw6Mp72FwYqkMn71hnjU2CMRTbX7RzkKxkmQ==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -1193,7 +1197,7 @@ packages:
       css-tree: 2.3.1
       fast-glob: 3.2.12
       magic-string: 0.30.0
-      postcss: 8.4.23
+      postcss: 8.4.31
     dev: true
 
   /@unocss/preset-attributify@0.51.8:
@@ -1328,7 +1332,7 @@ packages:
     resolution: {integrity: sha512-aNmNHyLPsw+sVvlQFQ2/8sjNuLtK54TC6cuKnVzAY93ks4ZBrvwQSnkkIh7bsbNhum5hJBS00wSDipQ937f5DA==}
     dependencies:
       '@babel/parser': 7.21.4
-      postcss: 8.4.23
+      postcss: 8.4.31
       source-map: 0.6.1
 
   /@vueuse/core@9.13.0(vue@2.7.14):
@@ -1337,7 +1341,7 @@ packages:
       '@types/web-bluetooth': 0.0.16
       '@vueuse/metadata': 9.13.0
       '@vueuse/shared': 9.13.0(vue@2.7.14)
-      vue-demi: 0.14.0(vue@2.7.14)
+      vue-demi: 0.14.6(vue@2.7.14)
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
@@ -1350,7 +1354,7 @@ packages:
   /@vueuse/shared@9.13.0(vue@2.7.14):
     resolution: {integrity: sha512-UrnhU+Cnufu4S6JLCPZnkWh0WwZGUp72ktOF2DFptMlOs3TOdVv8xJN53zhHGARmVOsz5KqOls09+J1NR6sBKw==}
     dependencies:
-      vue-demi: 0.14.0(vue@2.7.14)
+      vue-demi: 0.14.6(vue@2.7.14)
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
@@ -3841,7 +3845,7 @@ packages:
       lodash-es: 4.17.21
       vanilla-jsoneditor: 0.17.1
       vue: 2.7.14
-      vue-demi: 0.14.0(vue@2.7.14)
+      vue-demi: 0.14.6(vue@2.7.14)
       vue-global-config: 0.4.0(vue@2.7.14)
     dev: true
 
@@ -4696,8 +4700,8 @@ packages:
       util-deprecate: 1.0.2
     dev: true
 
-  /postcss@8.4.23:
-    resolution: {integrity: sha512-bQ3qMcpF6A/YjR55xtoTr0jGOlnPOKAIMdOWiv0EIT6HVPEaJiJB4NLljSbiHoC2RX7DN5Uvjtpbg1NPdwv1oA==}
+  /postcss@8.4.31:
+    resolution: {integrity: sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==}
     engines: {node: ^10 || ^12 || >=14}
     dependencies:
       nanoid: 3.3.6
@@ -5650,7 +5654,7 @@ packages:
     engines: {node: '>= 10.0.0'}
     dev: true
 
-  /unocss@0.51.8(postcss@8.4.23)(vite@4.3.1):
+  /unocss@0.51.8(postcss@8.4.31)(vite@4.3.1):
     resolution: {integrity: sha512-uty78ilhQ/HxvjIDLRZ0J6Kb6fSfTKv0afyP7iWQmqoG/qTBR33ambnuTmi2Dt5GzCxAY6tyCaWjK/FZ7mfEYg==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -5663,7 +5667,7 @@ packages:
       '@unocss/cli': 0.51.8
       '@unocss/core': 0.51.8
       '@unocss/extractor-arbitrary-variants': 0.51.8
-      '@unocss/postcss': 0.51.8(postcss@8.4.23)
+      '@unocss/postcss': 0.51.8(postcss@8.4.31)
       '@unocss/preset-attributify': 0.51.8
       '@unocss/preset-icons': 0.51.8
       '@unocss/preset-mini': 0.51.8
@@ -5884,7 +5888,7 @@ packages:
     dependencies:
       '@types/node': 18.16.0
       esbuild: 0.15.18
-      postcss: 8.4.23
+      postcss: 8.4.31
       resolve: 1.22.2
       rollup: 2.79.1
       sass: 1.62.0
@@ -5919,7 +5923,7 @@ packages:
     dependencies:
       '@types/node': 18.16.0
       esbuild: 0.17.18
-      postcss: 8.4.23
+      postcss: 8.4.31
       rollup: 3.21.0
       sass: 1.62.0
     optionalDependencies:
@@ -5987,8 +5991,8 @@ packages:
     dependencies:
       vue: 2.7.14
 
-  /vue-demi@0.14.0(vue@2.7.14):
-    resolution: {integrity: sha512-gt58r2ogsNQeVoQ3EhoUAvUsH9xviydl0dWJj7dabBC/2L4uBId7ujtCwDRD0JhkGsV1i0CtfLAeyYKBht9oWg==}
+  /vue-demi@0.14.6(vue@2.7.14):
+    resolution: {integrity: sha512-8QA7wrYSHKaYgUxDA5ZC24w+eHm3sYCbp0EzcDwKqN3p6HqtTCGR/GVsPyZW92unff4UlcSh++lmqDWN3ZIq4w==}
     engines: {node: '>=12'}
     hasBin: true
     requiresBuild: true
