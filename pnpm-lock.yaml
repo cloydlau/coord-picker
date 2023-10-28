@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@amap/amap-jsapi-loader':
     specifier: latest
@@ -1337,7 +1341,7 @@ packages:
       '@types/web-bluetooth': 0.0.16
       '@vueuse/metadata': 9.13.0
       '@vueuse/shared': 9.13.0(vue@2.7.14)
-      vue-demi: 0.14.0(vue@2.7.14)
+      vue-demi: 0.14.6(vue@2.7.14)
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
@@ -1350,7 +1354,7 @@ packages:
   /@vueuse/shared@9.13.0(vue@2.7.14):
     resolution: {integrity: sha512-UrnhU+Cnufu4S6JLCPZnkWh0WwZGUp72ktOF2DFptMlOs3TOdVv8xJN53zhHGARmVOsz5KqOls09+J1NR6sBKw==}
     dependencies:
-      vue-demi: 0.14.0(vue@2.7.14)
+      vue-demi: 0.14.6(vue@2.7.14)
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
@@ -1657,8 +1661,9 @@ packages:
       randombytes: 2.1.0
     dev: true
 
-  /browserify-sign@4.2.1:
-    resolution: {integrity: sha512-/vrA5fguVAKKAVTNJjgSm1tRQDHUU6DbwO9IROu/0WAzC8PKhucDSh18J0RMvVeHAn5puMd+QHC2erPRNf8lmg==}
+  /browserify-sign@4.2.2:
+    resolution: {integrity: sha512-1rudGyeYY42Dk6texmv7c4VcQ0EsvVbLwZkA+AQB7SxvXxmcD93jcHie8bzecJ+ChDlmAm2Qyu0+Ccg5uhZXCg==}
+    engines: {node: '>= 4'}
     dependencies:
       bn.js: 5.2.1
       browserify-rsa: 4.1.0
@@ -2080,7 +2085,7 @@ packages:
     resolution: {integrity: sha512-fz4spIh+znjO2VjL+IdhEpRJ3YN6sMzITSBijk6FK2UvTqruSQW+/cCZTSNsMiZNvUeq0CqurF+dAbyiGOY6Wg==}
     dependencies:
       browserify-cipher: 1.0.1
-      browserify-sign: 4.2.1
+      browserify-sign: 4.2.2
       create-ecdh: 4.0.4
       create-hash: 1.2.0
       create-hmac: 1.1.7
@@ -3841,7 +3846,7 @@ packages:
       lodash-es: 4.17.21
       vanilla-jsoneditor: 0.17.1
       vue: 2.7.14
-      vue-demi: 0.14.0(vue@2.7.14)
+      vue-demi: 0.14.6(vue@2.7.14)
       vue-global-config: 0.4.0(vue@2.7.14)
     dev: true
 
@@ -5987,8 +5992,8 @@ packages:
     dependencies:
       vue: 2.7.14
 
-  /vue-demi@0.14.0(vue@2.7.14):
-    resolution: {integrity: sha512-gt58r2ogsNQeVoQ3EhoUAvUsH9xviydl0dWJj7dabBC/2L4uBId7ujtCwDRD0JhkGsV1i0CtfLAeyYKBht9oWg==}
+  /vue-demi@0.14.6(vue@2.7.14):
+    resolution: {integrity: sha512-8QA7wrYSHKaYgUxDA5ZC24w+eHm3sYCbp0EzcDwKqN3p6HqtTCGR/GVsPyZW92unff4UlcSh++lmqDWN3ZIq4w==}
     engines: {node: '>=12'}
     hasBin: true
     requiresBuild: true
